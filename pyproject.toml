@@ -1,0 +1,86 @@
+[project]
+name = "redmcp"
+version = "0.1.0"
+description = "Offensive security testing framework for Model Context Protocol (MCP) servers"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "RedMCP Contributors" },
+]
+requires-python = ">=3.11"
+keywords = ["mcp", "security", "red-team", "prompt-injection", "llm", "ai-agents"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: Software Development :: Quality Assurance",
+    "Typing :: Typed",
+]
+dependencies = [
+    "httpx>=0.28.0",
+    "jinja2>=3.1.0",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.7.0",
+    "rich>=13.9.0",
+    "typer>=0.15.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit>=4.0.0",
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.25.0",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.9.0",
+]
+mcp = [
+    "mcp>=1.0.0",
+]
+
+[project.scripts]
+redmcp = "redmcp.cli.main:run"
+
+[project.urls]
+Homepage = "https://github.com/redmcp/redmcp"
+Documentation = "https://github.com/redmcp/redmcp#readme"
+Repository = "https://github.com/redmcp/redmcp"
+Issues = "https://github.com/redmcp/redmcp/issues"
+Changelog = "https://github.com/redmcp/redmcp/blob/main/CHANGELOG.md"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.sdist]
+only-include = ["src", "tests", "README.md", "LICENSE", "NOTICE", "pyproject.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-ra --strict-markers"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 110
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["redmcp"]
+
+[tool.coverage.run]
+source = ["redmcp"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 0
+show_missing = true
