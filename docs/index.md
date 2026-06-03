@@ -8,4 +8,5 @@
 
 ## Roadmap
 
-See the [README](../README.md#features) feature matrix for current status.
+- [Product Roadmap](roadmap.md) — Phased plan from risk scoring to MCP certification
+- [Feature matrix (README)](../README.md#features) — Current module status

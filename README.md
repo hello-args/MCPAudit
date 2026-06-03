@@ -123,6 +123,10 @@ pre-commit install
 | Semgrep | Static analysis |
 | **MCPAudit** | **MCP security** |
 
+## Roadmap
+
+See [docs/roadmap.md](docs/roadmap.md) for the phased plan — category risk scoring, GitHub Action, SARIF, attack simulation, and more.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
