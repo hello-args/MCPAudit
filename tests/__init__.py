@@ -1,1 +1,1 @@
-"""RedMCP test suite."""
+"""MCPVault test suite."""

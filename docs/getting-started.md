@@ -3,23 +3,23 @@
 ## Install
 
 ```bash
-pip install redmcp
+pip install mcpvault
 # or with uv
-uv tool install redmcp
+uv tool install mcpvault
 ```
 
 ## Scan your first server
 
 ```bash
-redmcp scan ./server.py
+mcpvault scan ./server.py
 ```
 
-RedMCP performs static analysis on Python MCP servers, discovering `@tool` decorators and running security analyzers against them.
+MCPVault performs static analysis on Python MCP servers, discovering `@tool` decorators and running security analyzers against them.
 
 ## Example output
 
 ```
-────────────────────── RedMCP Security Report ──────────────────────
+────────────────────── MCPVault Security Report ──────────────────────
 Target: examples/vulnerable-mcp-server/server.py
 Overall Score: 42/100
 
@@ -34,6 +34,6 @@ Overall Score: 42/100
 
 ## Next steps
 
-- Save JSON: `redmcp scan ./server.py -o report.json`
-- Generate HTML: `redmcp report report.json`
+- Save JSON: `mcpvault scan ./server.py -o report.json`
+- Generate HTML: `mcpvault report report.json`
 - Add to CI: see `action/action.yml`

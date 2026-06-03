@@ -1,4 +1,4 @@
-# RedMCP Documentation
+# MCPVault Documentation
 
 ## Guides
 

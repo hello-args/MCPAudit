@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from redmcp.analyzers.base import BaseAnalyzer
-from redmcp.mcp.models import MCPServerInfo, MCPTool
-from redmcp.reporting.models import Finding, Severity
+from mcpvault.analyzers.base import BaseAnalyzer
+from mcpvault.mcp.models import MCPServerInfo, MCPTool
+from mcpvault.reporting.models import Finding, Severity
 
 READ_HINTS = ("read", "fetch", "get", "list", "email", "query")
 EXFIL_HINTS = ("send", "post", "upload", "webhook", "http", "export")

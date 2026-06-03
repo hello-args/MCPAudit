@@ -1,6 +1,6 @@
 # Architecture
 
-RedMCP follows a modular pipeline architecture designed for extensibility.
+MCPVault follows a modular pipeline architecture designed for extensibility.
 
 ## Components
 

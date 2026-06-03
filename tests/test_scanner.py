@@ -2,9 +2,9 @@
 
 from pathlib import Path
 
-from redmcp.core.config import ScanConfig
-from redmcp.core.scanner import Scanner
-from redmcp.reporting.models import Severity
+from mcpvault.core.config import ScanConfig
+from mcpvault.core.scanner import Scanner
+from mcpvault.reporting.models import Severity
 
 
 def test_scan_finds_critical_issues(example_server_path: Path) -> None:

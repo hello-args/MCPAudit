@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from redmcp.mcp.models import MCPServerInfo
-from redmcp.reporting.models import Finding
+from mcpvault.mcp.models import MCPServerInfo
+from mcpvault.reporting.models import Finding
 
 
 class BaseAnalyzer(ABC):
-    """Interface implemented by all RedMCP security analyzers."""
+    """Interface implemented by all MCPVault security analyzers."""
 
     name: str = "base"
 

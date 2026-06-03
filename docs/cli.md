@@ -1,11 +1,11 @@
 # CLI Reference
 
-## `redmcp scan`
+## `mcpvault scan`
 
 Run a full security scan.
 
 ```bash
-redmcp scan <target> [--output report.json] [--fail-on-critical]
+mcpvault scan <target> [--output report.json] [--fail-on-critical]
 ```
 
 | Flag | Description |
@@ -13,22 +13,22 @@ redmcp scan <target> [--output report.json] [--fail-on-critical]
 | `--output`, `-o` | Write JSON report to file |
 | `--fail-on-critical` | Exit code 1 if critical findings exist |
 
-## `redmcp report`
+## `mcpvault report`
 
 Generate HTML from a JSON scan report.
 
 ```bash
-redmcp report report.json [--output security-report.html]
+mcpvault report report.json [--output security-report.html]
 ```
 
-## `redmcp fuzz` (roadmap)
+## `mcpvault fuzz` (roadmap)
 
 Fuzz an MCP server with generated attack payloads.
 
-## `redmcp pentest` (roadmap)
+## `mcpvault pentest` (roadmap)
 
 AI-assisted penetration testing agent.
 
-## `redmcp --version`
+## `mcpvault --version`
 
 Print the installed version.

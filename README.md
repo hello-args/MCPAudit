@@ -1,16 +1,16 @@
-# RedMCP
+# MCPVault
 
 **Offensive security testing framework for Model Context Protocol (MCP) servers.**
 
 Make MCP security testing as easy as running a linter.
 
 ```bash
-redmcp scan ./server.py
+mcpvault scan ./server.py
 ```
 
 ## Problem
 
-MCP servers expose databases, APIs, file systems, cloud resources, and SaaS tools to AI agents — often without rigorous security review. RedMCP helps teams find issues before attackers do.
+MCP servers expose databases, APIs, file systems, cloud resources, and SaaS tools to AI agents — often without rigorous security review. MCPVault helps teams find issues before attackers do.
 
 ## Features
 
@@ -25,9 +25,9 @@ MCP servers expose databases, APIs, file systems, cloud resources, and SaaS tool
 | Risk Scoring Engine | ✅ Alpha | CVSS-inspired security score (0–100) |
 | Compliance Checks | ✅ Alpha | OWASP LLM Top 10 & MCP best practices |
 | CI/CD Integration | 🚧 Planned | GitHub Action for pipeline gates |
-| HTML Reports | ✅ Alpha | `redmcp report` → `security-report.html` |
-| MCP Fuzzer | 🔮 Roadmap | `redmcp fuzz` |
-| RedMCP Agent | 🔮 Roadmap | `redmcp pentest` |
+| HTML Reports | ✅ Alpha | `mcpvault report` → `security-report.html` |
+| MCP Fuzzer | 🔮 Roadmap | `mcpvault fuzz` |
+| MCPVault Agent | 🔮 Roadmap | `mcpvault pentest` |
 
 ## Quick Start
 
@@ -39,28 +39,28 @@ MCP servers expose databases, APIs, file systems, cloud resources, and SaaS tool
 ### Install
 
 ```bash
-git clone https://github.com/redmcp/redmcp.git
-cd redmcp
+git clone https://github.com/hello-args/MCPVault.git
+cd mcpvault
 uv sync --all-extras
 ```
 
 ### Scan an MCP server
 
 ```bash
-uv run redmcp scan examples/vulnerable-mcp-server/server.py
+uv run mcpvault scan examples/vulnerable-mcp-server/server.py
 ```
 
 Save JSON results and generate HTML:
 
 ```bash
-uv run redmcp scan examples/vulnerable-mcp-server/server.py -o report.json
-uv run redmcp report report.json -o security-report.html
+uv run mcpvault scan examples/vulnerable-mcp-server/server.py -o report.json
+uv run mcpvault report report.json -o security-report.html
 ```
 
 ### CI gate (fail on critical)
 
 ```bash
-uv run redmcp scan ./server.py --fail-on-critical
+uv run mcpvault scan ./server.py --fail-on-critical
 ```
 
 ## Architecture
@@ -72,7 +72,7 @@ uv run redmcp scan ./server.py --fail-on-critical
                   │
                   ▼
          ┌─────────────────┐
-         │ RedMCP Scanner  │
+         │ MCPVault Scanner │
          └─────────────────┘
                   │
      ┌────────────┼────────────┐
@@ -88,8 +88,8 @@ Analyzer      Engine       Scanner
 ## Project Structure
 
 ```
-RedMCP/
-├── src/redmcp/          # Main package (src layout)
+MCPVault/
+├── src/mcpvault/          # Main package (src layout)
 │   ├── cli/             # Typer CLI (`scan`, `report`, `fuzz`, `pentest`)
 │   ├── core/            # Scanner orchestration
 │   ├── analyzers/       # Security analyzers
@@ -108,7 +108,7 @@ RedMCP/
 ```bash
 uv sync --all-extras
 uv run pytest
-uv run ruff check src tests
+uv run ruff check .
 uv run ruff format src tests
 pre-commit install
 ```
@@ -121,7 +121,7 @@ pre-commit install
 | OWASP ZAP | Web security |
 | Trivy | Container security |
 | Semgrep | Static analysis |
-| **RedMCP** | **MCP security** |
+| **MCPVault** | **MCP security** |
 
 ## Contributing
 
