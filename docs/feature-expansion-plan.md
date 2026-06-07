@@ -351,18 +351,20 @@ src/mcts/
 
 ## Part 6 — Documentation to Add/Update
 
-| Doc | Action |
+| Doc | Status |
 |-----|--------|
-| `docs/scoring-spec.md` | **New** — formula, weights, category defs, gate semantics |
-| `docs/taxonomy.md` | **New** — MCTS-T technique catalog |
-| `docs/live-scanning.md` | **New** — consent, CI flags, transport matrix |
-| `docs/inventory.md` | **New** — config discovery, cross-server analysis |
-| `docs/ci-integration.md` | **New** — Action, SARIF upload, thresholds |
-| `docs/competitive-positioning.md` | **New** — how MCTS differs |
-| `docs/architecture.md` | Discovery layer, probe session, analyzer list |
-| `docs/cli.md` | New commands and flags |
-| `docs/roadmap.md` | Phases 0–3 aligned with this plan |
-| `action/README.md` | **New** — publish instructions |
+| `docs/scoring-spec.md` | ✅ Shipped |
+| `docs/taxonomy.md` | ✅ Shipped |
+| `docs/live-scanning.md` | ✅ Shipped |
+| `docs/inventory.md` | ✅ Shipped |
+| `docs/ci-integration.md` | ✅ Shipped |
+| `docs/competitive-positioning.md` | ✅ Shipped |
+| `docs/architecture.md` | ✅ Updated — discovery, probe, analyzer list |
+| `docs/cli.md` | ✅ Updated — all commands and flags |
+| `docs/roadmap.md` | ✅ Aligned with Phases 0–3 |
+| `docs/fuzzing.md` | ✅ Shipped |
+| `docs/typescript-discovery.md` | ✅ Shipped |
+| `action/README.md` | ✅ Shipped |
 
 ---
 

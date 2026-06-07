@@ -1,7 +1,7 @@
 # Competitive Positioning — MCTS vs MCP Security Tools
 
 How **MCTS** (Model Context Threat Scanner) compares to tools audited under `mcp_audit_competitor/`.  
-Last updated after Phase 0/1 foundation work.
+Last updated after Phase 0/1 foundation work (live stdio probe, inventory, fuzz, SARIF, taxonomy).
 
 ---
 
@@ -15,12 +15,12 @@ Last updated after Phase 0/1 foundation work.
 | **Attack-chain threat model** | **Unique** — capability-graph chains, not keyword-only |
 | **Auditable scoring** | **Unique** — exponential decay + `ScoreBasis` on every report |
 | **Config inventory** | **Competitive** — Cursor/Claude/VS Code/Windsurf (agent-scan still broader) |
-| **Live MCP probing** | **Gap** — mcp-scanner & agent-scan ahead (Phase 1.1 planned) |
-| **Dynamic fuzzing** | **Partial** — safe read-only default; aggressive tier with consent |
+| **Live MCP probing** | **Competitive** — stdio shipped; mcp-scanner ahead on multi-transport |
+| **Dynamic fuzzing** | **Competitive** — safe read-only default; aggressive tier with consent |
 | **Deep multi-language SAST** | **Gap** — mcp-scanner / agent-security ahead (tree-sitter + Semgrep) |
 | **MCP server mode for agents** | **Gap** — scanner-main / agent-security ahead (Phase 3) |
 
-**Bottom line:** MCTS wins on **deterministic CI adoption**, **risk scorecard**, **attack chains**, and **executive reporting** without cloud lock-in. Peers still win on **live protocol depth** (mcp-scanner) and **full destructive fuzz suites** (mcp-guard aggressive mode).
+**Bottom line:** MCTS wins on **deterministic CI adoption**, **risk scorecard**, **attack chains**, and **executive reporting** without cloud lock-in. Peers still win on **multi-transport live depth** (mcp-scanner SSE/HTTP) and **full destructive fuzz suites** (mcp-guard aggressive mode).
 
 ---
 
@@ -30,8 +30,8 @@ Last updated after Phase 0/1 foundation work.
 
 | | mcp-scanner | MCTS |
 |---|-------------|------|
-| Live MCP (tools/prompts/resources) | ✅ Multi-transport | ❌ Static only |
-| Static SAST depth | ✅ Tree-sitter + taint | ⚠️ Python AST + heuristics |
+| Live MCP (tools/prompts/resources) | ✅ Multi-transport | ✅ Stdio (`--live`); SSE/HTTP planned |
+| Static SAST depth | ✅ Tree-sitter + taint | ⚠️ Python AST + TS patterns + heuristics |
 | YARA / behavioral LLM | ✅ | ❌ |
 | Config discovery | ✅ known-configs | ✅ `mcts inventory` |
 | SARIF | ❌ | ✅ |
@@ -40,8 +40,8 @@ Last updated after Phase 0/1 foundation work.
 | CI score gate | ⚠️ Severity only | ✅ `--min-score` + SARIF |
 | Cloud dependency | ⚠️ Optional Cisco API | ✅ None |
 
-**MCTS wins:** SARIF, HTML, scoring, offline default, attack chains.  
-**mcp-scanner wins:** Live surfaces, SAST depth, YARA, behavioral alignment.
+**MCTS wins:** SARIF, HTML, scoring, offline default, attack chains, stdio live probe.  
+**mcp-scanner wins:** Multi-transport live, deeper SAST/taint, YARA, behavioral alignment.
 
 ---
 
@@ -51,7 +51,7 @@ Last updated after Phase 0/1 foundation work.
 |---|---------|------|
 | Semgrep + LLM pipeline | ✅ | ❌ |
 | Tests | ❌ | ✅ 40+ tests |
-| Live MCP | ❌ | ❌ |
+| Live MCP | ❌ | ✅ Stdio (`--live`) |
 | SARIF / CI | ❌ | ✅ |
 | Repo scan | ✅ | ✅ |
 
@@ -64,7 +64,7 @@ Last updated after Phase 0/1 foundation work.
 | | agent-scan | MCTS |
 |---|------------|------|
 | Config inventory breadth | ✅ 10+ agents | ⚠️ 4 clients |
-| Live introspection | ✅ | ❌ |
+| Live introspection | ✅ Multi-client | ✅ Stdio (`--live`) |
 | Security findings | ☁️ Snyk cloud | ✅ Local |
 | SARIF | ❌ | ✅ |
 | HTML dashboard | ❌ | ✅ |
@@ -140,7 +140,7 @@ No auditable source in competitor folder — **not a code peer**. MCTS exceeds a
 | SARIF | ✅ | ✅ |
 | HTML | ✅ | ✅ (attack graph + OWASP) |
 | MCP scan mode | ⚠️ Static filesystem | ✅ Static Python + TypeScript |
-| Live MCP probe | ❌ | ❌ |
+| Live MCP probe | ❌ | ✅ Stdio (`--live`) |
 | Supply chain / SBOM | ✅ | ❌ (Phase 3) |
 | Attack chains | ❌ | ✅ |
 | Local-first default | ⚠️ Heavy deps | ✅ Lean core |

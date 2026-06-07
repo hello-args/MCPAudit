@@ -30,7 +30,7 @@ Today, MCTS identifies security issues across permissions, prompt injection, too
 | Permission analyzer | ✅ Shipped |
 | Prompt injection simulator | ✅ Shipped (heuristic; live probing planned) |
 | Tool abuse testing | ✅ Shipped |
-| Data leakage detection | ✅ Shipped (metadata-only today) |
+| Data leakage detection | ✅ Shipped (source + metadata) |
 | Multi-step attack chain detection | ✅ Shipped (hint-based; graph upgrade planned) |
 | Compliance checks (OWASP LLM Top 10) | ✅ Shipped |
 | Exponential risk scoring (score + risk index) | ✅ Shipped |
@@ -53,8 +53,9 @@ Today, MCTS identifies security issues across permissions, prompt injection, too
 
 See [Building in Public](blog-building-mcp-security-in-public.md) and [Feature Expansion Plan — Part 1](feature-expansion-plan.md#part-1--current-state-honest-inventory).
 
-- Multi-file repo discovery shipped; jailbreak analyzer still uses weighted tool-count heuristic
+- Multi-file repo discovery shipped; jailbreak analyzer still uses weighted heuristic
 - `mcts pentest` remains a stub
+- SSE/HTTP live transports not yet implemented
 - ~34 / ~75 external-framework techniques covered by regression fixtures (~45%)
 
 ---
@@ -75,7 +76,7 @@ See [Building in Public](blog-building-mcp-security-in-public.md) and [Feature E
 
 ---
 
-## Phase 1 — Adoption & Live Probing (🚧 In progress)
+## Phase 1 — Adoption & Live Probing (✅ Shipped)
 
 > **Goal:** CI/CD adoption, live MCP enrichment, config inventory.  
 > **Timeline:** ~4–6 weeks. See [Part 4 — Phase 1](feature-expansion-plan.md#phase-1--adoption--live-probing-46-weeks).
@@ -158,19 +159,19 @@ Discover Cursor, Claude Desktop, VS Code configs. **Cross-server shadowing** ana
 
 ### 6. Capability Profiles
 
-Per-tool capability dimensions (reads untrusted input, egresses network, executes commands) feeding attack chains and HTML **Capability Matrix**.
+Per-tool capability dimensions (reads untrusted input, egresses network, executes commands) feed attack chains. HTML **Capability Matrix** section still planned.
 
 ---
 
-### 7. MCTS-T Technique Taxonomy
+### 7. MCTS-T Technique Taxonomy — ✅ Shipped (core)
 
-`technique_id` on findings; `docs/taxonomy.md`; Technique Map in HTML dashboard. Namespace: `MCTS-T-*` (MCTS-owned, optional external cross-refs).
+`technique_id` on findings; [taxonomy.md](taxonomy.md); bundled Sigma rules. Technique Map in HTML dashboard still planned.
 
 ---
 
 ### 8. Benchmark Corpus
 
-`examples/bench/` + `benchmarks/expected/` + `docs/scoring-spec.md` for regression and weight calibration.
+`examples/bench/` + regression fixtures + [scoring-spec.md](scoring-spec.md) for gate semantics. Expanded corpus still planned.
 
 ---
 
@@ -183,7 +184,7 @@ Per-tool capability dimensions (reads untrusted input, egresses network, execute
 |---|-------------|---------|
 | 2.1 | Protocol fuzzing (safe defaults) ✅ | `mcts fuzz` — see [fuzzing.md](fuzzing.md) |
 | 2.2 | Config audit (no LLM side effects) | `mcts audit-config` |
-| 2.3 | Rug-pull baselines | `--record-baseline` / `--check-baseline` |
+| 2.3 | Rug-pull baselines ✅ | `--baseline` / `--save-baseline` |
 | 2.4 | Description vs implementation drift | `ImplementationDriftAnalyzer` |
 | 2.5 | TypeScript/JavaScript static discovery ✅ | `discovery/static_js.py` — see [typescript-discovery.md](typescript-discovery.md) |
 | 2.6 | Scan history + trend chart | `.mcts/history/` |
@@ -229,10 +230,9 @@ Full rationale: [Feature Expansion Plan — Part 8](feature-expansion-plan.md#pa
 
 | Phase | Focus | Key deliverables |
 |-------|-------|------------------|
-| **Phase 0** | Foundation | Repo scan · source analyzers · real attack graph |
-| **Phase 1** | Adoption | SARIF · GitHub Action · live probe · inventory · MCTS-T taxonomy |
-| **Phase 2** | Differentiation | Fuzz · audit-config · baselines · TS discovery · simulation |
-| **Phase 3** | Platform | Vet · API · MCP tools · baselines · certification |
+| **Phase 0–1** ✅ | Foundation + adoption | Repo scan · SARIF · Action · live probe · inventory · taxonomy · fuzz |
+| **Phase 2** | Differentiation | audit-config · trends · simulation · SSE/HTTP |
+| **Phase 3** | Platform | Vet · API · MCP tools · certification |
 
 ### Suggested build order
 
@@ -253,12 +253,14 @@ Week 11+:  Phase 2
 
 Phase 1 is complete when:
 
-- [ ] CI gates on score/SARIF without cloud APIs
-- [ ] Scan works on a repo directory
-- [ ] Live stdio probe optional with consent
-- [ ] Findings include `technique_id`, `location`, `confidence`
-- [ ] Attack chains use capability graph
-- [ ] Benchmark suite prevents regressions
+- [x] CI gates on score/SARIF without cloud APIs
+- [x] Scan works on a repo directory
+- [x] Live stdio probe optional with consent
+- [x] Findings include `technique_id`, `location`, `confidence`
+- [x] Attack chains use capability graph
+- [x] Benchmark/regression suite prevents detector regressions
+
+Remaining Phase 1 polish: CLI/HTML Technique Map, capability matrix in dashboard, SSE/HTTP transports.
 
 Full checklist: [Feature Expansion Plan — Part 10](feature-expansion-plan.md#part-10--success-criteria).
 

@@ -52,19 +52,22 @@ MCP servers expose databases, APIs, file systems, cloud resources, and SaaS tool
 
 | Module | Status | Description |
 |--------|--------|-------------|
-| Permission Analyzer | ✅ Alpha | Flags destructive and over-privileged tools |
-| Prompt Injection Simulator | ✅ Alpha | Tests known injection attack patterns |
-| Tool Abuse Testing | ✅ Alpha | Detects path traversal and misuse surfaces |
-| Data Leakage Detection | ✅ Alpha | Scans for secrets and sensitive references |
-| Agent Jailbreak Testing | 🚧 Planned | Resistance scoring against jailbreak suites |
-| Multi-Step Attack Chains | ✅ Alpha | Identifies dangerous tool combinations |
-| Risk Scoring Engine | ✅ Alpha | Security score + risk index (exponential decay) |
+| Repository scanning | ✅ Alpha | `mcts scan ./repo/` — Python + TypeScript discovery |
+| Permission & metadata analyzers | ✅ Alpha | Destructive tools, poisoning, schema surface (FSP) |
+| Source-aware SAST | ✅ Alpha | Secrets, command execution, path validation in handlers |
+| Runtime telemetry analyzers | ✅ Alpha | OAuth, rug-pull, injection — via `--runtime-events` / `--live` |
+| Multi-step attack chains | ✅ Alpha | Capability-graph chain detection |
+| Live stdio probing | ✅ Alpha | `--live` merges MCP protocol schemas with static analysis |
+| Config inventory | ✅ Alpha | `mcts inventory` — Cursor, Claude, VS Code, Windsurf |
+| Protocol fuzzing | ✅ Alpha | `mcts fuzz` — safe read-only probes by default |
+| Risk scoring engine | ✅ Alpha | Exponential score + risk index + category breakdown |
+| MCTS-T taxonomy | ✅ Alpha | Technique/mitigation IDs on every finding |
 | Terminal UI | ✅ Alpha | Rich dashboard, themes (`cyber`, `minimal`, `github`) |
-| Compliance Checks | ✅ Alpha | OWASP LLM Top 10 & MCP best practices |
-| CI/CD Integration | 🚧 Planned | GitHub Action for pipeline gates |
-| HTML Security Dashboard | ✅ Alpha | Enterprise HTML report — gauge, grades, OWASP, attack chains |
-| MCP Fuzzer | ✅ Alpha | `mcts fuzz` — safe read-only protocol probes by default |
-| MCTS Agent | 🔮 Roadmap | `mcts pentest` |
+| SARIF + CI gates | ✅ Alpha | `--format sarif`, `--min-score`, `--fail-on-category` |
+| GitHub Action | ✅ Alpha | JSON + SARIF + HTML artifacts (`@v1`) |
+| HTML security dashboard | ✅ Alpha | `mcts report` — gauge, grades, OWASP, attack chains |
+| Compliance checks | ✅ Alpha | OWASP LLM Top 10 mapping |
+| MCTS Agent | 🔮 Roadmap | `mcts pentest` (stub) |
 
 ## Quick Start
 
@@ -97,11 +100,14 @@ open security-report.html
 
 The HTML report includes a dark-themed overview (score gauge, letter grade, severity cards, posture summary), risk breakdown with radar chart, searchable findings, attack chain graph, OWASP mapping, and in-browser export (JSON / HTML / PDF). See [docs/html-report.md](docs/html-report.md).
 
-### CI gate (fail on critical)
+### CI gate (fail on critical or score)
 
 ```bash
-uv run mcts scan ./server.py --fail-on-critical
+uv run mcts scan ./server.py --fail-on-critical --min-score 70
+uv run mcts scan ./server.py -o report.sarif --format sarif
 ```
+
+See [docs/ci-integration.md](docs/ci-integration.md) and [action/README.md](action/README.md).
 
 ### Themes
 
@@ -113,37 +119,33 @@ uv run mcts scan ./server.py --theme minimal --no-progress
 ## Architecture
 
 ```
-           ┌──────────────┐
-           │ MCP Server   │
-           └──────┬───────┘
-                  │
-                  ▼
-         ┌─────────────────┐
-         │ MCTS Scanner  │
-         └─────────────────┘
-                  │
-     ┌────────────┼────────────┐
-     ▼            ▼            ▼
-Permission   Injection     Leakage
-Analyzer      Engine       Scanner
-     ▼            ▼            ▼
-       Risk Scoring Engine
-                  │
-        ┌─────────┴─────────┐
-        ▼                   ▼
-  Terminal UI          HTML Dashboard
-  (Rich CLI)      (mcts report)
+  MCP server (file / repo / config)
+              │
+              ▼
+     Discovery (static Py+TS, optional live stdio)
+              │
+              ▼
+     19 security analyzers + compliance + MCTS-T taxonomy
+              │
+              ▼
+        Risk scoring engine
+              │
+    ┌─────────┼─────────┐
+    ▼         ▼         ▼
+ Terminal   JSON/     HTML dashboard
+ dashboard  SARIF    (mcts report)
 ```
 
 ## Documentation
 
 - [Getting Started](docs/getting-started.md)
 - [CLI Reference](docs/cli.md)
-- [HTML Security Dashboard](docs/html-report.md)
 - [Architecture](docs/architecture.md)
-- [Feature Expansion Plan](docs/feature-expansion-plan.md) — detailed implementation guide
-- [Product Roadmap](docs/roadmap.md) — phased deliverables
-- [Building in public (blog)](docs/blog-building-mcp-security-in-public.md) — alpha status, gaps, community discussion
+- [Live Scanning](docs/live-scanning.md) · [Fuzzing](docs/fuzzing.md) · [Inventory](docs/inventory.md)
+- [Scoring Spec](docs/scoring-spec.md) · [CI Integration](docs/ci-integration.md)
+- [Threat Taxonomy](docs/taxonomy.md) · [TypeScript Discovery](docs/typescript-discovery.md)
+- [HTML Security Dashboard](docs/html-report.md)
+- [Feature Expansion Plan](docs/feature-expansion-plan.md) · [Roadmap](docs/roadmap.md)
 - [Changelog](CHANGELOG.md)
 
 ## Project Structure
@@ -151,19 +153,23 @@ Analyzer      Engine       Scanner
 ```
 MCTS/
 ├── src/mcts/          # Main package (src layout)
-│   ├── cli/             # Typer CLI (`scan`, `report`, `fuzz`, `pentest`)
-│   ├── core/            # Scanner orchestration
-│   ├── analyzers/       # Security analyzers
+│   ├── cli/             # Typer CLI (`scan`, `report`, `inventory`, `fuzz`)
+│   ├── core/            # Scanner orchestration, ScanConfig
+│   ├── discovery/       # Static (Python/TS), live stdio, merge
+│   ├── probe/           # Live session, consent, behavioral events
+│   ├── analyzers/       # 19+ security analyzers
+│   ├── inventory/       # Client config discovery
+│   ├── fuzz/            # Protocol fuzz runner
+│   ├── taxonomy/        # MCTS-T techniques, Sigma rules
 │   ├── scoring/         # Risk scoring engine
 │   ├── compliance/      # OWASP & MCP compliance checks
-│   ├── reporting/       # ScanReport models & JSON
+│   ├── reporting/       # ScanReport models, SARIF, HTML entry
 │   ├── report/          # HTML dashboard (templates, CSS, JS)
-│   ├── brand/           # Logo assets
 │   ├── ui/              # Terminal dashboard (Rich)
-│   └── mcp/             # MCP client & discovery
-├── tests/               # pytest suite
-├── examples/            # Sample vulnerable MCP servers
-├── action/              # GitHub Action (planned)
+│   └── mcp/             # MCPServerInfo models
+├── tests/               # pytest suite + regression fixtures
+├── examples/            # Sample MCP servers & benchmarks
+├── action/              # GitHub Action (`@v1`)
 └── docs/                # Documentation
 ```
 
@@ -194,7 +200,7 @@ pre-commit install
 | [Feature Expansion Plan](docs/feature-expansion-plan.md) | Full gap analysis, how to implement each capability, module layout, build order |
 | [Product Roadmap](docs/roadmap.md) | Phased deliverables: foundation → CI adoption → differentiation → platform |
 
-**Next up (Phase 0–1):** repo-wide scanning, source-aware analyzers, SARIF, published GitHub Action, live MCP probing, config inventory, MCTS-T technique taxonomy.
+**Next up:** SSE/HTTP transports, `mcts audit-config`, scan history/trends, `mcts pentest` agent. Phase 0–1 foundation (repo scan, SARIF, live probe, inventory, taxonomy) is shipped — see [Roadmap](docs/roadmap.md).
 
 ## Contributing
 
