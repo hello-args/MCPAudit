@@ -1,0 +1,6 @@
+{
+  "runc_cwd_traversal": true,
+  "runc_cwd_equals": true,
+  "runc_normal": false,
+  "non_runc": false
+}

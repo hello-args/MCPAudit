@@ -27,6 +27,11 @@ class Severity(StrEnum):
         }[self]
 
 
+class SourceLocation(BaseModel):
+    file: str
+    line: int | None = None
+
+
 class Finding(BaseModel):
     id: str
     analyzer: str
@@ -36,6 +41,11 @@ class Finding(BaseModel):
     recommendation: str
     tool: str | None = None
     evidence: dict[str, Any] = Field(default_factory=dict)
+    technique_id: str | None = None
+    mitigation_ids: list[str] = Field(default_factory=list)
+    cwe_id: str | None = None
+    confidence: float = Field(default=1.0, ge=0.0, le=1.0)
+    location: SourceLocation | None = None
 
 
 class ScanSummary(BaseModel):
@@ -91,3 +101,4 @@ class ScanReport(BaseModel):
     findings: list[Finding]
     summary: ScanSummary
     score: RiskScore
+    attack_graph: dict[str, Any] = Field(default_factory=dict)

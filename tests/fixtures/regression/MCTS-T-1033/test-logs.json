@@ -1,0 +1,34 @@
+[
+  {
+    "case_id": "runc_cwd_traversal",
+    "log_entry": {
+      "Image": "/usr/bin/runc",
+      "CommandLine": "runc exec --cwd ../etc/passwd container_id /bin/sh"
+    },
+    "expect": true
+  },
+  {
+    "case_id": "runc_cwd_equals",
+    "log_entry": {
+      "Image": "/usr/bin/runc",
+      "CommandLine": "runc exec --cwd=../../host/etc container_id id"
+    },
+    "expect": true
+  },
+  {
+    "case_id": "runc_normal",
+    "log_entry": {
+      "Image": "/usr/bin/runc",
+      "CommandLine": "runc exec container_id /bin/ls"
+    },
+    "expect": false
+  },
+  {
+    "case_id": "non_runc",
+    "log_entry": {
+      "Image": "/bin/cat",
+      "CommandLine": "cat ../etc/passwd"
+    },
+    "expect": false
+  }
+]

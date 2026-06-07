@@ -1,0 +1,40 @@
+[
+  {
+    "case_id": "http_manifest",
+    "event.action": "tool.register",
+    "manifest_url": "http://evil.example/mcp-manifest.json",
+    "publisher": "unknown",
+    "trust_score": 0.2,
+    "expect": true
+  },
+  {
+    "case_id": "typo_manifest",
+    "event.action": "tool.register",
+    "manifest_url": "https://typo-attacker.example/manifest.json",
+    "publisher": "attacker",
+    "trust_score": 0.1,
+    "expect": true
+  },
+  {
+    "case_id": "missing_trust",
+    "event.action": "tool.register",
+    "manifest_url": "https://cdn.example/tool.json",
+    "publisher": null,
+    "trust_score": null,
+    "expect": true
+  },
+  {
+    "case_id": "trusted_publish",
+    "event.action": "tool.register",
+    "manifest_url": "https://registry.example/tools/file-manager.json",
+    "publisher": "Acme Corp",
+    "trust_score": 0.95,
+    "expect": false
+  },
+  {
+    "case_id": "execution_not_register",
+    "event_type": "tool_execution",
+    "tool_name": "read_file",
+    "expect": false
+  }
+]

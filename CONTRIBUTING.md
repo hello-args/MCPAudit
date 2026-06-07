@@ -43,7 +43,7 @@ Pull requests to `main` require the **test** CI check to pass.
 **Option A — Script**
 
 ```bash
-./scripts/enable-branch-protection.sh MCTS/MCTS
+./scripts/enable-branch-protection.sh MCP-Audit/MCTS
 ```
 
 **Option B — GitHub UI**
@@ -63,7 +63,7 @@ Before large features, read:
 - [Feature Expansion Plan](docs/feature-expansion-plan.md) — gap analysis, implementation how-to, module layout
 - [Product Roadmap](docs/roadmap.md) — phased deliverables and success criteria
 
-Pick a phase item and open a [feature request](https://github.com/MCTS/MCTS/issues/new?template=feature_request.yml) or Discussion to align on design.
+Pick a phase item and open a [feature request](https://github.com/MCP-Audit/MCTS/issues/new?template=feature_request.yml) or Discussion to align on design.
 
 ## Adding a New Analyzer
 
@@ -80,4 +80,4 @@ This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md).
 
 ## Questions?
 
-Open a [GitHub Discussion](https://github.com/MCTS/MCTS/discussions) or [issue](https://github.com/MCTS/MCTS/issues).
+Open a [GitHub Discussion](https://github.com/MCP-Audit/MCTS/discussions) or [issue](https://github.com/MCP-Audit/MCTS/issues).

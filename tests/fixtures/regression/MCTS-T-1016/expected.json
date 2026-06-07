@@ -1,0 +1,8 @@
+{
+  "benign-single-approved": false,
+  "benign-tool-approved": false,
+  "conversation-carryover-auto-approved": true,
+  "noisy-legitimate-multi-step": false,
+  "quota-drain-burst": true,
+  "sensitive-tool-after-sampling": true
+}

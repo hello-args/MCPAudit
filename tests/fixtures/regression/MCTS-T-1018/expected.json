@@ -1,0 +1,13 @@
+{
+  "deputy_user_mismatch": true,
+  "deputy_source_dest": true,
+  "audience_mismatch": true,
+  "tenant_violation": true,
+  "token_passthrough": true,
+  "consent_bypass": true,
+  "idp_mixup": true,
+  "iam_assumption": true,
+  "benign_same_user": false,
+  "benign_service_account": false,
+  "benign_audience_match": false
+}

@@ -38,47 +38,60 @@ Today, MCTS identifies security issues across permissions, prompt injection, too
 | JSON reports | ✅ Shipped |
 | HTML security dashboard (`mcts report`) | ✅ Shipped |
 | Category breakdown (HTML dashboard bars + radar) | ✅ Shipped |
-| GitHub Action scaffold | 🚧 In progress |
-| Agent jailbreak testing | 📋 Planned (replace tool-count placeholder) |
-| Dynamic attack simulation | 📋 Planned |
-| SARIF output | 📋 Planned |
-| CI score thresholds (`--min-score`) | 📋 Planned |
+| Live stdio probing (`--live`) | ✅ Shipped |
+| Protocol fuzzing (`mcts fuzz`) | ✅ Shipped |
+| SARIF output (`--format sarif`) | ✅ Shipped |
+| CI score thresholds (`--min-score`, `--max-critical`) | ✅ Shipped |
+| Technique regression harness (34 techniques) | ✅ Shipped |
+| Runtime telemetry analyzers (`--runtime-events`) | ✅ Shipped |
+| CLI category breakdown + `--fail-on-category` | ✅ Shipped |
+| GitHub Action (JSON + SARIF + HTML artifacts) | ✅ Shipped — `@v1` tag published |
+| Agent pentest (`mcts pentest`) | 📋 Planned |
+| SSE/HTTP live transports | 📋 Planned |
 
 ### Known alpha gaps
 
 See [Building in Public](blog-building-mcp-security-in-public.md) and [Feature Expansion Plan — Part 1](feature-expansion-plan.md#part-1--current-state-honest-inventory).
 
-- Static analysis only — single Python entrypoint file
-- Placeholder analyzers (prompt injection keywords, jailbreak tool count)
-- HTML dashboard ahead of engine on benchmarks and trend data
-- `fuzz` / `pentest` CLI stubs
+- Multi-file repo discovery shipped; jailbreak analyzer still uses weighted tool-count heuristic
+- `mcts pentest` remains a stub
+- ~34 / ~75 external-framework techniques covered by regression fixtures (~45%)
 
 ---
 
-## Phase 0 — Foundation (📋 Planned)
+## Phase 0 — Foundation (✅ Shipped)
 
 > **Goal:** Fix structural limits so new features have a solid base.  
 > **Timeline:** ~2–3 weeks. See [Part 4 — Phase 0](feature-expansion-plan.md#phase-0--foundation-23-weeks).
 
 | # | Deliverable | Status |
 |---|-------------|--------|
-| 0.1 | Multi-file **repository scanning** (`mcts scan ./repo/`) | 📋 |
-| 0.2 | Parse **`input_schema`** + handler snippets | 📋 |
-| 0.3 | **Source-aware analyzers** (secrets in code, command execution, path validation) | 📋 |
-| 0.4 | Fix **placeholder analyzers** + **capability-graph** attack chains | 📋 |
+| 0.1 | Multi-file **repository scanning** (`mcts scan ./repo/`) | ✅ |
+| 0.2 | Parse **`input_schema`** + handler snippets | ✅ |
+| 0.3 | **Source-aware analyzers** (secrets in code, command execution, path validation) | ✅ |
+| 0.4 | Fix **placeholder analyzers** + **capability-graph** attack chains | 🚧 Partial — jailbreak heuristic remains |
 
 **New modules:** `discovery/static.py`, `core/target.py`, analyzers: `schema_surface`, `command_execution`, `path_validation`.
 
 ---
 
-## Phase 1 — Adoption & Live Probing (📋 Planned)
+## Phase 1 — Adoption & Live Probing (🚧 In progress)
 
 > **Goal:** CI/CD adoption, live MCP enrichment, config inventory.  
 > **Timeline:** ~4–6 weeks. See [Part 4 — Phase 1](feature-expansion-plan.md#phase-1--adoption--live-probing-46-weeks).
 
-### 1. Security Risk Score (Category Breakdown in CLI)
+| # | Deliverable | Status |
+|---|-------------|--------|
+| 1.1 | CI score thresholds (`--min-score`, `--max-critical`) | ✅ |
+| 1.2 | GitHub Action (JSON + SARIF + HTML) | ✅ `@v1` published |
+| 1.3 | SARIF output (`--format sarif`) | ✅ |
+| 1.4 | Live MCP probing (`--live`, stdio) | ✅ |
+| 1.5 | Config inventory (`mcts inventory`) | ✅ |
+| 1.6 | Runtime telemetry analyzers (`--runtime-events`) | ✅ |
+| 1.7 | Technique regression harness (34 techniques, ≥80% gate) | ✅ |
+| 1.8 | CLI category breakdown + `--fail-on-category` gates | ✅ |
 
-Extend HTML category scoring to **terminal output and CI gates**:
+### 1. Security Risk Score (Category Breakdown in CLI) — ✅ Shipped
 
 ```
 Overall Risk Score: 82/100 (Critical)
@@ -100,18 +113,18 @@ Breakdown:
 Ship a published Action:
 
 ```yaml
-- uses: MCTS/MCTS@v1
+- uses: MCP-Audit/MCTS@v1
   with:
     target: ./server.py
     fail-on-critical: true
     min-score: 70
 ```
 
-Upload JSON, SARIF, and HTML artifacts. Stub: [`action/action.yml`](../action/action.yml).
+Upload JSON, SARIF, and HTML artifacts. Implementation: [`action/action.yml`](../action/action.yml) — validated in CI via [`.github/workflows/action-validate.yml`](../.github/workflows/action-validate.yml). Publish with `git tag v1`.
 
 ---
 
-### 3. SARIF Output
+### 3. SARIF Output — ✅ Shipped
 
 ```bash
 mcts scan ./server.py -o report.sarif --format sarif
@@ -121,7 +134,7 @@ Integrations: GitHub Advanced Security, GitLab, Azure DevOps, VS Code Security P
 
 ---
 
-### 4. Live MCP Probing
+### 4. Live MCP Probing — ✅ Shipped
 
 ```bash
 mcts scan --live --command uv --args run,server.py
@@ -132,7 +145,7 @@ Stdio first; consent gate + `--i-understand-live-risk` for CI. Modules: `probe/s
 
 ---
 
-### 5. Config Inventory
+### 5. Config Inventory — ✅ Shipped
 
 ```bash
 mcts inventory
@@ -168,11 +181,11 @@ Per-tool capability dimensions (reads untrusted input, egresses network, execute
 
 | # | Deliverable | Command |
 |---|-------------|---------|
-| 2.1 | Protocol fuzzing (safe defaults) | `mcts fuzz` |
+| 2.1 | Protocol fuzzing (safe defaults) ✅ | `mcts fuzz` — see [fuzzing.md](fuzzing.md) |
 | 2.2 | Config audit (no LLM side effects) | `mcts audit-config` |
 | 2.3 | Rug-pull baselines | `--record-baseline` / `--check-baseline` |
 | 2.4 | Description vs implementation drift | `ImplementationDriftAnalyzer` |
-| 2.5 | TypeScript/JavaScript static discovery | `discovery/static_js.py` |
+| 2.5 | TypeScript/JavaScript static discovery ✅ | `discovery/static_js.py` — see [typescript-discovery.md](typescript-discovery.md) |
 | 2.6 | Scan history + trend chart | `.mcts/history/` |
 | 2.7 | Attack simulation mode | `mcts simulate` |
 | 2.8 | Visual attack graph export | Mermaid, Graphviz, PNG |
@@ -254,7 +267,7 @@ Full checklist: [Feature Expansion Plan — Part 10](feature-expansion-plan.md#p
 ## How to Contribute
 
 1. Read [Feature Expansion Plan](feature-expansion-plan.md) for implementation detail.
-2. Pick a phase item and open a [feature request](https://github.com/MCTS/MCTS/issues/new?template=feature_request.yml) or [Discussion](https://github.com/MCTS/MCTS/discussions).
+2. Pick a phase item and open a [feature request](https://github.com/MCP-Audit/MCTS/issues/new?template=feature_request.yml) or [Discussion](https://github.com/MCP-Audit/MCTS/discussions).
 3. See [CONTRIBUTING.md](../CONTRIBUTING.md) for dev setup.
 
 ---

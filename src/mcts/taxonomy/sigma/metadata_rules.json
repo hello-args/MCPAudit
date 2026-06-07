@@ -1,0 +1,2036 @@
+[
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_description",
+        "pattern": "*<!-- SYSTEM:*"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "*<|system|>*"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "*[INST]*"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "*### Instruction:*"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "*\\u200b*"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "*\\u200c*"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "*\\uE00*"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "*\\u202A*"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "*\\u202B*"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "*\\u202D*"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "*\\u202E*"
+      }
+    ],
+    "rule_id": "5894b8fe-29f0-44d8-ad9b-2266a132ec57",
+    "tags": [
+      "attack.initial_access",
+      "attack.t1195"
+    ],
+    "technique_id": "MCTS-T-1001",
+    "title": "MCP Tool Description Poisoning Detection"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_description",
+        "pattern": "before using"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "instead of using"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "always add"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "ignore previous instructions"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "NEVER mention"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "should never be invoked"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "override"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "hijack"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "intercept"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "(?i)(before|instead|when).*using\\s+\\w+_\\w+"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "when calling"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "before calling"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "instead of calling"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "send_email"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "send_message"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_read"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "database_query"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "api_call"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "add.*bcc"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "add.*cc"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "forward to"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "copy to"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "@evil.com"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "@attacker"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "invoke"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "call"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "execute"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "(?i)(invoke|call|execute).*\\w+\\.\\w+"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "never be invoked"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "should not be called"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "do not use"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "for internal use only"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "shadow"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "hidden"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "internal"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "backdoor"
+      }
+    ],
+    "rule_id": "7c8d9e0f-1a2b-3c4d-5e6f-789012345678",
+    "tags": [
+      "attack.initial_access",
+      "attack.execution",
+      "attack.t1055",
+      "attack.t1134",
+      "attack.t1036"
+    ],
+    "technique_id": "MCTS-T-1020",
+    "title": "MCP Tool Shadowing Attack Detection (MCTS rule T1008)"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "file_reader"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_writer"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "directory_browser"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_manager"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "write_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "list_directory"
+      },
+      {
+        "field": "path",
+        "pattern": "*/../*"
+      },
+      {
+        "field": "path",
+        "pattern": "*\\..\\*"
+      },
+      {
+        "field": "path",
+        "pattern": "*..%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%2e%2e%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%252e%252e%252f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%252e%252e%5c*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%c0%ae%c0%ae*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%c0%ae%c0%ae%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%c0%ae%c0%ae%5c*"
+      },
+      {
+        "field": "path",
+        "pattern": "*..%2f..%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%2e%2e%2f%2e%2e%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%00*"
+      },
+      {
+        "field": "path",
+        "pattern": "*../*%00*"
+      },
+      {
+        "field": "path",
+        "pattern": "*..%2F*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%2E%2E%2F*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%2e%2E%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/etc/passwd*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/etc/shadow*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/etc/hosts*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/etc/ssh*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/proc/*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/sys/*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.ssh/id_rsa*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.ssh/id_rsa.pub*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.ssh/known_hosts*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.ssh/config*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.env*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/config.json*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/secrets.yaml*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/database.yml*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/credentials*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/home/*/.bash_history*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/home/*/.profile*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/root/.bash_history*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/root/.profile*"
+      },
+      {
+        "field": "path",
+        "pattern": "*../*../*../*"
+      },
+      {
+        "field": "path",
+        "pattern": "*..%2f*..%2f*..%2f*"
+      }
+    ],
+    "rule_id": "mcts-t1105-path-traversal",
+    "tags": [
+      "attack.execution",
+      "path-traversal",
+      "file-access"
+    ],
+    "technique_id": "MCTS-T-1002",
+    "title": "MCTS rule T1105 Path Traversal via File Tool"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "name",
+        "pattern": "/etc/mcp/"
+      },
+      {
+        "field": "name",
+        "pattern": "/opt/mcp/"
+      },
+      {
+        "field": "name",
+        "pattern": "/var/lib/mcp/"
+      },
+      {
+        "field": "name",
+        "pattern": ".mcp/"
+      },
+      {
+        "field": "name",
+        "pattern": "mcp-server/"
+      },
+      {
+        "field": "name",
+        "pattern": "mcp-tools/"
+      },
+      {
+        "field": "name",
+        "pattern": "tool-definitions/"
+      },
+      {
+        "field": "name",
+        "pattern": "tools.json"
+      },
+      {
+        "field": "name",
+        "pattern": "tools.yaml"
+      },
+      {
+        "field": "name",
+        "pattern": "tool-config"
+      },
+      {
+        "field": "name",
+        "pattern": ".json"
+      },
+      {
+        "field": "name",
+        "pattern": ".yaml"
+      },
+      {
+        "field": "name",
+        "pattern": ".yml"
+      },
+      {
+        "field": "name",
+        "pattern": ".toml"
+      },
+      {
+        "field": "name",
+        "pattern": "mcp-init"
+      },
+      {
+        "field": "name",
+        "pattern": "mcp-start"
+      },
+      {
+        "field": "name",
+        "pattern": "tool-loader"
+      },
+      {
+        "field": "name",
+        "pattern": "mcp-bootstrap"
+      },
+      {
+        "field": "name",
+        "pattern": ".sh"
+      },
+      {
+        "field": "name",
+        "pattern": ".bash"
+      },
+      {
+        "field": "name",
+        "pattern": ".py"
+      }
+    ],
+    "rule_id": "0f397773-638b-4eee-b3b8-20cf9d284573",
+    "tags": [
+      "attack.persistence",
+      "attack.t1546",
+      "attack.t1546.004",
+      "attack.t1574",
+      "attack.t1543",
+      "attack.t1505",
+      "mcp.persistence"
+    ],
+    "technique_id": "MCTS-T-1040",
+    "title": "MCP Tool Definition File Modification Detection"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "query",
+        "pattern": "INSERT INTO tool"
+      },
+      {
+        "field": "query",
+        "pattern": "UPDATE tool"
+      },
+      {
+        "field": "query",
+        "pattern": "DELETE FROM tool"
+      },
+      {
+        "field": "query",
+        "pattern": "INSERT INTO mcp_tool"
+      },
+      {
+        "field": "query",
+        "pattern": "UPDATE mcp_tool"
+      },
+      {
+        "field": "query",
+        "pattern": "ALTER TABLE tool"
+      },
+      {
+        "field": "query",
+        "pattern": "handler_script"
+      },
+      {
+        "field": "query",
+        "pattern": "pre_execute"
+      },
+      {
+        "field": "query",
+        "pattern": "post_execute"
+      },
+      {
+        "field": "query",
+        "pattern": "_internal"
+      },
+      {
+        "field": "query",
+        "pattern": "eval("
+      },
+      {
+        "field": "query",
+        "pattern": "exec("
+      },
+      {
+        "field": "query",
+        "pattern": "curl "
+      },
+      {
+        "field": "query",
+        "pattern": "wget "
+      },
+      {
+        "field": "query",
+        "pattern": "bash -c"
+      },
+      {
+        "field": "query",
+        "pattern": "/bin/sh"
+      }
+    ],
+    "rule_id": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+    "tags": [
+      "attack.persistence",
+      "attack.t1505",
+      "mcp.database"
+    ],
+    "technique_id": "MCTS-T-1040",
+    "title": "MCP Tool Definition Database Modification"
+  },
+  {
+    "level": "critical",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "execute_command"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "run_shell"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "docker_run"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "sys_admin"
+      }
+    ],
+    "rule_id": "1A20BBC7-3491-4028-8960-813CA5AB5ABF",
+    "tags": [
+      "attack.privilege_escalation",
+      "attack.t1548"
+    ],
+    "technique_id": "MCTS-T-1030",
+    "title": "High-Privilege Tool Abuse"
+  },
+  {
+    "level": "critical",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "execute_command"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "run_shell"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "exec"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "shell"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "bash"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "write_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_manager"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_read"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_write"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "execute_command"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "run_shell"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "exec"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "shell"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "execute_command"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "run_shell"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "write_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "execute_command"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "run_shell"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "docker"
+      }
+    ],
+    "rule_id": "942bded6-c291-4f07-bf3c-2a8932c4ec6f",
+    "tags": [
+      "attack.privilege_escalation",
+      "attack.t1068",
+      "attack.t1611",
+      "attack.t1548",
+      "mcp.root_abuse",
+      "mcp.privilege_escalation",
+      "mcp.rce"
+    ],
+    "technique_id": "MCTS-S-1305",
+    "title": "MCP Server Root Privilege Abuse Detection"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "*filesystem.write*"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "*filesystem.delete*"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "*fs.write*"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "*shell*"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "*exec*"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "*process.spawn*"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "*http.request*"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "*network.fetch*"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "*secrets.*"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "*admin.*"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "*deploy*"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "*db.execute*"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "*sql.execute*"
+      }
+    ],
+    "rule_id": "4a7f1c30-1e8b-4d6e-9d4f-1c3090000309",
+    "tags": [
+      "attack.privilege_escalation",
+      "attack.ta0004",
+      "attack.execution",
+      "attack.ta0002",
+      "attack.t1548",
+      "mcp.security",
+      "mcp.tool_invocation"
+    ],
+    "technique_id": "MCTS-S-1309",
+    "title": "MCP Privileged Tool Invocation Following Authority-Claim Pretext"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "description",
+        "pattern": "<!--"
+      },
+      {
+        "field": "description",
+        "pattern": "\\u200B"
+      },
+      {
+        "field": "description",
+        "pattern": "\\u200C"
+      },
+      {
+        "field": "description",
+        "pattern": "\\u200D"
+      }
+    ],
+    "rule_id": "3ba9af96-ad37-409b-9b18-fbf6c1432a30",
+    "tags": [
+      "attack.defense_evasion",
+      "attack.t0005"
+    ],
+    "technique_id": "MCTS-T-1041",
+    "title": "MCP Tool Metadata Steganography Detection"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "execute_command"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "run_shell"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "exec"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "shell"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "bash"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "http"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "fetch"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "write_file"
+      }
+    ],
+    "rule_id": "be1a6c82-66c5-47ef-ad3a-84f760115c8f",
+    "tags": [
+      "attack.defense_evasion"
+    ],
+    "technique_id": "MCTS-S-1404",
+    "title": "MCTS rule T1404 MCP Response Tampering (Narrative/Tool Mismatch)"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "query",
+        "pattern": "api."
+      },
+      {
+        "field": "query",
+        "pattern": "mcp."
+      },
+      {
+        "field": "query",
+        "pattern": "tools."
+      },
+      {
+        "field": "query",
+        "pattern": "agent."
+      },
+      {
+        "field": "query",
+        "pattern": ".com"
+      },
+      {
+        "field": "query",
+        "pattern": ".io"
+      },
+      {
+        "field": "query",
+        "pattern": ".ai"
+      }
+    ],
+    "rule_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "tags": [
+      "attack.defense_evasion",
+      "attack.t1557",
+      "mcp.dns"
+    ],
+    "technique_id": "MCTS-S-1407",
+    "title": "MCP API Endpoint DNS Resolution Anomaly"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_reader"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_text_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_reader"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_reader"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_text_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_reader"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "get_file_contents"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_reader"
+      }
+    ],
+    "rule_id": "2fe0d755-ef84-43a0-8cd8-de7f4f11027c",
+    "tags": [
+      "attack.credential_access",
+      "attack.t1552",
+      "attack.t1552.001"
+    ],
+    "technique_id": "MCTS-T-1024",
+    "title": "MCP File-Based Credential Harvest"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_reader"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_text_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "get_file_contents"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_reader"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_text_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_reader"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_reader"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_reader"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "get_file_contents"
+      }
+    ],
+    "rule_id": "13f1dfef-4612-40e8-8be2-0ae3e5f4718d",
+    "tags": [
+      "attack.credential_access",
+      "attack.t1552",
+      "attack.t1552.001"
+    ],
+    "technique_id": "MCTS-S-1503",
+    "title": "MCP Environment Variable File Access"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "token"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "access_token"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "session.token"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "session_token"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "auth_token"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "debug_token"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "get_token"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "access token"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "session token"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "oauth"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "debug"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "introspect"
+      }
+    ],
+    "rule_id": "72591379-34f3-4e48-94fc-4206e0f128b8",
+    "tags": [
+      "attack.credential-access",
+      "attack.T1528",
+      "attack.T1550.001",
+      "mcp",
+      "oauth"
+    ],
+    "technique_id": "MCTS-S-1504",
+    "title": "MCTS rule T1504 - Token Theft via API Response"
+  },
+  {
+    "level": "medium",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "list_directory"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "dir"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "filesystem_list_directory"
+      }
+    ],
+    "rule_id": "9e5b2d7a-8c1f-4b5e-9a3d-1f2c3e4d5b6a",
+    "tags": [
+      "attack.discovery",
+      "attack.t1083"
+    ],
+    "technique_id": "MCTS-S-1606",
+    "title": "Suspicious Directory Listing"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "save_memory"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "add_embedding"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "store_knowledge"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "upsert_vector"
+      }
+    ],
+    "rule_id": "D0101B15-ECF5-468A-ACA5-E35EECBEF217",
+    "tags": [
+      "attack.lateral_movement",
+      "attack.t1565"
+    ],
+    "technique_id": "MCTS-S-1702",
+    "title": "Shared-Memory Poisoning Detection"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "http_request"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "fetch"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "api_call"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "rest_api"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "graphql_query"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "http_request"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "fetch"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "api_call"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "http_request"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "api_call"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "graphql_query"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "http_request"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "http_request"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "fetch"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "api_call"
+      }
+    ],
+    "rule_id": "7c4a8f92-1b3d-4e56-9a8f-2c3d4e5f6a7b",
+    "tags": [
+      "attack.collection",
+      "attack.t1213",
+      "attack.t1119",
+      "attack.t1005"
+    ],
+    "technique_id": "MCTS-S-1804",
+    "title": "MCP API Data Harvest Detection"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "http_request"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "fetch"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "api_call"
+      }
+    ],
+    "rule_id": "8d5b9g03-2c4e-5f67-0b9g-3d4e5f6a7b8c",
+    "tags": [
+      "attack.collection",
+      "attack.t1213"
+    ],
+    "technique_id": "MCTS-S-1804",
+    "title": "MCP API Harvesting - Cumulative Data Volume Alert"
+  },
+  {
+    "level": "medium",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "http_request"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "api_call"
+      }
+    ],
+    "rule_id": "9e6c0h14-3d5f-6g78-1c0h-4e5f6a7b8c9d",
+    "tags": [
+      "attack.collection",
+      "attack.t1119"
+    ],
+    "technique_id": "MCTS-S-1804",
+    "title": "MCP API Harvesting - Sequential Pattern Detection"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "http_request"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "api_call"
+      }
+    ],
+    "rule_id": "0f7d1i25-4e6g-7h89-2d1i-5f6a7b8c9d0e",
+    "tags": [
+      "attack.collection",
+      "attack.t1213"
+    ],
+    "technique_id": "MCTS-S-1804",
+    "title": "MCP API Harvesting - Multi-Round Extraction Pattern"
+  },
+  {
+    "level": "critical",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_read"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "get_env"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "database_query"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "fetch_secret"
+      },
+      {
+        "field": "path",
+        "pattern": ".env"
+      },
+      {
+        "field": "path",
+        "pattern": "credentials"
+      },
+      {
+        "field": "path",
+        "pattern": ".aws"
+      },
+      {
+        "field": "path",
+        "pattern": ".ssh"
+      },
+      {
+        "field": "path",
+        "pattern": "config"
+      },
+      {
+        "field": "path",
+        "pattern": "secret"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "send_"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "post_"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "create_"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "upload_"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "notify"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "webhook"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "email"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "message"
+      }
+    ],
+    "rule_id": "f1a2b3c4-d5e6-7f89-0abc-def123456789",
+    "tags": [
+      "attack.exfiltration",
+      "attack.collection",
+      "attack.t1119",
+      "attack.t1041",
+      "mcp.multi_stage"
+    ],
+    "technique_id": "MCTS-S-1911",
+    "title": "MCP Data Collection Followed by Parameter Exfiltration"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "bridge"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "cross_chain"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "multichain"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "stargate"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "hop_protocol"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "synapse"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "celer"
+      }
+    ],
+    "rule_id": "a7f8c9d2-1e4b-4a5c-9f3d-8b6e2c5a1d9f",
+    "tags": [
+      "attack.exfiltration",
+      "attack.defense_evasion",
+      "attack.impact",
+      "attack.ta0010",
+      "attack.ta0005",
+      "attack.ta0040",
+      "blockchain.bridge",
+      "blockchain.dex",
+      "crypto.laundering"
+    ],
+    "technique_id": "MCTS-S-1915",
+    "title": "Cross-Chain Laundering via Bridge Hopping"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "http.get"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "http.post"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "http.put"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "http.delete"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "api.call"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "rest.request"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "http"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "http"
+      }
+    ],
+    "rule_id": "B5FD1186-18C3-4BEF-8BD8-895E234E48B4",
+    "tags": [
+      "attack.impact",
+      "attack.t1499",
+      "attack.t1499.003"
+    ],
+    "technique_id": "MCTS-S-2102",
+    "title": "MCP Agent External API Flooding Detection"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_description",
+        "pattern": "<!-- SYSTEM:"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "hidden instruction"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "\\u200b"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "\\u200c"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "\\uE00"
+      }
+    ],
+    "rule_id": "a367ee9a-44ff-4c5c-9032-917436940104",
+    "tags": [
+      "attack.impact",
+      "attack.t1565",
+      "attack.t1496"
+    ],
+    "technique_id": "MCTS-S-2105",
+    "title": "MCP Disinformation Output Detection"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "file_reader"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_writer"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "directory_browser"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_manager"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "write_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "list_directory"
+      },
+      {
+        "field": "path",
+        "pattern": "*/../*"
+      },
+      {
+        "field": "path",
+        "pattern": "*\\..\\*"
+      },
+      {
+        "field": "path",
+        "pattern": "*..%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%2e%2e%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%252e%252e%252f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%252e%252e%5c*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%c0%ae%c0%ae*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%c0%ae%c0%ae%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%c0%ae%c0%ae%5c*"
+      },
+      {
+        "field": "path",
+        "pattern": "*..%2f..%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%2e%2e%2f%2e%2e%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%00*"
+      },
+      {
+        "field": "path",
+        "pattern": "*../*%00*"
+      },
+      {
+        "field": "path",
+        "pattern": "*..%2F*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%2E%2E%2F*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%2e%2E%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/etc/passwd*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/etc/shadow*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/etc/hosts*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/etc/ssh*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/proc/*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/sys/*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.ssh/id_rsa*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.ssh/id_rsa.pub*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.ssh/known_hosts*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.ssh/config*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.env*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/config.json*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/secrets.yaml*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/database.yml*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/credentials*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/home/*/.bash_history*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/home/*/.profile*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/root/.bash_history*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/root/.profile*"
+      },
+      {
+        "field": "path",
+        "pattern": "*../*../*../*"
+      },
+      {
+        "field": "path",
+        "pattern": "*..%2f*..%2f*..%2f*"
+      }
+    ],
+    "rule_id": "mcts-t1105-path-traversal",
+    "tags": [
+      "attack.execution",
+      "mcts",
+      "path-traversal",
+      "file-access"
+    ],
+    "technique_id": "MCTS-T-1002",
+    "title": "MCTS-T-1002 Path Traversal via File Tool"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_description",
+        "pattern": "before using"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "instead of using"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "always add"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "ignore previous instructions"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "NEVER mention"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "should never be invoked"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "override"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "hijack"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "intercept"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "(?i)(before|instead|when).*using\\s+\\w+_\\w+"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "when calling"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "before calling"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "instead of calling"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "send_email"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "send_message"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_read"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "database_query"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "api_call"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "add.*bcc"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "add.*cc"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "forward to"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "copy to"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "@evil.com"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "@attacker"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "invoke"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "call"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "execute"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "(?i)(invoke|call|execute).*\\w+\\.\\w+"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "never be invoked"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "should not be called"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "do not use"
+      },
+      {
+        "field": "tool_description",
+        "pattern": "for internal use only"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "shadow"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "hidden"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "internal"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "backdoor"
+      }
+    ],
+    "rule_id": "7c8d9e0f-1a2b-3c4d-5e6f-789012345678",
+    "tags": [
+      "attack.initial_access",
+      "attack.execution",
+      "attack.t1055",
+      "attack.t1134",
+      "attack.t1036"
+    ],
+    "technique_id": "MCTS-T-1020",
+    "title": "MCP Tool Shadowing Attack Detection (MCTS-T-1020)"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "file_reader"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_writer"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "directory_browser"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_manager"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "write_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "list_directory"
+      },
+      {
+        "field": "path",
+        "pattern": "*/../*"
+      },
+      {
+        "field": "path",
+        "pattern": "*\\..\\*"
+      },
+      {
+        "field": "path",
+        "pattern": "*..%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%2e%2e%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%252e%252e%252f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%252e%252e%5c*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%c0%ae%c0%ae*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%c0%ae%c0%ae%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%c0%ae%c0%ae%5c*"
+      },
+      {
+        "field": "path",
+        "pattern": "*..%2f..%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%2e%2e%2f%2e%2e%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%00*"
+      },
+      {
+        "field": "path",
+        "pattern": "*../*%00*"
+      },
+      {
+        "field": "path",
+        "pattern": "*..%2F*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%2E%2E%2F*"
+      },
+      {
+        "field": "path",
+        "pattern": "*%2e%2E%2f*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/etc/passwd*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/etc/shadow*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/etc/hosts*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/etc/ssh*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/proc/*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/sys/*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.ssh/id_rsa*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.ssh/id_rsa.pub*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.ssh/known_hosts*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.ssh/config*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/.env*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/config.json*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/secrets.yaml*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/database.yml*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/credentials*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/home/*/.bash_history*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/home/*/.profile*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/root/.bash_history*"
+      },
+      {
+        "field": "path",
+        "pattern": "*/root/.profile*"
+      },
+      {
+        "field": "path",
+        "pattern": "*../*../*../*"
+      },
+      {
+        "field": "path",
+        "pattern": "*..%2f*..%2f*..%2f*"
+      }
+    ],
+    "rule_id": "mcts-t1105-path-traversal",
+    "tags": [
+      "attack.execution",
+      "mcts",
+      "path-traversal",
+      "file-access"
+    ],
+    "technique_id": "MCTS-T-1002",
+    "title": "MCTS-T-1002 Path Traversal via File Tool"
+  }
+]

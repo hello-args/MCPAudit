@@ -63,7 +63,7 @@ MCP servers expose databases, APIs, file systems, cloud resources, and SaaS tool
 | Compliance Checks | ✅ Alpha | OWASP LLM Top 10 & MCP best practices |
 | CI/CD Integration | 🚧 Planned | GitHub Action for pipeline gates |
 | HTML Security Dashboard | ✅ Alpha | Enterprise HTML report — gauge, grades, OWASP, attack chains |
-| MCP Fuzzer | 🔮 Roadmap | `mcts fuzz` |
+| MCP Fuzzer | ✅ Alpha | `mcts fuzz` — safe read-only protocol probes by default |
 | MCTS Agent | 🔮 Roadmap | `mcts pentest` |
 
 ## Quick Start
@@ -76,7 +76,7 @@ MCP servers expose databases, APIs, file systems, cloud resources, and SaaS tool
 ### Install
 
 ```bash
-git clone https://github.com/MCTS/MCTS.git
+git clone https://github.com/MCP-Audit/MCTS.git
 cd MCTS
 uv sync --all-extras
 ```

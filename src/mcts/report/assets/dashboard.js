@@ -368,6 +368,16 @@
       .join("");
   }
 
+  function formatMitigationLinks(links) {
+    if (!links || !links.length) return "";
+    return links
+      .map(
+        (link) =>
+          `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.id)}</a>`
+      )
+      .join(" · ");
+  }
+
   function renderFindingsTable() {
     const tbody = document.getElementById("findings-body");
     if (!tbody) return;
@@ -397,7 +407,21 @@
         <td>${escapeHtml(f.category)}</td>
         <td>${escapeHtml(f.owasp)}</td>
         <td>${escapeHtml(f.tool)}</td>
-        <td>${escapeHtml(f.recommendation)}</td>
+        <td>${escapeHtml(f.recommendation)}${
+          f.mitigation_links && f.mitigation_links.length
+            ? `<div style="margin-top:6px;font-size:12px">SAF mitigations: ${formatMitigationLinks(
+                f.mitigation_links
+              )}</div>`
+            : ""
+        }${
+          f.technique_scenario_url
+            ? `<div style="margin-top:4px;font-size:12px"><a href="${escapeHtml(
+                f.technique_scenario_url
+              )}" target="_blank" rel="noopener noreferrer">${escapeHtml(
+                f.technique_id
+              )}</a></div>`
+            : ""
+        }</td>
       </tr>`
       )
       .join("");
@@ -466,6 +490,13 @@
         <div class="rec-priority">Priority ${r.priority}</div>
         <h4>${escapeHtml(r.title)}</h4>
         <p style="color:var(--muted);margin:0 0 10px">${escapeHtml(r.recommendation)}</p>
+        ${
+          r.mitigation_links && r.mitigation_links.length
+            ? `<p style="font-size:12px;margin:0 0 10px">SAF mitigations: ${formatMitigationLinks(
+                r.mitigation_links
+              )}</p>`
+            : ""
+        }
         <div class="rec-meta">
           <span>Impact: <strong>${escapeHtml(r.impact)}</strong></span>
           <span>Effort: <strong>${escapeHtml(r.effort)}</strong></span>

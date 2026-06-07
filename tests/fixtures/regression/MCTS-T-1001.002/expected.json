@@ -1,0 +1,8 @@
+{
+  "schema_enum_poison": true,
+  "schema_default_poison": true,
+  "schema_credential_harvest": true,
+  "schema_ssh_path": true,
+  "benign_schema": false,
+  "benign_optional_path": false
+}

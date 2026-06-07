@@ -1,0 +1,18 @@
+{
+  "cross_origin_attempts:system_coordinator:0": true,
+  "cross_tool_references:api_redirector:1": true,
+  "cross_tool_references:message_interceptor:0": true,
+  "email_hijacking:send_email:0": true,
+  "email_hijacking:send_notification:1": true,
+  "legitimate_tools:file_read:1": false,
+  "legitimate_tools:send_email:0": false,
+  "shadowing_patterns:db_hijacker:2": true,
+  "shadowing_patterns:file_interceptor:1": true,
+  "shadowing_patterns:shadowing_attack:0": true,
+  "sleeper_tools:hidden_access:1": true,
+  "sleeper_tools:internal_validator:2": true,
+  "sleeper_tools:shadow_monitor:0": true,
+  "tool_impersonation:api_call:2": true,
+  "tool_impersonation:database_query:1": true,
+  "tool_impersonation:file_read:0": true
+}

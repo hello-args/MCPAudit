@@ -1,0 +1,10 @@
+{
+  "oauth_token_post_logout": true,
+  "impossible_travel": true,
+  "concurrent_token_usage": true,
+  "post_password_change": true,
+  "foci_abuse": true,
+  "prt_abuse": true,
+  "legitimate_travel": false,
+  "mobile_background_refresh": false
+}

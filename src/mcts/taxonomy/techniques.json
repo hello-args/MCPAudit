@@ -1,0 +1,604 @@
+{
+  "techniques": {
+    "MCTS-T-1001": {
+      "name": "Tool Description Poisoning",
+      "tactic": "initial_access",
+      "severity_default": "high",
+      "analyzers": [
+        "prompt_injection",
+        "metadata_integrity"
+      ],
+      "owasp": "LLM01",
+      "cwe": "CWE-74"
+    },
+    "MCTS-T-1001.002": {
+      "name": "Schema Surface Poisoning (FSP)",
+      "tactic": "initial_access",
+      "severity_default": "medium",
+      "analyzers": [
+        "schema_surface"
+      ],
+      "owasp": "LLM01",
+      "cwe": "CWE-20"
+    },
+    "MCTS-T-1002": {
+      "name": "Path Traversal / Missing Validation",
+      "tactic": "collection",
+      "severity_default": "high",
+      "analyzers": [
+        "path_validation",
+        "tool_abuse"
+      ],
+      "owasp": "LLM02",
+      "cwe": "CWE-22"
+    },
+    "MCTS-T-1003": {
+      "name": "Command Execution via Tool Handler",
+      "tactic": "execution",
+      "severity_default": "critical",
+      "analyzers": [
+        "command_execution"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-78"
+    },
+    "MCTS-T-1004": {
+      "name": "Sensitive Data Exposure",
+      "tactic": "collection",
+      "severity_default": "high",
+      "analyzers": [
+        "data_leakage"
+      ],
+      "owasp": "LLM02",
+      "cwe": "CWE-200"
+    },
+    "MCTS-T-1005": {
+      "name": "Multi-Step Attack Chain",
+      "tactic": "impact",
+      "severity_default": "critical",
+      "analyzers": [
+        "attack_chains"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-693"
+    },
+    "MCTS-T-1006": {
+      "name": "Excessive Tool Permissions",
+      "tactic": "privilege_escalation",
+      "severity_default": "high",
+      "analyzers": [
+        "permission_analyzer"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-269"
+    },
+    "MCTS-T-1007": {
+      "name": "Tool Output Prompt Injection",
+      "tactic": "defense_evasion",
+      "severity_default": "high",
+      "analyzers": [
+        "jailbreak",
+        "runtime_events"
+      ],
+      "owasp": "LLM07",
+      "cwe": "CWE-74"
+    },
+    "MCTS-T-1008": {
+      "name": "Cross-Server Tool Shadowing",
+      "tactic": "defense_evasion",
+      "severity_default": "high",
+      "analyzers": [
+        "cross_server"
+      ],
+      "owasp": "LLM01",
+      "cwe": "CWE-451"
+    },
+    "MCTS-T-1009": {
+      "name": "Protocol Fuzzing Exposure",
+      "tactic": "execution",
+      "severity_default": "high",
+      "analyzers": [
+        "fuzz"
+      ],
+      "owasp": "LLM04",
+      "cwe": "CWE-20"
+    },
+    "MCTS-T-1010": {
+      "name": "Sigma Metadata Rule Match",
+      "tactic": "initial_access",
+      "severity_default": "high",
+      "analyzers": [
+        "sigma_metadata"
+      ],
+      "owasp": "LLM01",
+      "cwe": "CWE-74"
+    },
+    "MCTS-T-1011": {
+      "name": "OAuth Authorization Phishing",
+      "tactic": "initial_access",
+      "severity_default": "critical",
+      "analyzers": [
+        "oauth_config"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-287"
+    },
+    "MCTS-T-1012": {
+      "name": "OAuth Authorization Server Mix-up",
+      "tactic": "initial_access",
+      "severity_default": "critical",
+      "analyzers": [
+        "oauth_config"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-287"
+    },
+    "MCTS-T-1013": {
+      "name": "Tool Metadata Rug Pull",
+      "tactic": "persistence",
+      "severity_default": "critical",
+      "analyzers": [
+        "metadata_diff"
+      ],
+      "owasp": "LLM01",
+      "cwe": "CWE-353"
+    },
+    "MCTS-T-1014": {
+      "name": "Supply Chain Compromise",
+      "tactic": "initial_access",
+      "severity_default": "high",
+      "analyzers": [
+        "supply_chain"
+      ],
+      "owasp": "LLM05",
+      "cwe": "CWE-829"
+    },
+    "MCTS-T-1015": {
+      "name": "Malicious MCP Server Distribution",
+      "tactic": "initial_access",
+      "severity_default": "high",
+      "analyzers": [
+        "supply_chain"
+      ],
+      "owasp": "LLM05",
+      "cwe": "CWE-506"
+    },
+    "MCTS-T-1016": {
+      "name": "Sampling Request Abuse",
+      "tactic": "execution",
+      "severity_default": "high",
+      "analyzers": [
+        "fuzz"
+      ],
+      "owasp": "LLM04",
+      "cwe": "CWE-400"
+    },
+    "MCTS-T-1017": {
+      "name": "Rogue Authorization Server",
+      "tactic": "privilege_escalation",
+      "severity_default": "critical",
+      "analyzers": [
+        "oauth_config",
+        "runtime_events"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-287"
+    },
+    "MCTS-T-1018": {
+      "name": "OAuth Confused Deputy",
+      "tactic": "privilege_escalation",
+      "severity_default": "high",
+      "analyzers": [
+        "oauth_config",
+        "runtime_events"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-269"
+    },
+    "MCTS-T-1019": {
+      "name": "Token Scope Substitution",
+      "tactic": "privilege_escalation",
+      "severity_default": "high",
+      "analyzers": [
+        "oauth_config",
+        "runtime_events"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-287"
+    },
+    "MCTS-T-1020": {
+      "name": "Tool Shadowing Attack",
+      "tactic": "initial_access",
+      "severity_default": "high",
+      "analyzers": [
+        "tool_shadowing"
+      ],
+      "owasp": "LLM01",
+      "cwe": "CWE-74"
+    },
+    "MCTS-T-1021": {
+      "name": "Line Jumping / Context Precedence Attack",
+      "tactic": "defense_evasion",
+      "severity_default": "high",
+      "analyzers": [
+        "line_jumping"
+      ],
+      "owasp": "LLM01",
+      "cwe": "CWE-74"
+    },
+    "MCTS-T-1022": {
+      "name": "Semantic Credential Exposure",
+      "tactic": "credential_access",
+      "severity_default": "high",
+      "analyzers": [
+        "embedding_secrets"
+      ],
+      "owasp": "LLM02",
+      "cwe": "CWE-200"
+    },
+    "MCTS-T-1023": {
+      "name": "Runtime Command Injection",
+      "tactic": "execution",
+      "severity_default": "critical",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-78"
+    },
+    "MCTS-T-1024": {
+      "name": "Runtime Credential File Access",
+      "tactic": "credential_access",
+      "severity_default": "critical",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM02",
+      "cwe": "CWE-200"
+    },
+    "MCTS-T-1026": {
+      "name": "Behavioral System Prompt Extraction",
+      "tactic": "discovery",
+      "severity_default": "high",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM07",
+      "cwe": "CWE-200"
+    },
+    "MCTS-T-1027": {
+      "name": "Exposed MCP Endpoint",
+      "tactic": "initial_access",
+      "severity_default": "critical",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-668"
+    },
+    "MCTS-T-1028": {
+      "name": "DNS / Certificate Poisoning",
+      "tactic": "initial_access",
+      "severity_default": "high",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM05",
+      "cwe": "CWE-345"
+    },
+    "MCTS-T-1029": {
+      "name": "Cross-Server Tool Shadowing",
+      "tactic": "privilege_escalation",
+      "severity_default": "high",
+      "analyzers": [
+        "runtime_events",
+        "cross_server"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-269"
+    },
+    "MCTS-T-1030": {
+      "name": "High-Privilege Tool Abuse",
+      "tactic": "privilege_escalation",
+      "severity_default": "critical",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-269"
+    },
+    "MCTS-T-1031": {
+      "name": "Suspicious Tool Registration",
+      "tactic": "initial_access",
+      "severity_default": "high",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM05",
+      "cwe": "CWE-506"
+    },
+    "MCTS-T-1032": {
+      "name": "Fake Tool Invocation",
+      "tactic": "execution",
+      "severity_default": "high",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-345"
+    },
+    "MCTS-T-1033": {
+      "name": "Container Sandbox Escape",
+      "tactic": "privilege_escalation",
+      "severity_default": "critical",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-94"
+    },
+    "MCTS-T-1034": {
+      "name": "Vector Store Contamination",
+      "tactic": "persistence",
+      "severity_default": "high",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM01",
+      "cwe": "CWE-74"
+    },
+    "MCTS-T-1035": {
+      "name": "Autonomous Loop Exploit",
+      "tactic": "execution",
+      "severity_default": "high",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM04",
+      "cwe": "CWE-400"
+    },
+    "MCTS-T-1036": {
+      "name": "MCP Inspector RCE",
+      "tactic": "execution",
+      "severity_default": "critical",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-94"
+    },
+    "MCTS-T-1037": {
+      "name": "OAuth Token Persistence",
+      "tactic": "persistence",
+      "severity_default": "high",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM06",
+      "cwe": "CWE-287"
+    },
+    "MCTS-T-1038": {
+      "name": "Backdoored MCP Server Install",
+      "tactic": "persistence",
+      "severity_default": "high",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM05",
+      "cwe": "CWE-506"
+    },
+    "MCTS-T-1039": {
+      "name": "Context Memory Implant",
+      "tactic": "persistence",
+      "severity_default": "high",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM01",
+      "cwe": "CWE-74"
+    },
+    "MCTS-T-1040": {
+      "name": "Persistent Tool Redefinition",
+      "tactic": "persistence",
+      "severity_default": "high",
+      "analyzers": [
+        "metadata_diff",
+        "runtime_events"
+      ],
+      "owasp": "LLM01",
+      "cwe": "CWE-353"
+    },
+    "MCTS-T-1041": {
+      "name": "Instruction Steganography in Metadata",
+      "tactic": "defense_evasion",
+      "severity_default": "high",
+      "analyzers": [
+        "runtime_events"
+      ],
+      "owasp": "LLM01",
+      "cwe": "CWE-74"
+    }
+  },
+  "mitigations": {
+    "MCTS-M-001": {
+      "name": "Enforce path canonicalization and allowlisted roots",
+      "techniques": [
+        "MCTS-T-1002"
+      ]
+    },
+    "MCTS-M-002": {
+      "name": "Remove shell execution from tool handlers",
+      "techniques": [
+        "MCTS-T-1003"
+      ]
+    },
+    "MCTS-M-003": {
+      "name": "Isolate read and egress capabilities",
+      "techniques": [
+        "MCTS-T-1005"
+      ]
+    },
+    "MCTS-M-004": {
+      "name": "Use neutral tool descriptions without imperative instructions",
+      "techniques": [
+        "MCTS-T-1001"
+      ]
+    },
+    "MCTS-M-005": {
+      "name": "Resolve cross-server tool name collisions",
+      "techniques": [
+        "MCTS-T-1008"
+      ]
+    },
+    "MCTS-M-006": {
+      "name": "Apply least-privilege tool permissions",
+      "techniques": [
+        "MCTS-T-1006",
+        "MCTS-T-1030",
+        "MCTS-T-1033",
+        "MCTS-T-1036"
+      ]
+    },
+    "MCTS-M-007": {
+      "name": "Validate Unicode normalization on tool metadata",
+      "techniques": [
+        "MCTS-T-1001",
+        "MCTS-T-1041"
+      ]
+    },
+    "MCTS-M-008": {
+      "name": "Pin dependencies and verify package provenance",
+      "techniques": [
+        "MCTS-T-1014",
+        "MCTS-T-1015",
+        "MCTS-T-1028",
+        "MCTS-T-1031",
+        "MCTS-T-1038"
+      ]
+    },
+    "MCTS-M-009": {
+      "name": "Enforce context precedence and authenticated sources",
+      "techniques": [
+        "MCTS-T-1021",
+        "MCTS-T-1034",
+        "MCTS-T-1039"
+      ]
+    },
+    "MCTS-M-010": {
+      "name": "Verify MCP server distribution sources",
+      "techniques": [
+        "MCTS-T-1015",
+        "MCTS-T-1038"
+      ]
+    },
+    "MCTS-M-011": {
+      "name": "Rate-limit sampling and autonomous tool loops",
+      "techniques": [
+        "MCTS-T-1009",
+        "MCTS-T-1016",
+        "MCTS-T-1026",
+        "MCTS-T-1035"
+      ]
+    },
+    "MCTS-M-012": {
+      "name": "Monitor behavioral baselines for anomalous tool use",
+      "techniques": [
+        "MCTS-T-1005",
+        "MCTS-T-1026"
+      ]
+    },
+    "MCTS-M-013": {
+      "name": "Harden tool handlers against injection",
+      "techniques": [
+        "MCTS-T-1003",
+        "MCTS-T-1023",
+        "MCTS-T-1032",
+        "MCTS-T-1036"
+      ]
+    },
+    "MCTS-M-014": {
+      "name": "Harden OAuth flows and token storage",
+      "techniques": [
+        "MCTS-T-1011",
+        "MCTS-T-1012",
+        "MCTS-T-1017",
+        "MCTS-T-1018",
+        "MCTS-T-1019",
+        "MCTS-T-1037"
+      ]
+    },
+    "MCTS-M-015": {
+      "name": "Limit OAuth token scopes to least privilege",
+      "techniques": [
+        "MCTS-T-1019"
+      ]
+    },
+    "MCTS-M-016": {
+      "name": "Pin authorization server URLs and validate issuers",
+      "techniques": [
+        "MCTS-T-1012",
+        "MCTS-T-1017"
+      ]
+    },
+    "MCTS-M-017": {
+      "name": "Restrict OAuth callback URLs per client",
+      "techniques": [
+        "MCTS-T-1011"
+      ]
+    },
+    "MCTS-M-018": {
+      "name": "Generate and verify SBOMs for MCP server dependencies",
+      "techniques": [
+        "MCTS-T-1014",
+        "MCTS-T-1024"
+      ]
+    },
+    "MCTS-M-019": {
+      "name": "Isolate redirect URIs and prevent token forwarding",
+      "techniques": [
+        "MCTS-T-1018"
+      ]
+    },
+    "MCTS-M-020": {
+      "name": "Apply Sigma-style metadata pattern monitoring",
+      "techniques": [
+        "MCTS-T-1010",
+        "MCTS-T-1001"
+      ]
+    },
+    "MCTS-M-021": {
+      "name": "Validate schema defaults and surface fields",
+      "techniques": [
+        "MCTS-T-1001.002",
+        "MCTS-T-1002"
+      ]
+    },
+    "MCTS-M-022": {
+      "name": "Sign tool manifests and reject unsigned changes",
+      "techniques": [
+        "MCTS-T-1013",
+        "MCTS-T-1040"
+      ]
+    },
+    "MCTS-M-023": {
+      "name": "Prevent cross-server confused-deputy tool routing",
+      "techniques": [
+        "MCTS-T-1018",
+        "MCTS-T-1029"
+      ]
+    },
+    "MCTS-M-024": {
+      "name": "Detect and block rug-pull metadata changes",
+      "techniques": [
+        "MCTS-T-1013"
+      ]
+    },
+    "MCTS-M-025": {
+      "name": "Scan for semantic credential exposure in tool output",
+      "techniques": [
+        "MCTS-T-1022",
+        "MCTS-T-1024"
+      ]
+    }
+  }
+}

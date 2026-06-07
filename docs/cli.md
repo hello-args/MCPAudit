@@ -18,19 +18,23 @@ mcts scan <target> [--output report.json] [--fail-on-critical] [--theme cyber]
 | `--fail-on-critical` | ✅ | Exit code 1 if critical findings exist |
 | `--theme` | ✅ | Terminal theme: `cyber`, `minimal`, `github` |
 | `--no-progress` | ✅ | Skip pre-report progress animation |
-| `--format` | 📋 | `json` (default), `sarif` |
-| `--min-score` | 📋 | Exit 1 if overall score below threshold |
-| `--max-critical` | 📋 | Exit 1 if critical count exceeds limit |
-| `--live` | 📋 | Connect to running server via MCP stdio |
-| `--command`, `--args` | 📋 | Spawn command for live probe |
-| `--config`, `--server` | 📋 | Scan server entry from client MCP config |
-| `--i-understand-live-risk` | 📋 | Skip consent prompt (CI only) |
-| `--record-baseline` | 📋 | Save tool description/schema hashes |
-| `--check-baseline` | 📋 | Diff against baseline (rug-pull detection) |
+| `--format` | ✅ | `json` (default) or `sarif` |
+| `--min-score` | ✅ | Exit 1 if overall score below threshold |
+| `--max-critical` | ✅ | Exit 1 if critical count exceeds limit |
+| `--live` | ✅ | Connect to running server via MCP stdio |
+| `--command`, `--args` | ✅ | Spawn command for live probe |
+| `--config`, `--server` | ✅ | Scan server entry from client MCP config |
+| `--i-understand-live-risk` | ✅ | Consent for live MCP probing (or `MCTS_LIVE_OK=1` in CI) |
+| `--runtime-events` | ✅ | JSON telemetry file for runtime analyzers |
+| `--behavioral-probe` | ✅ | Multi-turn MCTS-T-1026 probe events (on by default with `--live`) |
+| `--semantic-secrets` | ✅ | Opt-in semantic credential detection (MCTS-T-1022) |
+| `--sigma-rules-path` | ✅ | Extra Sigma YAML directory (`MCTS-T-*/detection-rule.yml`) |
+| `--baseline` / `--save-baseline` | ✅ | Rug-pull baseline compare/snapshot |
+| `--languages` | ✅ | Discovery languages: `python`, `typescript` |
 | `--profile` | 📋 | Policy profile: `strict`, `balanced`, `dev` |
 | `--llm-review` | 📋 | Opt-in LLM finding review (requires API key) |
 
-`<target>` today: path to a Python MCP server entrypoint. **Planned:** directory (repo scan), config path.
+`<target>`: path to MCP server entrypoint **or repository directory** (multi-file discovery). Use `.` with `--config` + `--server`.
 
 ### Scoring output
 
@@ -65,18 +69,16 @@ See [HTML Security Dashboard](html-report.md).
 
 ---
 
-## `mcts inventory` (📋 Planned)
+## `mcts inventory` (✅ Shipped)
 
 Discover MCP servers configured on this machine.
 
 ```bash
 mcts inventory
-mcts inventory --scan
-mcts inventory --scan --server filesystem
-mcts inventory --json
+mcts inventory --scan -o inventory.json
 ```
 
-Supports Cursor, Claude Desktop, VS Code (extensible discoverers). Optional `--skills` in Phase 3.
+Supports Cursor, Claude Desktop, VS Code, Windsurf. Optional `--skills` in Phase 3.
 
 ---
 
@@ -91,16 +93,16 @@ mcts audit-config ./claude_desktop_config.json --probe
 
 ---
 
-## `mcts fuzz` (📋 Planned)
+## `mcts fuzz` (✅ Shipped)
 
-Protocol-level probing against a live MCP server. Stub today.
+Protocol-level probing against a live stdio MCP server.
 
 ```bash
-mcts fuzz <target> --live --command uv --args run,server.py
-mcts fuzz <target> --fuzz-level safe|standard|aggressive
+mcts fuzz <target> --i-understand-live-risk --fuzz-level safe|standard|aggressive
+mcts fuzz . --config ~/.cursor/mcp.json --server my-server --i-understand-live-risk -o fuzz.json
 ```
 
-Default: read-only (handshake + list). Requires consent or `--i-understand-live-risk`.
+Output includes `runtime_events` for piping into `mcts scan --runtime-events`. Aggressive level requires `--i-understand-fuzz-risk`.
 
 ---
 

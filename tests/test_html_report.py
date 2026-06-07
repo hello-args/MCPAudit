@@ -22,7 +22,8 @@ def test_build_dashboard_payload_from_scan(example_server_path: Path) -> None:
     assert payload["meta"]["tools_discovered"] == len(report.server.tools)
     assert payload["risk"]["badge"] == risk_rating(report.score.overall)[0]
     assert payload["categories"]
-    assert len(payload["categories"]) == 5
+    assert len(payload["categories"]) == 7
+    assert payload["techniques"]
     assert payload["score"]["grade"]["letter"] == security_grade(report.score.overall)["letter"]
     assert payload["executive_summary"]["paragraphs"]
     assert payload["executive_summary"]["recommended"]

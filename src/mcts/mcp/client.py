@@ -2,57 +2,41 @@
 
 from __future__ import annotations
 
-import ast
-import re
 from pathlib import Path
 
-from mcts.mcp.models import MCPServerInfo, MCPTool
-
-TOOL_DECORATOR_PATTERN = re.compile(
-    r"@(?:\w+\.)?tool\s*\([^)]*\)\s*\n\s*(?:async\s+)?def\s+(\w+)\s*\(",
-    re.MULTILINE,
-)
-DOCSTRING_PATTERN = re.compile(
-    r"def\s+\w+\s*\([^)]*\)\s*(?:->[^:]*)?:\s*(?:\"\"\"(.*?)\"\"\"|'\'\'(.*?)\'\'\')?",
-    re.DOTALL,
-)
+from mcts.core.config import ScanConfig
+from mcts.discovery.merge import merge_server_info
+from mcts.discovery.static_runner import discover_static
+from mcts.mcp.models import MCPServerInfo
 
 
 class MCPClient:
-    """Discovers MCP server capabilities from source or live connection."""
+    """Discovers MCP server capabilities from static source and/or live stdio probe."""
 
-    def __init__(self, target: Path) -> None:
+    def __init__(self, target: Path, config: ScanConfig | None = None) -> None:
         self.target = target
+        self.config = config or ScanConfig(target=target)
 
     def discover(self) -> MCPServerInfo:
-        """Discover tools from a Python MCP server entrypoint (static analysis)."""
-        if not self.target.exists():
-            return MCPServerInfo(name=str(self.target), tools=[])
+        """Discover tools via static analysis, live probe, or merged mode."""
+        static_info = self._discover_static()
+        if not self.config.live:
+            return static_info
 
-        source = self.target.read_text(encoding="utf-8")
-        tools = self._parse_tools_from_source(source)
-        return MCPServerInfo(
-            name=self.target.stem,
-            tools=tools,
-            transport="stdio",
-        )
+        from mcts.discovery.live import LiveDiscovery
 
-    def _parse_tools_from_source(self, source: str) -> list[MCPTool]:
-        tools: list[MCPTool] = []
-        for match in TOOL_DECORATOR_PATTERN.finditer(source):
-            func_name = match.group(1)
-            description = self._extract_docstring(source, func_name)
-            tools.append(MCPTool(name=func_name, description=description))
-        return tools
+        live_info = LiveDiscovery(self.config).discover()
 
-    def _extract_docstring(self, source: str, func_name: str) -> str:
-        try:
-            tree = ast.parse(source)
-        except SyntaxError:
-            return ""
+        if static_info.tools and self.config.merge_static_live and static_info.discovery_mode != "empty":
+            return merge_server_info(static_info, live_info)
+        return live_info
 
-        for node in ast.walk(tree):
-            if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef) and node.name == func_name:
-                doc = ast.get_docstring(node)
-                return doc or ""
-        return ""
+    def _discover_static(self) -> MCPServerInfo:
+        if self.config.config_path and not self._target_exists():
+            return MCPServerInfo(name=self.config.config_server or "config", discovery_mode="empty")
+        if not self._target_exists():
+            return MCPServerInfo(name=str(self.target), discovery_mode="empty")
+        return discover_static(self.config)
+
+    def _target_exists(self) -> bool:
+        return self.target.exists()

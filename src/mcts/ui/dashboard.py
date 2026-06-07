@@ -11,6 +11,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from mcts.report.data import category_scores
 from mcts.reporting.models import Finding, ScanReport, ScanSummary, ScoreBasis, Severity
 from mcts.scoring.engine import RISK_WEIGHTS, security_score_from_raw_risk
 from mcts.ui.layout import FINDINGS_PANEL_MIN_WIDTH, SEVERITY_PANEL_WIDTH, content_width
@@ -157,6 +158,27 @@ def build_score_block(report: ScanReport, theme: Theme) -> Table:
     return grid
 
 
+def build_category_breakdown(report: ScanReport, theme: Theme) -> Table:
+    """Risk category breakdown aligned with the HTML dashboard."""
+    p = theme.palette
+    table = Table(
+        title="Risk Category Breakdown",
+        box=box.SIMPLE_HEAVY,
+        show_header=True,
+        header_style=theme.style(p.cyan, bold=True),
+        title_style=theme.style(p.white, bold=True),
+        border_style=theme.style(p.panel_border),
+        padding=(0, 1),
+    )
+    table.add_column("Category", style=theme.style(p.white))
+    table.add_column("Score", justify="right", style=theme.style(p.yellow, bold=True))
+    table.add_column("Findings", justify="right", style=theme.style(p.muted))
+
+    for row in category_scores(report.findings):
+        table.add_row(row["label"], row["display"], str(row["findings_count"]))
+    return table
+
+
 def build_severity_panel(summary: ScanSummary, theme: Theme) -> Panel:
     """Left panel: severity breakdown with colored bullets."""
     p = theme.palette
@@ -301,6 +323,7 @@ def build_dashboard(
         build_scan_status(meta, report, theme),
         build_report_divider(theme),
         build_score_block(report, theme),
+        build_category_breakdown(report, theme),
     ]
 
     if width >= 90:

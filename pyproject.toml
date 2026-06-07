@@ -28,6 +28,7 @@ dependencies = [
     "jinja2>=3.1.0",
     "pydantic>=2.13.4",
     "pydantic-settings>=2.7.0",
+    "pyyaml>=6.0",
     "rich>=13.9.0",
     "typer>=0.15.0",
 ]
@@ -40,6 +41,10 @@ dev = [
     "pytest-cov>=7.1.0",
     "ruff>=0.9.0",
 ]
+semantic = [
+    "sentence-transformers>=3.0.0",
+    "numpy>=1.24.0",
+]
 mcp = [
     "mcp>=1.27.2",
 ]
@@ -48,11 +53,11 @@ mcp = [
 mcts = "mcts.cli.main:run"
 
 [project.urls]
-Homepage = "https://github.com/MCTS/MCTS"
-Documentation = "https://github.com/MCTS/MCTS#readme"
-Repository = "https://github.com/MCTS/MCTS"
-Issues = "https://github.com/MCTS/MCTS/issues"
-Changelog = "https://github.com/MCTS/MCTS/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/MCP-Audit/MCTS"
+Documentation = "https://github.com/MCP-Audit/MCTS#readme"
+Repository = "https://github.com/MCP-Audit/MCTS"
+Issues = "https://github.com/MCP-Audit/MCTS/issues"
+Changelog = "https://github.com/MCP-Audit/MCTS/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling"]
@@ -61,16 +66,14 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.sdist]
 only-include = ["src", "tests", "README.md", "LICENSE", "NOTICE", "pyproject.toml"]
 
-[tool.hatch.build.targets.wheel.force-include]
-"src/mcts/report/templates" = "mcts/report/templates"
-"src/mcts/report/assets" = "mcts/report/assets"
-"src/mcts/brand" = "mcts/brand"
-
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
 asyncio_mode = "auto"
 addopts = "-ra --strict-markers"
+markers = [
+    "integration: optional integration tests requiring mcp extra",
+]
 
 [tool.ruff]
 target-version = "py311"
@@ -79,6 +82,9 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/mcts/cli/main.py" = ["UP045"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["mcts"]

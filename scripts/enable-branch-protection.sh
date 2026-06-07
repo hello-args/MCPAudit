@@ -6,7 +6,7 @@ set -euo pipefail
 #
 # Usage:
 #   ./scripts/enable-branch-protection.sh
-#   ./scripts/enable-branch-protection.sh MCTS/MCTS
+#   ./scripts/enable-branch-protection.sh MCP-Audit/MCTS
 
 REPO="${1:-$(gh repo view --json nameWithOwner -q .nameWithOwner)}"
 RULESET_FILE="$(cd "$(dirname "$0")/.." && pwd)/.github/rulesets/main.json"

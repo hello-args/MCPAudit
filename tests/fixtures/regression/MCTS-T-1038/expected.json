@@ -1,0 +1,8 @@
+{
+  "install_writes_cron_entry": true,
+  "install_enables_systemd_unit": true,
+  "install_outbound_to_suspicious_destination": true,
+  "normal_install_downloads_dependencies": false,
+  "legit_service_setup_without_persistence_paths": false,
+  "developer_writes_shell_profile": false
+}

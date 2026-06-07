@@ -1,0 +1,17 @@
+{
+  "benign_001": false,
+  "benign_002": false,
+  "benign_003": false,
+  "malicious_001": true,
+  "malicious_002": true,
+  "malicious_003": true,
+  "malicious_004": true,
+  "malicious_005": true,
+  "malicious_006": true,
+  "malicious_007": true,
+  "malicious_008": true,
+  "malicious_009": true,
+  "edge_case_001": false,
+  "edge_case_002": false,
+  "edge_case_003": false
+}

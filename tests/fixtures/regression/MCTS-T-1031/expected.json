@@ -1,0 +1,7 @@
+{
+  "http_manifest": true,
+  "typo_manifest": true,
+  "missing_trust": true,
+  "trusted_publish": false,
+  "execution_not_register": false
+}

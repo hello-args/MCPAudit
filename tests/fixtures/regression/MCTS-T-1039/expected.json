@@ -1,0 +1,7 @@
+{
+  "implant_full": true,
+  "implant_persistence": true,
+  "implant_vector": true,
+  "benign_config": false,
+  "benign_read": false
+}

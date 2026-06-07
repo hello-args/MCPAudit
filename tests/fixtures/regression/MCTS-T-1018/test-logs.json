@@ -1,0 +1,73 @@
+[
+  {
+    "case_id": "deputy_user_mismatch",
+    "event_type": "token_forward",
+    "action": "relay_token",
+    "token_owner_id": "alice@example.com",
+    "request_user_id": "bob@example.com"
+  },
+  {
+    "case_id": "deputy_source_dest",
+    "event_type": "token_forward",
+    "source_user": "user-a@example.com",
+    "destination_user": "user-b@example.com",
+    "match_users": false
+  },
+  {
+    "case_id": "audience_mismatch",
+    "event_type": "resource_access",
+    "jwt_aud_claim": "https://api.service-a.com",
+    "target_service_id": "https://api.service-b.com"
+  },
+  {
+    "case_id": "tenant_violation",
+    "event_type": "token_usage",
+    "token_tenant_id": "tenant-a",
+    "accessing_tenant_id": "tenant-b"
+  },
+  {
+    "case_id": "token_passthrough",
+    "event_type": "token_forward",
+    "token_passthrough_detected": true,
+    "token_issued_for": "https://other-mcp.example.com",
+    "mcp_server_id": "https://my-mcp.example.com"
+  },
+  {
+    "case_id": "consent_bypass",
+    "event_type": "oauth_authorization",
+    "consent_validated": false,
+    "consent_cookie_reused": true
+  },
+  {
+    "case_id": "idp_mixup",
+    "event_type": "token_validation",
+    "expected_issuer": "https://accounts.google.com",
+    "actual_issuer": "https://evil-idp.example.com"
+  },
+  {
+    "case_id": "iam_assumption",
+    "event_type": "iam_role_assumption",
+    "principal_account": "111111111111",
+    "target_role_account": "222222222222"
+  },
+  {
+    "case_id": "benign_same_user",
+    "event_type": "token_forward",
+    "token_owner_id": "alice@example.com",
+    "request_user_id": "alice@example.com"
+  },
+  {
+    "case_id": "benign_service_account",
+    "event_type": "api_call",
+    "token_owner_id": "svc-bot@example.com",
+    "request_user_id": "svc-bot@example.com",
+    "match_users": true
+  },
+  {
+    "case_id": "benign_audience_match",
+    "event_type": "resource_access",
+    "jwt_aud_claim": "https://api.service-a.com",
+    "target_service_id": "https://api.service-a.com",
+    "match_audience": true
+  }
+]

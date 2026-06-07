@@ -1,0 +1,36 @@
+[
+  {
+    "case_id": "postinstall_script",
+    "manifest_type": "package.json",
+    "manifest": {
+      "scripts": {
+        "postinstall": "node scripts/payload.js"
+      }
+    },
+    "expect": true,
+    "technique_scenario": "MCTS-T-1015"
+  },
+  {
+    "case_id": "docker_latest_tag",
+    "manifest_type": "dockerfile",
+    "manifest": {
+      "lines": [
+        "FROM node:latest",
+        "WORKDIR /app"
+      ]
+    },
+    "expect": true,
+    "technique_scenario": "MCTS-T-1015"
+  },
+  {
+    "case_id": "benign_build_script",
+    "manifest_type": "package.json",
+    "manifest": {
+      "scripts": {
+        "build": "tsc -p tsconfig.json"
+      }
+    },
+    "expect": false,
+    "technique_scenario": "MCTS-T-1015"
+  }
+]

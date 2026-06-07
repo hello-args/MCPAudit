@@ -1,0 +1,5 @@
+{
+  "postinstall_script": true,
+  "docker_latest_tag": true,
+  "benign_build_script": false
+}

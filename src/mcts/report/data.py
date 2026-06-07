@@ -7,20 +7,32 @@ from typing import Any
 
 from mcts.reporting.models import Finding, ScanReport, ScanSummary, Severity
 from mcts.scoring.engine import RISK_WEIGHTS
+from mcts.taxonomy.mapper import technique_catalog
+from mcts.taxonomy.mitigation_urls import mitigation_links, technique_url
 
 OWASP_CATALOG: tuple[tuple[str, str, tuple[str, ...]], ...] = (
-    ("LLM01", "Prompt Injection", ("prompt_injection",)),
-    ("LLM02", "Sensitive Information Disclosure", ("data_leakage",)),
+    (
+        "LLM01",
+        "Prompt Injection",
+        ("prompt_injection", "metadata_integrity", "schema_surface", "cross_server"),
+    ),
+    ("LLM02", "Sensitive Information Disclosure", ("data_leakage", "path_validation")),
     ("LLM04", "Model Denial of Service", ("tool_abuse",)),
-    ("LLM06", "Excessive Agency", ("attack_chains", "permission_analyzer", "compliance")),
+    (
+        "LLM06",
+        "Excessive Agency",
+        ("attack_chains", "permission_analyzer", "command_execution", "compliance"),
+    ),
     ("LLM07", "System Prompt Leakage", ("jailbreak",)),
 )
 
 CATEGORY_DEFS: tuple[tuple[str, str, int, tuple[str, ...]], ...] = (
-    ("permissions", "Excessive Permissions", 25, ("permission_analyzer",)),
-    ("injection", "Injection Exposure", 25, ("prompt_injection",)),
-    ("data_leakage", "Data Leakage Risk", 20, ("data_leakage",)),
-    ("attack_chains", "Attack Chain Risk", 20, ("attack_chains",)),
+    ("permissions", "Excessive Permissions", 20, ("permission_analyzer",)),
+    ("injection", "Injection & Metadata", 20, ("prompt_injection", "metadata_integrity", "schema_surface")),
+    ("execution", "Execution & Path Risk", 15, ("command_execution", "path_validation", "tool_abuse")),
+    ("data_leakage", "Data Leakage Risk", 15, ("data_leakage",)),
+    ("attack_chains", "Attack Chain Risk", 15, ("attack_chains",)),
+    ("shadowing", "Cross-Server Shadowing", 5, ("cross_server",)),
     ("jailbreak", "Jailbreak Resistance", 10, ("jailbreak",)),
 )
 
@@ -29,9 +41,19 @@ ANALYZER_LABELS: dict[str, str] = {
     "prompt_injection": "Prompt Injection",
     "tool_abuse": "Tool Abuse",
     "data_leakage": "Data Leakage",
+    "schema_surface": "Schema Surface",
+    "command_execution": "Command Execution",
+    "path_validation": "Path Validation",
+    "metadata_integrity": "Metadata Integrity",
+    "cross_server": "Cross-Server Shadowing",
     "jailbreak": "Jailbreak",
     "attack_chains": "Attack Chains",
+    "fuzz": "Protocol Fuzzing",
     "compliance": "Compliance",
+    "sigma_metadata": "Sigma Metadata Rules",
+    "oauth_config": "OAuth Configuration",
+    "metadata_diff": "Metadata Baseline Diff",
+    "supply_chain": "Supply Chain",
 }
 
 SEVERITY_ORDER = {
@@ -44,8 +66,10 @@ SEVERITY_ORDER = {
 INDUSTRY_BENCHMARK: dict[str, float] = {
     "permissions": 8,
     "injection": 6,
+    "execution": 5,
     "data_leakage": 5,
     "attack_chains": 4,
+    "shadowing": 2,
     "jailbreak": 3,
 }
 
@@ -232,6 +256,50 @@ def category_scores(findings: list[Finding]) -> list[dict[str, Any]]:
     return rows
 
 
+def category_gate_keys() -> frozenset[str]:
+    return frozenset(key for key, _, _, _ in CATEGORY_DEFS)
+
+
+def parse_category_gates(raw_values: list[str] | None) -> dict[str, int]:
+    """Parse `--fail-on-category permissions:10` style thresholds."""
+    gates: dict[str, int] = {}
+    if not raw_values:
+        return gates
+    valid = category_gate_keys()
+    for raw in raw_values:
+        for part in raw.split(","):
+            part = part.strip()
+            if not part:
+                continue
+            if ":" not in part:
+                raise ValueError(f"Invalid --fail-on-category value {part!r}. Use category:max_score.")
+            category, limit_text = part.split(":", 1)
+            category = category.strip()
+            if category not in valid:
+                valid_list = ", ".join(sorted(valid))
+                raise ValueError(f"Unknown category {category!r}. Valid categories: {valid_list}")
+            limit = int(limit_text.strip())
+            if limit < 0:
+                raise ValueError(f"Category limit must be >= 0, got {limit}")
+            gates[category] = limit
+    return gates
+
+
+def category_gate_failures(findings: list[Finding], gates: dict[str, int]) -> list[str]:
+    """Return human-readable failures when a category score meets/exceeds its gate."""
+    if not gates:
+        return []
+    by_key = {row["key"]: row for row in category_scores(findings)}
+    failures: list[str] = []
+    for category, limit in gates.items():
+        row = by_key.get(category)
+        if not row:
+            continue
+        if row["score"] >= limit:
+            failures.append(f"{row['label']} scored {row['display']} (limit {limit})")
+    return failures
+
+
 def owasp_mappings(findings: list[Finding]) -> list[dict[str, Any]]:
     tools_by_analyzer: dict[str, set[str]] = {}
     for finding in findings:
@@ -313,12 +381,17 @@ def build_recommendations(findings: list[Finding]) -> list[dict[str, Any]]:
                 "effort": effort_map[finding.severity],
                 "analyzer": finding.analyzer,
                 "tool": finding.tool,
+                "mitigation_links": mitigation_links(finding.mitigation_ids),
+                "technique_url": technique_url(finding.technique_id) if finding.technique_id else None,
             }
         )
     return rows
 
 
 def build_attack_graph(report: ScanReport) -> dict[str, Any]:
+    if report.attack_graph.get("edges") or report.attack_graph.get("nodes"):
+        return report.attack_graph
+
     nodes: dict[str, dict[str, str]] = {}
     edges: list[dict[str, str]] = []
 
@@ -332,8 +405,9 @@ def build_attack_graph(report: ScanReport) -> dict[str, Any]:
         read_tools = evidence.get("read_tools", [])
         exfil_tools = evidence.get("exfil_tools", [])
         cred_tools = evidence.get("credential_tools", [])
+        exec_tools = evidence.get("exec_tools", [])
 
-        for name in read_tools + exfil_tools + cred_tools:
+        for name in read_tools + exfil_tools + cred_tools + exec_tools:
             nodes[name] = {"id": name, "label": name, "type": "tool"}
 
         for src in read_tools:
@@ -345,11 +419,9 @@ def build_attack_graph(report: ScanReport) -> dict[str, Any]:
         for src in read_tools:
             for dst in cred_tools:
                 edges.append({"from": src, "to": dst, "label": "read → cred"})
-
-    if not edges and len(report.server.tools) >= 2:
-        sample = [t.name for t in report.server.tools[:4]]
-        for idx in range(len(sample) - 1):
-            edges.append({"from": sample[idx], "to": sample[idx + 1], "label": "related"})
+        for src in read_tools:
+            for dst in exec_tools:
+                edges.append({"from": src, "to": dst, "label": "read → exec"})
 
     return {
         "nodes": list(nodes.values()),
@@ -382,6 +454,10 @@ def build_dashboard_payload(report: ScanReport) -> dict[str, Any]:
                 "owasp": ", ".join(owasp_ids) if owasp_ids else "—",
                 "tool": finding.tool or "—",
                 "recommendation": finding.recommendation,
+                "technique_id": finding.technique_id or "—",
+                "technique_url": technique_url(finding.technique_id) if finding.technique_id else None,
+                "mitigation_links": mitigation_links(finding.mitigation_ids),
+                "cwe_id": finding.cwe_id or "—",
             }
         )
 
@@ -428,6 +504,7 @@ def build_dashboard_payload(report: ScanReport) -> dict[str, Any]:
         "attack_graph": build_attack_graph(report),
         "owasp": owasp_mappings(report.findings),
         "recommendations": build_recommendations(report.findings),
+        "techniques": technique_catalog(),
         "risk_guide": list(RISK_GUIDE),
         "raw_report": report.model_dump(mode="json"),
     }

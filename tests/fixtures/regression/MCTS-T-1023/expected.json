@@ -1,0 +1,18 @@
+{
+  "test_001_basic_semicolon_injection": true,
+  "test_002_pipe_injection": true,
+  "test_003_command_substitution": true,
+  "test_004_backtick_injection": true,
+  "test_005_and_operator_injection": true,
+  "test_006_legitimate_git_operation": false,
+  "test_007_base64_encoded_command": true,
+  "test_008_reverse_shell_dev_tcp": true,
+  "test_009_environment_variable_manipulation": true,
+  "test_010_legitimate_file_path": false,
+  "test_011_sql_injection_with_command": true,
+  "test_012_powershell_encoded": true,
+  "test_013_option_injection_dash": true,
+  "test_014_option_injection_help": true,
+  "test_015_windows_command_separator": true,
+  "test_016_callback_url_ssrf": true
+}

@@ -1,38 +1,66 @@
 name: MCTS Security Scan
-description: Scan an MCP server for security vulnerabilities
+description: Scan an MCP server for security vulnerabilities with JSON, SARIF, and HTML outputs
 branding:
   icon: shield
   color: red
 
 inputs:
   target:
-    description: Path to MCP server entrypoint
+    description: Path to MCP server entrypoint or repository directory
     required: true
     default: ./server.py
   fail-on-critical:
     description: Fail the workflow if critical findings exist
     required: false
     default: "true"
+  min-score:
+    description: Fail if security score is below this value (0-100). Leave empty to skip.
+    required: false
+    default: ""
 
 runs:
   using: composite
   steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
     - name: Install MCTS
       shell: bash
-      run: pip install mcts
+      run: pip install .
 
     - name: Run security scan
       shell: bash
       run: |
-        ARGS="${{ inputs.target }}"
+        set -euo pipefail
+        TARGET="${{ inputs.target }}"
+        ARGS=(scan "$TARGET" --no-progress -o mcts-report.json)
+
         if [ "${{ inputs.fail-on-critical }}" = "true" ]; then
-          mcts scan "$ARGS" --fail-on-critical -o mcts-report.json
-        else
-          mcts scan "$ARGS" -o mcts-report.json
+          ARGS+=(--fail-on-critical)
+        fi
+        if [ -n "${{ inputs.min-score }}" ]; then
+          ARGS+=(--min-score "${{ inputs.min-score }}")
         fi
 
-    - name: Upload report
+        mcts "${ARGS[@]}"
+        mcts scan "$TARGET" --no-progress --format sarif -o mcts-report.sarif
+
+    - name: Generate HTML dashboard
+      shell: bash
+      run: mcts report mcts-report.json -o mcts-report.html
+
+    - name: Upload JSON report
+      if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: mcts-report
+        name: mcts-report-json
         path: mcts-report.json
+
+    - name: Upload HTML dashboard
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: mcts-report-html
+        path: mcts-report.html

@@ -1,0 +1,7 @@
+{
+  "admin_tool": true,
+  "bypass_args": true,
+  "elevated_flag": true,
+  "benign_read": false,
+  "benign_search": false
+}

@@ -122,9 +122,9 @@ def test_verify_detects_tampered_score() -> None:
 @pytest.mark.parametrize(
     ("path", "min_score", "max_score", "min_raw", "max_raw"),
     [
-        ("examples/safe-mcp-server/server.py", 95, 100, 0, 5),
-        ("examples/medium-risk-mcp-server/server.py", 55, 85, 15, 35),
-        ("examples/vulnerable-mcp-server/server.py", 1, 20, 100, 200),
+        ("examples/safe-mcp-server/server.py", 95, 100, 0, 10),
+        ("examples/medium-risk-mcp-server/server.py", 60, 75, 15, 30),
+        ("examples/vulnerable-mcp-server/server.py", 0, 5, 180, 230),
     ],
 )
 def test_real_server_scores_in_expected_bands(

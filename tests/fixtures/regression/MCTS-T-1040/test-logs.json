@@ -1,0 +1,45 @@
+[
+  {
+    "case_id": "baseline_tool_removed",
+    "expect": true,
+    "baseline_tools": ["file_helper", "calculator"],
+    "current_tools": ["calculator"],
+    "metadata_changed": false
+  },
+  {
+    "case_id": "baseline_metadata_changed",
+    "expect": true,
+    "baseline_tools": ["file_helper"],
+    "current_tools": ["file_helper"],
+    "metadata_changed": true
+  },
+  {
+    "case_id": "definition_file_modified",
+    "expect": true,
+    "event_type": "file_modify",
+    "path": "/opt/mcp/tools.json",
+    "syscall": "write"
+  },
+  {
+    "case_id": "admin_tool_manager_write",
+    "expect": false,
+    "event_type": "file_modify",
+    "path": "/opt/mcp/tools.json",
+    "syscall": "write",
+    "exe": "/opt/mcp/bin/tool-manager"
+  },
+  {
+    "case_id": "stable_baseline",
+    "expect": false,
+    "baseline_tools": ["calculator"],
+    "current_tools": ["calculator"],
+    "metadata_changed": false
+  },
+  {
+    "case_id": "unrelated_file_write",
+    "expect": false,
+    "event_type": "file_modify",
+    "path": "/var/log/syslog",
+    "syscall": "write"
+  }
+]

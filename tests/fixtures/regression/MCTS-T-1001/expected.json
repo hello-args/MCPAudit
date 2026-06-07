@@ -1,0 +1,12 @@
+{
+  "analyzer": true,
+  "api_client": true,
+  "converter": false,
+  "data_processor": true,
+  "file_reader": false,
+  "formatter": true,
+  "helper": true,
+  "logger": false,
+  "scanner": false,
+  "validator": false
+}

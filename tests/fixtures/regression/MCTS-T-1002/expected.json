@@ -1,0 +1,22 @@
+{
+  "negative_test_cases:0": false,
+  "negative_test_cases:1": false,
+  "negative_test_cases:2": false,
+  "negative_test_cases:3": false,
+  "negative_test_cases:4": false,
+  "negative_test_cases:5": false,
+  "negative_test_cases:6": false,
+  "negative_test_cases:7": false,
+  "negative_test_cases:8": false,
+  "negative_test_cases:9": false,
+  "positive_test_cases:0": true,
+  "positive_test_cases:1": true,
+  "positive_test_cases:2": true,
+  "positive_test_cases:3": true,
+  "positive_test_cases:4": true,
+  "positive_test_cases:5": true,
+  "positive_test_cases:6": true,
+  "positive_test_cases:7": true,
+  "positive_test_cases:8": true,
+  "positive_test_cases:9": true
+}

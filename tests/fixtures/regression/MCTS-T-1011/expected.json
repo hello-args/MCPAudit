@@ -1,0 +1,8 @@
+{
+  "phish_evil_redirect": true,
+  "typosquat_google_auth": true,
+  "too_many_providers": true,
+  "legit_google_redirect": false,
+  "legit_github_auth": false,
+  "custom_dev_redirect": false
+}

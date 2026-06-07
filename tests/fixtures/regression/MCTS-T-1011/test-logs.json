@@ -1,0 +1,44 @@
+[
+  {
+    "case_id": "phish_evil_redirect",
+    "expect": true,
+    "config": {
+      "oauth_redirect_uri": "https://evil-phish.example/oauth/callback"
+    }
+  },
+  {
+    "case_id": "typosquat_google_auth",
+    "expect": true,
+    "config": {
+      "authorization_endpoint": "https://accounts-google.com/o/oauth2/auth"
+    }
+  },
+  {
+    "case_id": "too_many_providers",
+    "expect": true,
+    "config": {
+      "oauth_providers": ["google", "github", "custom", "rogue"]
+    }
+  },
+  {
+    "case_id": "legit_google_redirect",
+    "expect": false,
+    "config": {
+      "oauth_redirect_uri": "https://accounts.google.com/oauth2/callback"
+    }
+  },
+  {
+    "case_id": "legit_github_auth",
+    "expect": false,
+    "config": {
+      "authorization_endpoint": "https://github.com/login/oauth/authorize"
+    }
+  },
+  {
+    "case_id": "custom_dev_redirect",
+    "expect": false,
+    "config": {
+      "oauth_redirect_uri": "http://localhost:3000/auth/return"
+    }
+  }
+]

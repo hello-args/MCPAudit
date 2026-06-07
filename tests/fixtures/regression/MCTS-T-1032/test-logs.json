@@ -1,0 +1,37 @@
+[
+  {
+    "case_id": "admin_tool",
+    "event.action": "tools/call",
+    "tool_name": "system_admin_shell",
+    "arguments": {"cmd": "ls"},
+    "expect": true
+  },
+  {
+    "case_id": "bypass_args",
+    "event.action": "tools/call",
+    "tool_name": "read_config",
+    "arguments": {"mode": "bypass_acl"},
+    "expect": true
+  },
+  {
+    "case_id": "elevated_flag",
+    "event.action": "tools/call",
+    "tool_name": "run_task",
+    "tool": {"name": "run_task", "arguments": {"privilege": "elevated"}},
+    "expect": true
+  },
+  {
+    "case_id": "benign_read",
+    "event.action": "tools/call",
+    "tool_name": "read_file",
+    "arguments": {"path": "notes.txt"},
+    "expect": false
+  },
+  {
+    "case_id": "benign_search",
+    "event.action": "tools/call",
+    "tool_name": "search_docs",
+    "arguments": {"query": "getting started"},
+    "expect": false
+  }
+]

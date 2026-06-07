@@ -22,4 +22,31 @@ jobs:
       - run: uv sync --all-extras
       - run: uv run ruff check .
       - run: uv run ruff format --check .
+      - run: uv run python scripts/compile_sigma_rules.py --source tests/fixtures/sigma_fixtures --validate-min 6
+      - run: uv run python scripts/compile_sigma_rules.py --check
       - run: uv run pytest
+      - run: |
+          uv run python - <<'PY'
+          from mcts.testing.regression_harness import REGRESSION_THRESHOLD, REGRESSION_TECHNIQUES, evaluate_technique
+
+          failures = []
+          for technique_id in REGRESSION_TECHNIQUES:
+              result = evaluate_technique(technique_id)
+              if result.accuracy_pct < REGRESSION_THRESHOLD:
+                  failures.append(
+                      f"{technique_id}: {result.accuracy_pct}% "
+                      f"(FP={result.false_positives}, FN={result.false_negatives})"
+                  )
+          if failures:
+              raise SystemExit("Technique regression below threshold:\n" + "\n".join(failures))
+          print(f"Regression gate passed for {len(REGRESSION_TECHNIQUES)} techniques (>={REGRESSION_THRESHOLD}%)")
+          PY
+      - run: |
+          uv run mcts scan examples/vulnerable-mcp-server/server.py --no-progress --format sarif -o mcts-ci.sarif
+          uv run python -c "import json; p=json.load(open('mcts-ci.sarif')); assert p.get('version') and p.get('runs'), 'invalid SARIF'"
+      - run: uv run python -c "from pathlib import Path; from mcts.testing.regression_harness import write_regression_report; write_regression_report(Path('regression-report.json'))"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mcts-regression-report
+          path: regression-report.json
