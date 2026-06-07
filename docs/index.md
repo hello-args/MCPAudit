@@ -26,7 +26,8 @@
 
 - [Feature Expansion Plan](feature-expansion-plan.md) — Gap analysis, phased implementation, module layout
 - [Product Roadmap](roadmap.md) — Phases from foundation → platform
-- [Competitive Positioning](competitive-positioning.md) — How MCTS compares to other MCP security tools
+- [Product Positioning](product-positioning.md) — Strengths, use cases, design principles
+- [External Frameworks](external-frameworks.md) — How industry taxonomies relate to MCTS-T
 - [Feature matrix (README)](../README.md#features) — Current module status
 
 ## Blog & community

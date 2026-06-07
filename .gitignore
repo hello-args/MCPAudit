@@ -23,6 +23,9 @@ security-report.html
 report.json
 *.scan.json
 
+# Local analysis mirrors (not shipped)
+competitors/
+
 # IDE
 .idea/
 .vscode/
