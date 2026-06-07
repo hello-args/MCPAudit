@@ -10,7 +10,7 @@
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-If you discover a security issue in MCPAudit itself:
+If you discover a security issue in MCTS itself:
 
 1. Email or DM the maintainers (update this with your contact when published)
 2. Include steps to reproduce and potential impact
@@ -20,9 +20,11 @@ We appreciate responsible disclosure and will acknowledge reporters in the relea
 
 ## Scope
 
-- MCPAudit CLI, libraries, GitHub Action, and official documentation
-- Out of scope: vulnerabilities in third-party MCP servers scanned by MCPAudit (report those to the server maintainers)
+- MCTS CLI, libraries, GitHub Action, and official documentation
+- Out of scope: vulnerabilities in third-party MCP servers scanned by MCTS (report those to the server maintainers)
 
 ## Safe Usage
 
-MCPAudit is an offensive security tool. Only scan MCP servers you own or have explicit authorization to test.
+MCTS is a security analysis tool. Only scan MCP servers you own or have explicit authorization to test.
+
+HTML reports are self-contained files with embedded scan data. They do not transmit data to MCTS or third parties beyond CDN loads for Chart.js and Inter fonts when you open the file in a browser.

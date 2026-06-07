@@ -2,9 +2,9 @@
 
 from pathlib import Path
 
-from mcpaudit.core.config import ScanConfig
-from mcpaudit.core.scanner import Scanner
-from mcpaudit.reporting.models import Severity
+from mcts.core.config import ScanConfig
+from mcts.core.scanner import Scanner
+from mcts.reporting.models import Severity
 
 
 def test_scan_finds_critical_issues(example_server_path: Path) -> None:

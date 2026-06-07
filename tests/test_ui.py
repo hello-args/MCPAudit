@@ -1,8 +1,8 @@
 """Tests for terminal UI helpers."""
 
-from mcpaudit.reporting.models import Finding, Severity
-from mcpaudit.ui.dashboard import compute_owasp_counts, sort_findings
-from mcpaudit.ui.theme import ThemeName, get_theme
+from mcts.reporting.models import Finding, Severity
+from mcts.ui.dashboard import compute_owasp_counts, sort_findings
+from mcts.ui.theme import ThemeName, get_theme
 
 
 def test_get_theme_cyber() -> None:

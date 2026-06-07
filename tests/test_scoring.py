@@ -4,10 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from mcpaudit.core.config import ScanConfig
-from mcpaudit.core.scanner import Scanner
-from mcpaudit.reporting.models import Finding, ScanReport, Severity
-from mcpaudit.scoring.engine import (
+from mcts.core.config import ScanConfig
+from mcts.core.scanner import Scanner
+from mcts.reporting.models import Finding, ScanReport, Severity
+from mcts.scoring.engine import (
     RISK_WEIGHTS,
     RiskScoringEngine,
     security_score_from_raw_risk,

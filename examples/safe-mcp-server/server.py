@@ -1,4 +1,4 @@
-"""Minimal low-risk MCP server for MCPAudit scoring demos."""
+"""Minimal low-risk MCP server for MCTS scoring demos."""
 
 
 def create_app():

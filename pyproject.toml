@@ -1,11 +1,11 @@
 [project]
-name = "mcpaudit"
+name = "mcts"
 version = "0.1.0"
-description = "Offensive security testing framework for Model Context Protocol (MCP) servers"
+description = "Model Context Threat Scanner — security analysis for MCP servers"
 readme = "README.md"
 license = { text = "Apache-2.0" }
 authors = [
-    { name = "MCPAudit Contributors" },
+    { name = "MCTS Contributors" },
 ]
 requires-python = ">=3.11"
 keywords = ["mcp", "security", "red-team", "prompt-injection", "llm", "ai-agents"]
@@ -45,14 +45,14 @@ mcp = [
 ]
 
 [project.scripts]
-mcpaudit = "mcpaudit.cli.main:run"
+mcts = "mcts.cli.main:run"
 
 [project.urls]
-Homepage = "https://github.com/hello-args/MCPVault"
-Documentation = "https://github.com/hello-args/MCPVault#readme"
-Repository = "https://github.com/hello-args/MCPVault"
-Issues = "https://github.com/hello-args/MCPVault/issues"
-Changelog = "https://github.com/hello-args/MCPVault/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/MCTS/MCTS"
+Documentation = "https://github.com/MCTS/MCTS#readme"
+Repository = "https://github.com/MCTS/MCTS"
+Issues = "https://github.com/MCTS/MCTS/issues"
+Changelog = "https://github.com/MCTS/MCTS/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling"]
@@ -61,8 +61,14 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.sdist]
 only-include = ["src", "tests", "README.md", "LICENSE", "NOTICE", "pyproject.toml"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"src/mcts/report/templates" = "mcts/report/templates"
+"src/mcts/report/assets" = "mcts/report/assets"
+"src/mcts/brand" = "mcts/brand"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 asyncio_mode = "auto"
 addopts = "-ra --strict-markers"
 
@@ -75,10 +81,10 @@ src = ["src", "tests"]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["mcpaudit"]
+known-first-party = ["mcts"]
 
 [tool.coverage.run]
-source = ["mcpaudit"]
+source = ["mcts"]
 branch = true
 
 [tool.coverage.report]

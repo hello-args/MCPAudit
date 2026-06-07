@@ -1,1 +1,1 @@
-"""MCPAudit test suite."""
+"""MCTS test suite."""

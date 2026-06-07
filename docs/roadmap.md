@@ -1,8 +1,10 @@
-# MCPAudit Roadmap
+# MCTS Roadmap
 
-MCPAudit aims to become the **default security platform for the MCP ecosystem** — the CVSS-style scorecard, CI gate, and threat intelligence layer for AI agent tooling.
+MCTS aims to become the **default security platform for the MCP ecosystem** — the CVSS-style scorecard, CI gate, and threat intelligence layer for AI agent tooling.
 
-This document captures planned work, phased by impact and adoption potential. Status labels:
+**Detailed implementation guide:** [Feature Expansion Plan](feature-expansion-plan.md) — gap analysis, module layout, build order, and success criteria.
+
+Status labels:
 
 | Label | Meaning |
 |-------|---------|
@@ -15,9 +17,9 @@ This document captures planned work, phased by impact and adoption potential. St
 
 ## Vision
 
-Today, MCPAudit identifies security issues across permissions, prompt injection, tool abuse, data leakage, and attack chains. The next evolution turns those findings into **actionable risk intelligence** that teams can compare, track over time, and enforce in CI/CD — the same way teams use Trivy for containers or Semgrep for code.
+Today, MCTS identifies security issues across permissions, prompt injection, tool abuse, data leakage, and attack chains. The next evolution turns those findings into **actionable risk intelligence** that teams can compare, track over time, and enforce in CI/CD — the same way teams use Trivy for containers or Semgrep for code.
 
-**North star:** Make `mcpaudit scan` as standard in MCP projects as `ruff check` is in Python projects.
+**North star:** Make `mcts scan` as standard in MCP projects as `ruff check` is in Python projects.
 
 ---
 
@@ -26,31 +28,57 @@ Today, MCPAudit identifies security issues across permissions, prompt injection,
 | Capability | Status |
 |------------|--------|
 | Permission analyzer | ✅ Shipped |
-| Prompt injection simulator | ✅ Shipped |
+| Prompt injection simulator | ✅ Shipped (heuristic; live probing planned) |
 | Tool abuse testing | ✅ Shipped |
-| Data leakage detection | ✅ Shipped |
-| Multi-step attack chain detection | ✅ Shipped |
+| Data leakage detection | ✅ Shipped (metadata-only today) |
+| Multi-step attack chain detection | ✅ Shipped (hint-based; graph upgrade planned) |
 | Compliance checks (OWASP LLM Top 10) | ✅ Shipped |
-| Overall risk score (0–100) | ✅ Shipped (basic) |
-| JSON + HTML reports | ✅ Shipped |
+| Exponential risk scoring (score + risk index) | ✅ Shipped |
+| Terminal UI (Rich, themes, progress animation) | ✅ Shipped |
+| JSON reports | ✅ Shipped |
+| HTML security dashboard (`mcts report`) | ✅ Shipped |
+| Category breakdown (HTML dashboard bars + radar) | ✅ Shipped |
 | GitHub Action scaffold | 🚧 In progress |
-| Agent jailbreak testing | 📋 Planned |
+| Agent jailbreak testing | 📋 Planned (replace tool-count placeholder) |
 | Dynamic attack simulation | 📋 Planned |
+| SARIF output | 📋 Planned |
+| CI score thresholds (`--min-score`) | 📋 Planned |
 
-The scoring engine today applies severity-weighted penalties to produce a single overall score. The roadmap below expands this into category breakdowns, threat mapping, and CI-native outputs.
+### Known alpha gaps
+
+See [Building in Public](blog-building-mcp-security-in-public.md) and [Feature Expansion Plan — Part 1](feature-expansion-plan.md#part-1--current-state-honest-inventory).
+
+- Static analysis only — single Python entrypoint file
+- Placeholder analyzers (prompt injection keywords, jailbreak tool count)
+- HTML dashboard ahead of engine on benchmarks and trend data
+- `fuzz` / `pentest` CLI stubs
 
 ---
 
-## Phase 1 — Highest Impact (2026 Q3)
+## Phase 0 — Foundation (📋 Planned)
 
-> **Goal:** Adoption in CI/CD pipelines and security workflows.  
-> **Success metrics:** GitHub Action usage, SARIF integrations, score-based gating.
+> **Goal:** Fix structural limits so new features have a solid base.  
+> **Timeline:** ~2–3 weeks. See [Part 4 — Phase 0](feature-expansion-plan.md#phase-0--foundation-23-weeks).
 
-### 1. Security Risk Score (Category Breakdown)
+| # | Deliverable | Status |
+|---|-------------|--------|
+| 0.1 | Multi-file **repository scanning** (`mcts scan ./repo/`) | 📋 |
+| 0.2 | Parse **`input_schema`** + handler snippets | 📋 |
+| 0.3 | **Source-aware analyzers** (secrets in code, command execution, path validation) | 📋 |
+| 0.4 | Fix **placeholder analyzers** + **capability-graph** attack chains | 📋 |
 
-Extend the scoring engine from a single number to a **security scorecard** with per-category breakdowns.
+**New modules:** `discovery/static.py`, `core/target.py`, analyzers: `schema_surface`, `command_execution`, `path_validation`.
 
-**Example output:**
+---
+
+## Phase 1 — Adoption & Live Probing (📋 Planned)
+
+> **Goal:** CI/CD adoption, live MCP enrichment, config inventory.  
+> **Timeline:** ~4–6 weeks. See [Part 4 — Phase 1](feature-expansion-plan.md#phase-1--adoption--live-probing-46-weeks).
+
+### 1. Security Risk Score (Category Breakdown in CLI)
+
+Extend HTML category scoring to **terminal output and CI gates**:
 
 ```
 Overall Risk Score: 82/100 (Critical)
@@ -63,263 +91,178 @@ Breakdown:
   Secrets Handling            5/10
 ```
 
-**Why it matters:**
-
-- Compare MCP servers side-by-side
-- Track improvements across releases
-- Set CI thresholds (`--min-score 70`)
-
-**Positioning:** CVSS for MCP · Security scorecard for AI agents
+**Flags:** `--min-score 70`, `--max-critical 0`, `--fail-on-category permissions:10`
 
 ---
 
 ### 2. GitHub Action
 
-Ship a first-class GitHub Action so teams can add MCP security scanning in one step:
+Ship a published Action:
 
 ```yaml
-- uses: hello-args/MCPAudit@v1
+- uses: MCTS/MCTS@v1
   with:
     target: ./server.py
     fail-on-critical: true
+    min-score: 70
 ```
 
-**Expected CI output:**
-
-```
-Security Report Generated
-
-Critical: 2
-High:     4
-Medium:   6
-
-Build Failed
-```
-
-A stub exists in [`action/action.yml`](../action/action.yml). Phase 1 completes packaging, publishing, and documentation.
+Upload JSON, SARIF, and HTML artifacts. Stub: [`action/action.yml`](../action/action.yml).
 
 ---
 
 ### 3. SARIF Output
 
-Add SARIF as a first-class report format alongside JSON, HTML, and Markdown:
+```bash
+mcts scan ./server.py -o report.sarif --format sarif
+```
+
+Integrations: GitHub Advanced Security, GitLab, Azure DevOps, VS Code Security Panel.
+
+---
+
+### 4. Live MCP Probing
 
 ```bash
-mcpaudit scan ./server.py -o report.sarif --format sarif
+mcts scan --live --command uv --args run,server.py
+mcts scan --config ~/.cursor/mcp.json --server my-server
 ```
 
-**Integrations unlocked:**
-
-- GitHub Advanced Security / code scanning
-- GitLab Security Dashboard
-- Azure DevOps
-- VS Code Security Panel
-
-Many enterprise security teams require SARIF before adopting a tool in CI.
+Stdio first; consent gate + `--i-understand-live-risk` for CI. Modules: `probe/session.py`, `discovery/live.py`.
 
 ---
 
-## Phase 2 — Differentiation (2026 Q4)
-
-> **Goal:** Move beyond static analysis toward offensive security tooling.  
-> **Success metrics:** Research citations, demo engagement, unique attack coverage.
-
-### 4. MITRE ATT&CK-Style MCP Threat Mapping
-
-Publish a threat matrix mapping MCP-specific attacks to detection status:
-
-| Attack | Detected |
-|--------|----------|
-| Prompt Injection | ✅ |
-| Tool Escalation | ✅ |
-| Credential Theft | ❌ |
-| Data Exfiltration | ✅ |
-| Arbitrary File Access | ⚠️ |
-
-This would be among the first MCP-native threat frameworks — valuable for security researchers and compliance teams.
-
----
-
-### 5. Attack Simulation Mode
-
-Move from static checks to **active simulation**:
+### 5. Config Inventory
 
 ```bash
-mcpaudit simulate server.py
+mcts inventory
+mcts inventory --scan
 ```
 
-Simulated attack paths:
-
-- Prompt injection chains
-- Data extraction via tool chaining
-- Privilege escalation across tools
-
-**Example output:**
-
-```
-Attack #3 succeeded
-
-User Prompt
-  ↓
-Tool A (search)
-  ↓
-Tool B (browser)
-  ↓
-Tool C (filesystem)
-  ↓
-Sensitive Data Exposed
-```
-
-Differentiates MCPAudit from linters and static analyzers.
+Discover Cursor, Claude Desktop, VS Code configs. **Cross-server shadowing** analyzer (`MCTS-T-1008`).
 
 ---
 
-### 6. Visual Attack Graphs
+### 6. Capability Profiles
 
-Render discovered attack paths as interactive graphs:
-
-```
-User → Prompt → Search Tool → Browser Tool → Filesystem Tool → Sensitive Data
-```
-
-**Export formats:** Mermaid · Graphviz · HTML · PNG
-
-Security researchers and incident responders expect visual attack chains.
+Per-tool capability dimensions (reads untrusted input, egresses network, executes commands) feeding attack chains and HTML **Capability Matrix**.
 
 ---
 
-### 7. MCP Server Marketplace Scanner
+### 7. MCTS-T Technique Taxonomy
 
-Scan popular MCP servers and publish public scorecards:
-
-**Top Secure MCP Servers**
-
-| Rank | Server | Score |
-|------|--------|-------|
-| 1 | Filesystem MCP | 92 |
-| 2 | GitHub MCP | 88 |
-
-**Most Risky MCP Servers**
-
-| Rank | Server | Score |
-|------|--------|-------|
-| 1 | XYZ MCP | 22 |
-| 2 | ABC MCP | 18 |
-
-**Benefits:** Visibility · Research content · Community backlinks · Ecosystem trust signals
+`technique_id` on findings; `docs/taxonomy.md`; Technique Map in HTML dashboard. Namespace: `MCTS-T-*` (MCTS-owned, optional external cross-refs).
 
 ---
 
-## Phase 3 — Platform & Community (2027)
+### 8. Benchmark Corpus
 
-> **Goal:** Become a recognized security standard in the MCP ecosystem.  
-> **Success metrics:** Certification badges in the wild, benchmark adoption, contributor growth.
-
-### 8. LLM-Based Security Analysis
-
-Hybrid analysis combining static rules with LLM reasoning:
-
-| Layer | Role |
-|-------|------|
-| Static analysis | Pattern matching, known bad signatures |
-| Rule engine | Policy enforcement, compliance mapping |
-| LLM reasoning | Nuanced interpretation of tool descriptions and prompts |
-
-**Example:**
-
-```
-Tool Description: "Can execute shell commands on user request."
-
-Risk:     Critical
-Reason:   Tool permits arbitrary command execution without an
-          authorization boundary.
-```
+`examples/bench/` + `benchmarks/expected/` + `docs/scoring-spec.md` for regression and weight calibration.
 
 ---
 
-### 9. MCP Server Certification
+## Phase 2 — Differentiation (🔮 Future)
 
-Generate verifiable certification badges for READMEs and marketplaces:
+> **Goal:** Threat simulation and probing beyond static heuristics.  
+> See [Part 4 — Phase 2](feature-expansion-plan.md#phase-2--differentiation-610-weeks).
 
-![MCPAudit Certified](https://img.shields.io/badge/MCPAudit-Certified-gold)
-
-**Levels:** Bronze · Silver · Gold · Platinum
-
-Open-source MCP projects will display these badges — driving organic adoption.
-
----
-
-### 10. Security Baselines
-
-Environment-aware policy profiles:
-
-```bash
-mcpaudit check server.py --baseline strict
-```
-
-| Profile | Use case |
-|---------|----------|
-| Enterprise | Strictest controls, full compliance |
-| Startup | Balanced security vs. velocity |
-| Research | Relaxed for experimentation |
-| Personal | Minimal local-dev checks |
-
-Different environments need different policies.
+| # | Deliverable | Command |
+|---|-------------|---------|
+| 2.1 | Protocol fuzzing (safe defaults) | `mcts fuzz` |
+| 2.2 | Config audit (no LLM side effects) | `mcts audit-config` |
+| 2.3 | Rug-pull baselines | `--record-baseline` / `--check-baseline` |
+| 2.4 | Description vs implementation drift | `ImplementationDriftAnalyzer` |
+| 2.5 | TypeScript/JavaScript static discovery | `discovery/static_js.py` |
+| 2.6 | Scan history + trend chart | `.mcts/history/` |
+| 2.7 | Attack simulation mode | `mcts simulate` |
+| 2.8 | Visual attack graph export | Mermaid, Graphviz, PNG |
+| 2.9 | MCP marketplace scorecards | Public benchmark publishing |
 
 ---
 
-### 11. Benchmark Dataset
+## Phase 3 — Platform & Community (🔮 Future)
 
-Expand [`examples/`](../examples/) with intentionally vulnerable MCP servers:
+> **Goal:** Recognized security standard in the MCP ecosystem.  
+> See [Part 4 — Phase 3](feature-expansion-plan.md#phase-3--platform-10-weeks).
 
-```
-examples/
-  vulnerable-mcp-server/     # existing
-  vulnerable_filesystem/
-  vulnerable_shell/
-  vulnerable_github/
-  vulnerable_browser/
-```
-
-**Inspired by:** OWASP Juice Shop · DVWA · Damn Vulnerable MCP Server
-
-Used for testing, demos, contributor onboarding, and regression benchmarks.
+| # | Deliverable |
+|---|-------------|
+| 3.1 | Package vetting (`mcts vet pypi:…`) |
+| 3.2 | Local REST API (`mcts serve`) |
+| 3.3 | MCP server mode for IDE agents (`mcts-mcp`) |
+| 3.4 | Opt-in LLM review (`--llm-review`) |
+| 3.5 | Security baselines (`--profile strict\|balanced\|dev`) |
+| 3.6 | Certification badges (`mcts badge`) |
+| 3.7 | Expanded benchmark suite (Juice Shop–style MCP corpus) |
+| 3.8 | Community hub — research, hall of fame, disclosures |
 
 ---
 
-### 12. Community & Research
+## What We Will Not Build
 
-Grow beyond a CLI tool into a community hub:
+Stay focused on MCP server-author security. Deferred or out of scope:
 
-- **Roadmap** — This document, updated each quarter
-- **Hall of Fame** — Contributors, researchers, responsible disclosures
-- **Research section** — MCP security papers, known vulnerabilities, threat reports
-- **Discussions** — Q&A, ideas, and show-and-tell ([GitHub Discussions](https://github.com/hello-args/MCPAudit/discussions))
+- Cloud-dependent analysis APIs (local-first default)
+- Agent Guard / runtime monitoring hooks
+- General-purpose 1,700-rule SAST
+- Gamification or closed-source scanner cores
+- Vendoring third-party threat framework corpora (link + map IDs only)
+
+Full rationale: [Feature Expansion Plan — Part 8](feature-expansion-plan.md#part-8--what-not-to-build).
 
 ---
 
 ## Priority Summary
 
-If the goal is **stars, contributors, and visibility**, build in this order:
-
 | Phase | Focus | Key deliverables |
 |-------|-------|------------------|
-| **Phase 1** | Adoption | Category risk score · GitHub Action · SARIF |
-| **Phase 2** | Differentiation | Attack simulation · Attack graphs · Marketplace scanner |
-| **Phase 3** | Platform | Certification badges · Baselines · Benchmark suite · Research hub |
+| **Phase 0** | Foundation | Repo scan · source analyzers · real attack graph |
+| **Phase 1** | Adoption | SARIF · GitHub Action · live probe · inventory · MCTS-T taxonomy |
+| **Phase 2** | Differentiation | Fuzz · audit-config · baselines · TS discovery · simulation |
+| **Phase 3** | Platform | Vet · API · MCP tools · baselines · certification |
+
+### Suggested build order
+
+```
+Week 1-2:  Phase 0 (repo scan, source analyzers, attack graph)
+Week 3-4:  SARIF, CI gates, publish Action
+Week 5-6:  Live stdio probe
+Week 7-8:  Inventory, capability profiles, cross-server
+Week 9-10: MCTS-T taxonomy, benchmarks
+Week 11+:  Phase 2
+```
+
+**First PR bundle:** repo discovery · source leakage/command analyzers · SARIF · `--min-score` · attack graph data fix.
+
+---
+
+## Success Criteria
+
+Phase 1 is complete when:
+
+- [ ] CI gates on score/SARIF without cloud APIs
+- [ ] Scan works on a repo directory
+- [ ] Live stdio probe optional with consent
+- [ ] Findings include `technique_id`, `location`, `confidence`
+- [ ] Attack chains use capability graph
+- [ ] Benchmark suite prevents regressions
+
+Full checklist: [Feature Expansion Plan — Part 10](feature-expansion-plan.md#part-10--success-criteria).
 
 ---
 
 ## How to Contribute
 
-Pick a Phase 1 item and open a [feature request](https://github.com/hello-args/MCPAudit/issues/new?template=feature_request.yml) or start a [Discussion](https://github.com/hello-args/MCPAudit/discussions) to align on design before opening a PR.
-
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for development setup.
+1. Read [Feature Expansion Plan](feature-expansion-plan.md) for implementation detail.
+2. Pick a phase item and open a [feature request](https://github.com/MCTS/MCTS/issues/new?template=feature_request.yml) or [Discussion](https://github.com/MCTS/MCTS/discussions).
+3. See [CONTRIBUTING.md](../CONTRIBUTING.md) for dev setup.
 
 ---
 
 ## Related
 
-- [Architecture](architecture.md)
-- [CLI Reference](cli.md)
-- [Feature matrix (README)](../README.md#features)
+- [Feature Expansion Plan](feature-expansion-plan.md) — Full gap analysis and how-to
+- [Architecture](architecture.md) — Current and target pipeline
+- [CLI Reference](cli.md) — Commands including planned surface
+- [HTML Security Dashboard](html-report.md)
+- [Building in Public](blog-building-mcp-security-in-public.md)

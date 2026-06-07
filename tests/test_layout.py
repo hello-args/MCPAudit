@@ -1,6 +1,6 @@
 """Tests for layout width helpers."""
 
-from mcpaudit.ui.layout import CONTENT_MAX_WIDTH, content_width
+from mcts.ui.layout import CONTENT_MAX_WIDTH, content_width
 
 
 def test_content_width_clamps_wide_terminal() -> None:

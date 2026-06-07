@@ -1,4 +1,4 @@
-name: MCPAudit Security Scan
+name: MCTS Security Scan
 description: Scan an MCP server for security vulnerabilities
 branding:
   icon: shield
@@ -17,22 +17,22 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Install MCPAudit
+    - name: Install MCTS
       shell: bash
-      run: pip install mcpaudit
+      run: pip install mcts
 
     - name: Run security scan
       shell: bash
       run: |
         ARGS="${{ inputs.target }}"
         if [ "${{ inputs.fail-on-critical }}" = "true" ]; then
-          mcpaudit scan "$ARGS" --fail-on-critical -o mcpaudit-report.json
+          mcts scan "$ARGS" --fail-on-critical -o mcts-report.json
         else
-          mcpaudit scan "$ARGS" -o mcpaudit-report.json
+          mcts scan "$ARGS" -o mcts-report.json
         fi
 
     - name: Upload report
       uses: actions/upload-artifact@v4
       with:
-        name: mcpaudit-report
-        path: mcpaudit-report.json
+        name: mcts-report
+        path: mcts-report.json
