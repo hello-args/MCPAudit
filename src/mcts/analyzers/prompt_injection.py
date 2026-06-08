@@ -5,13 +5,15 @@ from __future__ import annotations
 import re
 
 from mcts.analyzers.base import BaseAnalyzer
+from mcts.analyzers.surface_context import scan_surfaces, surface_location, surface_text_fields, tool_for_surface
+from mcts.analyzers.surfaces import ScanSurface
 from mcts.analyzers.tpa_patterns import (
     find_homoglyphs,
     has_hidden_unicode,
     has_mixed_scripts,
 )
 from mcts.mcp.models import MCPServerInfo, MCPTool
-from mcts.reporting.models import Finding, Severity, SourceLocation
+from mcts.reporting.models import Finding, Severity
 
 INSTRUCTION_LIKE = re.compile(
     r"(?i)\b(ignore|disregard|forget|override|system prompt|you must|always|never reveal)\b"
@@ -19,33 +21,36 @@ INSTRUCTION_LIKE = re.compile(
 
 
 class PromptInjectionAnalyzer(BaseAnalyzer):
-    """Detects prompt injection surfaces in tool descriptions and handlers."""
+    """Detects prompt injection surfaces across MCP tools, prompts, resources, and instructions."""
 
     name = "prompt_injection"
 
     def analyze(self, server: MCPServerInfo) -> list[Finding]:
         findings: list[Finding] = []
-        for tool in server.tools:
-            findings.extend(self._analyze_tool(tool))
+        for surface in scan_surfaces(server):
+            findings.extend(self._analyze_surface(server, surface))
         return findings
 
-    def _analyze_tool(self, tool: MCPTool) -> list[Finding]:
+    def _analyze_surface(self, server: MCPServerInfo, surface: ScanSurface) -> list[Finding]:
         findings: list[Finding] = []
-        loc = SourceLocation(file=tool.source_file or "", line=tool.source_line)
+        loc = surface_location(surface)
+        tool = tool_for_surface(server, surface)
+        tool_name = tool.name if tool else None
 
-        for field, text in (("description", tool.description), ("name", tool.name)):
-            findings.extend(self._unicode_findings(tool, text, field, loc))
+        for field, text in surface_text_fields(surface):
+            findings.extend(self._unicode_findings(surface, text, field, loc, tool_name))
             if field == "description":
-                findings.extend(self._description_only_findings(tool, text, loc))
+                findings.extend(self._description_only_findings(surface, text, loc, tool, tool_name))
 
         return findings
 
     def _unicode_findings(
         self,
-        tool: MCPTool,
+        surface: ScanSurface,
         text: str,
         field: str,
-        loc: SourceLocation,
+        loc,
+        tool_name: str | None,
     ) -> list[Finding]:
         findings: list[Finding] = []
         suffix = f"-{field}" if field != "description" else ""
@@ -53,17 +58,17 @@ class PromptInjectionAnalyzer(BaseAnalyzer):
         if has_hidden_unicode(text):
             findings.append(
                 Finding(
-                    id=f"inject-hidden-chars-{tool.name}{suffix}",
+                    id=f"inject-hidden-chars-{surface.label}{suffix}",
                     analyzer=self.name,
-                    title=f"Hidden Unicode in {tool.name} {field}",
-                    description="Tool metadata contains invisible Unicode or tag characters.",
+                    title=f"Hidden Unicode in {surface.label} {field}",
+                    description="MCP surface contains invisible Unicode or tag characters.",
                     severity=Severity.HIGH,
-                    tool=tool.name,
+                    tool=tool_name,
                     recommendation="Strip zero-width, bidi override, and Unicode tag characters.",
                     technique_id="MCTS-T-1001",
                     confidence=0.8,
                     location=loc,
-                    evidence={"type": "hidden_unicode", "field": field},
+                    evidence={"type": "hidden_unicode", "field": field, "surface": surface.kind.value},
                 )
             )
 
@@ -71,34 +76,34 @@ class PromptInjectionAnalyzer(BaseAnalyzer):
         if homoglyphs:
             findings.append(
                 Finding(
-                    id=f"inject-homoglyph-{tool.name}{suffix}",
+                    id=f"inject-homoglyph-{surface.label}{suffix}",
                     analyzer=self.name,
-                    title=f"Homoglyph characters in {tool.name} {field}",
-                    description="Tool metadata uses Cyrillic lookalike characters that may spoof names.",
+                    title=f"Homoglyph characters in {surface.label} {field}",
+                    description="MCP surface uses Cyrillic lookalike characters that may spoof names.",
                     severity=Severity.MEDIUM,
-                    tool=tool.name,
-                    recommendation="Use ASCII-only tool names and descriptions where possible.",
+                    tool=tool_name,
+                    recommendation="Use ASCII-only names and descriptions where possible.",
                     technique_id="MCTS-T-1001",
                     confidence=0.75,
                     location=loc,
-                    evidence={"homoglyphs": homoglyphs[:5], "field": field},
+                    evidence={"homoglyphs": homoglyphs[:5], "field": field, "surface": surface.kind.value},
                 )
             )
 
         if has_mixed_scripts(text):
             findings.append(
                 Finding(
-                    id=f"inject-mixed-script-{tool.name}{suffix}",
+                    id=f"inject-mixed-script-{surface.label}{suffix}",
                     analyzer=self.name,
-                    title=f"Mixed scripts in {tool.name} {field}",
-                    description="Tool metadata mixes Unicode scripts — possible obfuscation.",
+                    title=f"Mixed scripts in {surface.label} {field}",
+                    description="MCP surface mixes Unicode scripts — possible obfuscation.",
                     severity=Severity.MEDIUM,
-                    tool=tool.name,
-                    recommendation="Normalize tool metadata to a single script/encoding.",
+                    tool=tool_name,
+                    recommendation="Normalize MCP surface text to a single script/encoding.",
                     technique_id="MCTS-T-1001",
                     confidence=0.65,
                     location=loc,
-                    evidence={"type": "mixed_scripts", "field": field},
+                    evidence={"type": "mixed_scripts", "field": field, "surface": surface.kind.value},
                 )
             )
 
@@ -106,37 +111,39 @@ class PromptInjectionAnalyzer(BaseAnalyzer):
 
     def _description_only_findings(
         self,
-        tool: MCPTool,
+        surface: ScanSurface,
         description: str,
-        loc: SourceLocation,
+        loc,
+        tool: MCPTool | None,
+        tool_name: str | None,
     ) -> list[Finding]:
         findings: list[Finding] = []
 
         if INSTRUCTION_LIKE.search(description):
             findings.append(
                 Finding(
-                    id=f"inject-instruction-like-{tool.name}",
+                    id=f"inject-instruction-like-{surface.label}",
                     analyzer=self.name,
-                    title=f"Instruction-like description on {tool.name}",
-                    description="Tool description contains imperative language that may confuse agents.",
+                    title=f"Instruction-like description on {surface.label}",
+                    description="MCP surface contains imperative language that may confuse agents.",
                     severity=Severity.MEDIUM,
-                    tool=tool.name,
+                    tool=tool_name,
                     recommendation=(
-                        "Use neutral, descriptive tool documentation without imperative instructions."
+                        "Use neutral, descriptive documentation without imperative instructions."
                     ),
                     technique_id="MCTS-T-1001",
                     confidence=0.6,
                     location=loc,
-                    evidence={"type": "instruction_like"},
+                    evidence={"type": "instruction_like", "surface": surface.kind.value},
                 )
             )
 
-        if self._description_handler_mismatch(tool):
+        if tool and self._description_handler_mismatch(tool):
             findings.append(
                 Finding(
-                    id=f"inject-desc-mismatch-{tool.name}",
+                    id=f"inject-desc-mismatch-{surface.label}",
                     analyzer=self.name,
-                    title=f"Description/handler mismatch on {tool.name}",
+                    title=f"Description/handler mismatch on {surface.label}",
                     description="Tool description claims differ from handler implementation signals.",
                     severity=Severity.HIGH,
                     tool=tool.name,
@@ -156,17 +163,17 @@ class PromptInjectionAnalyzer(BaseAnalyzer):
         if any(pattern.search(description) for pattern in risky_patterns):
             findings.append(
                 Finding(
-                    id=f"inject-risky-surface-{tool.name}",
+                    id=f"inject-risky-surface-{surface.label}",
                     analyzer=self.name,
-                    title=f"High-risk injection surface on {tool.name}",
-                    description="Tool exposes sensitive capabilities via description keywords.",
+                    title=f"High-risk injection surface on {surface.label}",
+                    description="MCP surface exposes sensitive capabilities via description keywords.",
                     severity=Severity.HIGH,
-                    tool=tool.name,
-                    recommendation="Sanitize tool inputs and enforce instruction boundaries.",
+                    tool=tool_name,
+                    recommendation="Sanitize inputs and enforce instruction boundaries.",
                     technique_id="MCTS-T-1001",
                     confidence=0.6,
                     location=loc,
-                    evidence={"type": "risky_keywords"},
+                    evidence={"type": "risky_keywords", "surface": surface.kind.value},
                 )
             )
 

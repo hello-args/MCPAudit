@@ -7,8 +7,10 @@ from pathlib import Path
 from typing import Any
 
 from mcts.analyzers.base import BaseAnalyzer
+from mcts.analyzers.surface_context import scan_surfaces, surface_location, tool_for_surface, tool_name_for
+from mcts.analyzers.surfaces import ScanSurface, ScanSurfaceKind
 from mcts.mcp.models import MCPServerInfo, MCPTool
-from mcts.reporting.models import Finding, Severity, SourceLocation
+from mcts.reporting.models import Finding, Severity
 from mcts.taxonomy.sigma.loader import MetadataSigmaRule, cached_metadata_rules
 from mcts.taxonomy.sigma.matcher import is_substantive_pattern, match_sigma_pattern
 
@@ -51,8 +53,12 @@ class SigmaMetadataAnalyzer(BaseAnalyzer):
         findings: list[Finding] = []
         seen: set[str] = set()
 
-        for tool in server.tools:
-            corpora = _tool_corpora(tool)
+        for surface in scan_surfaces(server):
+            corpora = _surface_corpora(surface)
+            if surface.kind == ScanSurfaceKind.TOOL:
+                tool = tool_for_surface(server, surface)
+                if tool:
+                    corpora = _merge_corpora(corpora, _tool_corpora(tool))
             for rule in rules:
                 for field, pattern in rule.patterns:
                     if not is_substantive_pattern(pattern):
@@ -65,7 +71,7 @@ class SigmaMetadataAnalyzer(BaseAnalyzer):
                         if _benign_html_comment_only(text, pattern):
                             continue
                         finding_id = (
-                            f"sigma-{rule.technique_id}-{tool.name}-{rule.rule_id}-{field}-{corpus_field}"
+                            f"sigma-{rule.technique_id}-{surface.label}-{rule.rule_id}-{field}-{corpus_field}"
                         )
                         if finding_id in seen:
                             continue
@@ -74,32 +80,55 @@ class SigmaMetadataAnalyzer(BaseAnalyzer):
                             Finding(
                                 id=finding_id,
                                 analyzer=self.name,
-                                title=f"Sigma rule match on {tool.name}: {rule.title}",
+                                title=f"Sigma rule match on {surface.label}: {rule.title}",
                                 description=(
                                     f"MCTS Sigma pattern matched in {corpus_field} ({rule.technique_id})."
                                 ),
                                 severity=_LEVEL_TO_SEVERITY.get(rule.level.lower(), Severity.MEDIUM),
-                                tool=tool.name,
+                                tool=tool_name_for(surface),
                                 recommendation=(
                                     "Review matched metadata against MCTS guidance and "
-                                    "sanitize tool definitions before deployment."
+                                    "sanitize MCP surface definitions before deployment."
                                 ),
                                 technique_id=rule.technique_id,
                                 confidence=0.8,
-                                location=SourceLocation(
-                                    file=tool.source_file or "",
-                                    line=tool.source_line,
-                                ),
+                                location=surface_location(surface),
                                 evidence={
                                     "sigma_rule_id": rule.rule_id,
                                     "sigma_field": field,
                                     "sigma_pattern": pattern,
                                     "corpus_field": corpus_field,
+                                    "surface": surface.kind.value,
                                     "attack_tags": _attack_tags(rule),
                                 },
                             )
                         )
         return findings
+
+
+def _merge_corpora(
+    left: dict[str, list[tuple[str, str]]],
+    right: dict[str, list[tuple[str, str]]],
+) -> dict[str, list[tuple[str, str]]]:
+    merged = {key: list(values) for key, values in left.items()}
+    for key, values in right.items():
+        merged.setdefault(key, []).extend(values)
+    return merged
+
+
+def _surface_corpora(surface: ScanSurface) -> dict[str, list[tuple[str, str]]]:
+    corpora: dict[str, list[tuple[str, str]]] = {
+        "tool_description": [("description", surface.description)],
+        "description": [("description", surface.description)],
+        "tool_name": [("name", surface.name)],
+        "name": [("name", surface.name)],
+    }
+    if surface.extra_text:
+        corpora.setdefault("description", []).append(("extra", surface.extra_text))
+    if surface.uri:
+        corpora["url"] = [("uri", surface.uri)]
+        corpora["path"] = [("uri", surface.uri)]
+    return corpora
 
 
 def _tool_corpora(tool: MCPTool) -> dict[str, list[tuple[str, str]]]:

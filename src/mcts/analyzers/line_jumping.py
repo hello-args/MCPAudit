@@ -5,8 +5,9 @@ from __future__ import annotations
 import re
 
 from mcts.analyzers.base import BaseAnalyzer
+from mcts.analyzers.surface_context import scan_surfaces, surface_location, tool_name_for
 from mcts.mcp.models import MCPServerInfo
-from mcts.reporting.models import Finding, Severity, SourceLocation
+from mcts.reporting.models import Finding, Severity
 
 PRIORITY_INSTRUCTIONS: tuple[str, ...] = (
     "system directive",
@@ -124,34 +125,35 @@ def detect_line_jumping(
 
 
 class LineJumpingAnalyzer(BaseAnalyzer):
-    """Detect line-jumping patterns in tool descriptions (static metadata proxy)."""
+    """Detect line-jumping patterns across MCP surfaces."""
 
     name = "line_jumping"
 
     def analyze(self, server: MCPServerInfo) -> list[Finding]:
         findings: list[Finding] = []
-        for tool in server.tools:
-            if not detect_line_jumping(tool.description, context_position=0):
+        for surface in scan_surfaces(server):
+            text = surface.all_text()
+            if not detect_line_jumping(text, context_position=0):
                 continue
             findings.append(
                 Finding(
-                    id=f"line-jump-{tool.name}",
+                    id=f"line-jump-{surface.label}",
                     analyzer=self.name,
-                    title=f"Line jumping pattern on {tool.name}",
+                    title=f"Line jumping pattern on {surface.label}",
                     description=(
-                        "Tool metadata attempts to establish precedence over security "
+                        "MCP surface attempts to establish precedence over security "
                         "directives (MCTS-T-1021)."
                     ),
                     severity=Severity.HIGH,
-                    tool=tool.name,
+                    tool=tool_name_for(surface),
                     recommendation=(
-                        "Strip priority/override language from tool metadata; enforce "
+                        "Strip priority/override language from MCP surfaces; enforce "
                         "immutable system policy ordering."
                     ),
                     technique_id="MCTS-T-1021",
                     confidence=0.8,
-                    location=SourceLocation(file=tool.source_file or "", line=tool.source_line),
-                    evidence={"type": "line_jumping"},
+                    location=surface_location(surface),
+                    evidence={"type": "line_jumping", "surface": surface.kind.value},
                 )
             )
         return findings
