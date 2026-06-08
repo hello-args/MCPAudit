@@ -1,0 +1,1 @@
+"""Go static analysis helpers."""
