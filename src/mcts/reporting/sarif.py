@@ -17,11 +17,12 @@ SARIF_SEVERITY: dict[Severity, str] = {
     Severity.LOW: "note",
 }
 
+# GitHub Code Scanning expects numeric strings in the 0.1–10.0 range on rule properties.
 SARIF_SECURITY_SEVERITY: dict[Severity, str] = {
-    Severity.CRITICAL: "critical",
-    Severity.HIGH: "high",
-    Severity.MEDIUM: "medium",
-    Severity.LOW: "low",
+    Severity.CRITICAL: "9.5",
+    Severity.HIGH: "8.0",
+    Severity.MEDIUM: "5.0",
+    Severity.LOW: "2.0",
 }
 
 
@@ -35,7 +36,7 @@ def write_sarif_report(report: ScanReport) -> str:
 
 def build_sarif(report: ScanReport) -> dict[str, Any]:
     rules = _build_rules(report.findings)
-    results = [_finding_to_result(finding, rules) for finding in report.findings]
+    results = [_finding_to_result(finding, rules, report.target) for finding in report.findings]
     taxonomies = _build_taxonomies(report.findings)
 
     driver: dict[str, Any] = {
@@ -121,19 +122,22 @@ def _build_rules(findings: list[Finding]) -> dict[str, dict[str, Any]]:
             "properties": {
                 "analyzer": finding.analyzer,
                 "technique_id": finding.technique_id,
+                "security-severity": SARIF_SECURITY_SEVERITY[finding.severity],
             },
         }
     return rules
 
 
-def _finding_to_result(finding: Finding, rules: dict[str, dict[str, Any]]) -> dict[str, Any]:
+def _finding_to_result(
+    finding: Finding, rules: dict[str, dict[str, Any]], target: str
+) -> dict[str, Any]:
     result: dict[str, Any] = {
         "ruleId": finding.id,
         "level": SARIF_SEVERITY[finding.severity],
         "message": {"text": finding.description},
+        "locations": [_result_location(finding, target)],
         "properties": {
             "severity": finding.severity.value,
-            "security-severity": SARIF_SECURITY_SEVERITY[finding.severity],
             "analyzer": finding.analyzer,
             "recommendation": finding.recommendation,
             "confidence": finding.confidence,
@@ -151,23 +155,32 @@ def _finding_to_result(finding: Finding, rules: dict[str, dict[str, Any]]) -> di
         result["properties"]["technique_id"] = finding.technique_id
     if finding.mitigation_ids:
         result["properties"]["mitigation_ids"] = finding.mitigation_ids
-    if finding.location:
-        result["locations"] = [
-            {
-                "physicalLocation": {
-                    "artifactLocation": {"uri": finding.location.file},
-                    "region": {"startLine": finding.location.line or 1},
-                }
-            }
-        ]
     if finding.id not in rules:
         rules[finding.id] = {
             "id": finding.id,
             "name": finding.title,
             "shortDescription": {"text": finding.title},
             "fullDescription": {"text": finding.description},
+            "properties": {
+                "security-severity": SARIF_SECURITY_SEVERITY[finding.severity],
+            },
         }
     return result
+
+
+def _result_location(finding: Finding, target: str) -> dict[str, Any]:
+    if finding.location and finding.location.file:
+        uri = finding.location.file
+        line = finding.location.line or 1
+    else:
+        uri = target
+        line = 1
+    return {
+        "physicalLocation": {
+            "artifactLocation": {"uri": uri},
+            "region": {"startLine": line},
+        }
+    }
 
 
 def _result_taxa(finding: Finding) -> list[dict[str, Any]]:

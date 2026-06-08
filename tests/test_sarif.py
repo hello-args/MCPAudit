@@ -25,6 +25,12 @@ def test_sarif_report_structure(example_server_path: Path) -> None:
     for result in sarif["runs"][0]["results"]:
         for taxon in result.get("taxa", []):
             assert isinstance(taxon, dict)
+        assert result.get("locations"), "GitHub Code Scanning requires at least one location per result"
+        assert "security-severity" not in result.get("properties", {})
+    for rule in sarif["runs"][0]["tool"]["driver"]["rules"]:
+        severity = rule.get("properties", {}).get("security-severity")
+        assert severity is not None
+        assert float(severity) > 0
 
 
 def test_write_sarif_report_is_valid_json(example_server_path: Path) -> None:
