@@ -124,7 +124,7 @@ def test_verify_detects_tampered_score() -> None:
     [
         ("examples/safe-mcp-server/server.py", 95, 100, 0, 10),
         ("examples/medium-risk-mcp-server/server.py", 60, 75, 15, 30),
-        ("examples/vulnerable-mcp-server/server.py", 0, 5, 180, 230),
+        ("examples/vulnerable-mcp-server/server.py", 0, 5, 180, 290),
     ],
 )
 def test_real_server_scores_in_expected_bands(

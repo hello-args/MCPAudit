@@ -63,3 +63,49 @@ def test_reporting_module_delegates_to_dashboard(example_server_path: Path, tmp_
     out = tmp_path / "via-reporting.html"
     write_via_reporting(report, out)
     assert "Risk Score Breakdown" in out.read_text(encoding="utf-8")
+
+
+def test_legacy_string_input_schema_report_loads(tmp_path: Path) -> None:
+    """Older scan JSON stored input_schema as a string; mcts report must still load."""
+    from mcts.reporting.models import ScanReport
+
+    legacy = {
+        "version": "0.1.0",
+        "target": "server.py",
+        "scanned_at": "2026-06-04T10:01:38.400766Z",
+        "server": {
+            "name": "server",
+            "tools": [
+                {
+                    "name": "read_file",
+                    "description": "Read a file.",
+                    "input_schema": "{}",
+                }
+            ],
+        },
+        "findings": [],
+        "summary": {"critical": 0, "high": 0, "medium": 0, "low": 0, "total": 0},
+        "score": {
+            "overall": 100,
+            "risk_index": 0,
+            "raw_risk": 0,
+            "penalty": 0,
+            "basis": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0,
+                "scorable_total": 0,
+                "excluded_non_scorable": 0,
+            },
+        },
+    }
+    path = tmp_path / "legacy.json"
+    path.write_text(json.dumps(legacy), encoding="utf-8")
+
+    report = ScanReport.model_validate_json(path.read_text(encoding="utf-8"))
+    assert report.server.tools[0].input_schema == {}
+
+    out = tmp_path / "legacy.html"
+    write_via_reporting(report, out)
+    assert "MCTS Security Report" in out.read_text(encoding="utf-8")
