@@ -67,8 +67,13 @@ def _client_from_path(path: Path) -> str:
 
 def parse_config_file(client: str, path: Path) -> list[InventoryEntry]:
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+        from mcts.discovery.json5_util import load_json5
+
+        if path.suffix.lower() in (".json5", ".jsonc"):
+            payload = load_json5(path)
+        else:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, ValueError):
         return []
 
     servers: dict = {}

@@ -20,6 +20,8 @@ DEFAULT_EXCLUDE_DIRS = (
     ".ruff_cache",
 )
 
+DEFAULT_SURFACES = ["tool", "prompt", "resource", "instruction"]
+
 
 class ScanConfig(BaseModel):
     """Configuration for a MCTS security scan."""
@@ -27,6 +29,7 @@ class ScanConfig(BaseModel):
     target: Path
     output: Path | None = None
     output_format: str = "json"
+    terminal_format: str | None = None
     fail_on_critical: bool = False
     min_score: int | None = Field(default=None, ge=0, le=100)
     max_critical: int | None = Field(default=None, ge=0)
@@ -57,3 +60,48 @@ class ScanConfig(BaseModel):
     runtime_events: list[dict[str, Any]] = Field(default_factory=list)
     behavioral_probe: bool = False
     fail_on_category: dict[str, int] = Field(default_factory=dict)
+    # P0 — multi-surface + remote transport
+    surfaces: list[str] = Field(default_factory=lambda: list(DEFAULT_SURFACES))
+    resource_mime_allowlist: list[str] = Field(default_factory=list)
+    remote_url: str | None = None
+    remote_transport: str = "streamable-http"
+    bearer_token: str | None = None
+    remote_headers: dict[str, str] = Field(default_factory=dict)
+    oauth_token_url: str | None = None
+    oauth_client_id: str | None = None
+    oauth_client_secret: str | None = None
+    oauth_scopes: str | None = None
+    protocol_probe: bool = False
+    stderr_file: str | None = None
+    expand_vars: str = "auto"
+    # P1 — static snapshot + supply chain
+    snapshot_path: Path | None = None
+    snapshot_tools: Path | None = None
+    snapshot_prompts: Path | None = None
+    snapshot_resources: Path | None = None
+    snapshot_instructions: Path | None = None
+    pip_audit: bool = False
+    npm_audit: bool = False
+    # P2 — optional analyzers
+    enable_yara: bool = False
+    yara_rules_path: Path | None = None
+    enable_llm_judge: bool = False
+    llm_model: str | None = None
+    enable_cloud_inspect: bool = False
+    cloud_endpoint: str | None = None
+    enable_prompt_defense: bool = True
+    enable_behavioral_static: bool = True
+    enable_surface_metadata: bool = True
+    enable_virustotal: bool = False
+    vt_max_files: int = 10
+    # Filters
+    tool_filter: list[str] = Field(default_factory=list)
+    analyzer_filter: list[str] = Field(default_factory=list)
+    severity_filter: list[str] = Field(default_factory=list)
+    hide_safe: bool = False
+    analyzers: list[str] = Field(default_factory=list)
+    readiness_opa: bool = False
+    readiness_opa_policies: Path | None = None
+    readiness_llm: bool = False
+    readiness_llm_model: str | None = None
+    raw_envelope: bool = False

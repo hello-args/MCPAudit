@@ -33,10 +33,26 @@ def _version_callback(value: bool) -> None:
         raise typer.Exit()
 
 
-def _write_report(report, output: Path, output_format: str) -> None:
+def _write_report(
+    report,
+    output: Path,
+    output_format: str,
+    *,
+    target: str = "",
+    remote_url: str | None = None,
+) -> None:
+    import json
+
     fmt = output_format.lower()
     if fmt == "sarif":
         output.write_text(write_sarif_report(report))
+    elif fmt == "raw":
+        payload = {
+            "target": target,
+            "remote_url": remote_url,
+            "scan_results": report.model_dump(mode="json"),
+        }
+        output.write_text(json.dumps(payload, indent=2))
     else:
         output.write_text(report.model_dump_json(indent=2))
 
@@ -87,7 +103,7 @@ def scan(
         typer.Option(
             "--format",
             "-f",
-            help="Output format: json or sarif",
+            help="Output format: json, sarif, or raw (envelope)",
             case_sensitive=False,
         ),
     ] = "json",
@@ -192,6 +208,103 @@ def scan(
             help="Enable multi-turn MCTS-T-1026 behavioral probe events (auto with --live)",
         ),
     ] = False,
+    url: Annotated[
+        Optional[str],
+        typer.Option("--url", help="Remote MCP server URL (SSE or streamable HTTP)"),
+    ] = None,
+    transport: Annotated[
+        str,
+        typer.Option("--transport", help="Remote transport: streamable-http or sse"),
+    ] = "streamable-http",
+    bearer_token: Annotated[
+        Optional[str],
+        typer.Option("--bearer-token", help="Bearer token for remote MCP server"),
+    ] = None,
+    header: Annotated[
+        Optional[list[str]],
+        typer.Option("--header", help="Custom HTTP header (Name: Value). Repeatable."),
+    ] = None,
+    surfaces: Annotated[
+        Optional[str],
+        typer.Option(
+            "--surfaces",
+            help="Comma-separated surfaces: tool,prompt,resource,instruction",
+        ),
+    ] = None,
+    resource_mime: Annotated[
+        Optional[str],
+        typer.Option(
+            "--resource-mime",
+            help="Comma-separated MIME types to scan for resources (e.g. text/plain,application/json)",
+        ),
+    ] = None,
+    snapshot: Annotated[
+        Optional[Path],
+        typer.Option("--snapshot", help="Static JSON snapshot (tools/list export)"),
+    ] = None,
+    expand_vars: Annotated[
+        str,
+        typer.Option("--expand-vars", help="Env expansion: auto, linux, mac, windows, off"),
+    ] = "auto",
+    pip_audit: Annotated[
+        bool,
+        typer.Option("--pip-audit", help="Run pip-audit on Python dependencies"),
+    ] = False,
+    npm_audit: Annotated[
+        bool,
+        typer.Option("--npm-audit", help="Run npm audit on Node dependencies"),
+    ] = False,
+    protocol_probe: Annotated[
+        bool,
+        typer.Option("--protocol-probe", help="Active MCPS protocol checks on --url"),
+    ] = False,
+    stderr_file: Annotated[
+        Optional[str],
+        typer.Option("--stderr-file", help="Capture live server stderr to file"),
+    ] = None,
+    enable_yara: Annotated[
+        bool,
+        typer.Option("--yara", help="Enable YARA metadata analyzer"),
+    ] = False,
+    enable_llm: Annotated[
+        bool,
+        typer.Option("--llm-judge", help="Enable opt-in LLM-as-judge analyzer"),
+    ] = False,
+    enable_cloud: Annotated[
+        bool,
+        typer.Option("--cloud-inspect", help="Enable opt-in cloud ML inspect API"),
+    ] = False,
+    enable_virustotal: Annotated[
+        bool,
+        typer.Option("--virustotal", help="Enable VirusTotal hash lookup"),
+    ] = False,
+    terminal_format: Annotated[
+        Optional[str],
+        typer.Option(
+            "--terminal-format",
+            help="Terminal layout: table, by_tool, by_analyzer, by_severity, summary",
+        ),
+    ] = None,
+    tool_filter: Annotated[
+        Optional[str],
+        typer.Option("--tool-filter", help="Comma-separated tool names to scan"),
+    ] = None,
+    analyzer_filter: Annotated[
+        Optional[str],
+        typer.Option("--analyzer-filter", help="Comma-separated analyzer names"),
+    ] = None,
+    severity_filter: Annotated[
+        Optional[str],
+        typer.Option("--severity-filter", help="Comma-separated severities to show"),
+    ] = None,
+    analyzers: Annotated[
+        Optional[str],
+        typer.Option("--analyzers", help="Comma-separated analyzers to run (subset)"),
+    ] = None,
+    hide_safe: Annotated[
+        bool,
+        typer.Option("--hide-safe", help="Hide low-severity informational findings in terminal output"),
+    ] = False,
 ) -> None:
     """Run a full security scan against an MCP server."""
     import json
@@ -199,11 +312,12 @@ def scan(
     from mcts.probe.consent import LiveProbeConsentError, live_consent_granted
     from mcts.probe.session import MCPProbeError
 
-    if target == Path(".") and config is None:
+    if target == Path(".") and config is None and snapshot is None and not url:
         console.print("[red]Error:[/red] Provide a target path or --config with --server.")
         raise typer.Exit(code=2)
 
-    if live and not live_consent_granted(flag=understand_live_risk):
+    needs_live = live or bool(url)
+    if needs_live and not live_consent_granted(flag=understand_live_risk):
         console.print(
             "[red]Live probing requires consent.[/red] Pass --i-understand-live-risk "
             "or set MCTS_LIVE_OK=1 in CI."
@@ -221,6 +335,23 @@ def scan(
         if languages
         else ["python", "typescript"]
     )
+    surface_list = (
+        [part.strip() for part in surfaces.split(",") if part.strip()]
+        if surfaces
+        else ["tool", "prompt", "resource", "instruction"]
+    )
+    resource_mime_list = (
+        [part.strip() for part in resource_mime.split(",") if part.strip()] if resource_mime else []
+    )
+    remote_headers = _parse_headers(header)
+    tool_filters = [p.strip() for p in tool_filter.split(",") if p.strip()] if tool_filter else []
+    analyzer_filters = (
+        [p.strip() for p in analyzer_filter.split(",") if p.strip()] if analyzer_filter else []
+    )
+    severity_filters = (
+        [p.strip() for p in severity_filter.split(",") if p.strip()] if severity_filter else []
+    )
+    analyzer_list = [p.strip() for p in analyzers.split(",") if p.strip()] if analyzers else []
 
     try:
         resolved_theme = get_theme(theme)
@@ -235,8 +366,8 @@ def scan(
         raise typer.Exit(code=2) from exc
 
     output_format = format.lower()
-    if output_format not in ("json", "sarif"):
-        console.print(f"[red]Error:[/red] Unknown format {format!r}. Use json or sarif.")
+    if output_format not in ("json", "sarif", "raw"):
+        console.print(f"[red]Error:[/red] Unknown format {format!r}. Use json, sarif, or raw.")
         raise typer.Exit(code=2)
 
     runtime_event_rows: list[dict] = []
@@ -265,13 +396,14 @@ def scan(
         target=scan_target,
         output=output,
         output_format=output_format,
+        terminal_format=terminal_format,
         fail_on_critical=fail_on_critical,
         min_score=min_score,
         max_critical=max_critical,
         fail_on_category=category_gates,
         theme=resolved_theme.name.value,
         no_progress=no_progress,
-        live=live,
+        live=needs_live,
         live_command=command,
         live_args=live_args,
         config_path=config,
@@ -283,7 +415,28 @@ def scan(
         sigma_rules_path=sigma_rules_path,
         semantic_secrets=semantic_secrets,
         runtime_events=runtime_event_rows,
-        behavioral_probe=behavioral_probe or live,
+        behavioral_probe=behavioral_probe or needs_live,
+        surfaces=surface_list,
+        resource_mime_allowlist=resource_mime_list,
+        remote_url=url,
+        remote_transport=transport,
+        bearer_token=bearer_token,
+        remote_headers=remote_headers,
+        protocol_probe=protocol_probe,
+        stderr_file=stderr_file,
+        expand_vars=expand_vars,
+        snapshot_path=snapshot,
+        pip_audit=pip_audit,
+        npm_audit=npm_audit,
+        enable_yara=enable_yara,
+        enable_llm_judge=enable_llm,
+        enable_cloud_inspect=enable_cloud,
+        enable_virustotal=enable_virustotal,
+        tool_filter=tool_filters,
+        analyzer_filter=analyzer_filters,
+        severity_filter=severity_filters,
+        analyzers=analyzer_list,
+        hide_safe=hide_safe,
     )
     scanner = Scanner(config_obj)
     command_label = f"mcts scan {scan_target}"
@@ -315,15 +468,32 @@ def scan(
     if not no_progress:
         console.print()
 
-    renderer.render(
-        report,
-        command=command_label,
-        duration_seconds=duration,
-        analyzers_run=scanner.analyzers_run_count(),
-    )
+    if terminal_format:
+        from mcts.ui.alternate_formats import render_report
+
+        try:
+            render_report(
+                report,
+                terminal_format,
+                console,
+                tool_filter=set(tool_filters) if tool_filters else None,
+                analyzer_filter=set(analyzer_filters) if analyzer_filters else None,
+                severity_filter=set(severity_filters) if severity_filters else None,
+                hide_safe=hide_safe,
+            )
+        except ValueError as exc:
+            console.print(f"[red]Error:[/red] {exc}")
+            raise typer.Exit(code=2) from exc
+    else:
+        renderer.render(
+            report,
+            command=command_label,
+            duration_seconds=duration,
+            analyzers_run=scanner.analyzers_run_count(),
+        )
 
     if output:
-        _write_report(report, output, output_format)
+        _write_report(report, output, output_format, target=str(scan_target), remote_url=url)
         renderer.render_saved_notice(str(output))
 
     _check_gates(report, config_obj)
@@ -561,6 +731,138 @@ def fuzz(
 
     if any(f.severity.value in ("critical", "high") for f in findings):
         raise typer.Exit(code=1)
+
+
+def _parse_headers(header: list[str] | None) -> dict[str, str]:
+    rows: dict[str, str] = {}
+    for item in header or []:
+        if ":" not in item:
+            continue
+        name, value = item.split(":", 1)
+        rows[name.strip()] = value.strip()
+    return rows
+
+
+@app.command()
+def readiness(
+    target: Annotated[Path, typer.Argument(help="MCP server path or repo")],
+    output: Annotated[Optional[Path], typer.Option("--output", "-o")] = None,
+    enable_opa: Annotated[
+        bool,
+        typer.Option("--opa", help="Enable optional OPA Rego policy checks"),
+    ] = False,
+    enable_llm: Annotated[
+        bool,
+        typer.Option("--llm-judge", help="Enable opt-in LLM readiness review"),
+    ] = False,
+) -> None:
+    """Run production readiness checks (separate from security score)."""
+    import json
+
+    from mcts.readiness.runner import run_readiness
+
+    config = ScanConfig(target=target, readiness_opa=enable_opa, readiness_llm=enable_llm)
+    report = run_readiness(config)
+    console.print(
+        f"[bold]Readiness[/bold] — score {report.readiness_score}/100, "
+        f"{report.tools_checked} tool(s), {len(report.findings)} note(s)"
+    )
+    for finding in report.findings[:20]:
+        console.print(f"  [{finding.severity.value}] {finding.title}")
+    if output:
+        output.write_text(
+            json.dumps(
+                {
+                    "target": report.target,
+                    "tools_checked": report.tools_checked,
+                    "readiness_score": report.readiness_score,
+                    "production_ready": report.production_ready,
+                    "findings": [f.model_dump() for f in report.findings],
+                },
+                indent=2,
+            )
+        )
+        console.print(f"[green]Saved[/green] {output}")
+
+
+@app.command(name="serve")
+def serve_api(
+    host: Annotated[str, typer.Option("--host")] = "127.0.0.1",
+    port: Annotated[int, typer.Option("--port")] = 8080,
+    reload: Annotated[bool, typer.Option("--reload")] = False,
+) -> None:
+    """Start the MCTS REST API server."""
+    try:
+        import uvicorn
+    except ImportError as exc:
+        console.print("[red]REST API requires optional api extra: uv sync --extra api[/red]")
+        raise typer.Exit(code=2) from exc
+    from mcts.api.app import app as api_app
+
+    uvicorn.run(api_app, host=host, port=port, reload=reload)
+
+
+def _surface_scan(target: Path, surfaces: list[str], snapshot: Path | None = None) -> None:
+    """Run a scan limited to specific MCP surfaces."""
+    config = ScanConfig(
+        target=target,
+        surfaces=surfaces,
+        snapshot_path=snapshot,
+    )
+    report = Scanner(config).run()
+    console.print(f"[bold]MCTS[/bold] — {len(report.findings)} finding(s) on surfaces: {', '.join(surfaces)}")
+    for finding in report.findings[:15]:
+        console.print(f"  [{finding.severity.value}] {finding.title}")
+
+
+@app.command("scan-prompts")
+def scan_prompts(
+    target: Annotated[Path, typer.Argument(help="MCP server path or repo")],
+    snapshot: Annotated[
+        Optional[Path],
+        typer.Option("--snapshot", help="Static JSON snapshot with prompts"),
+    ] = None,
+) -> None:
+    """Scan prompts and server instructions only."""
+    _surface_scan(target, ["prompt", "instruction"], snapshot)
+
+
+@app.command("scan-resources")
+def scan_resources(
+    target: Annotated[Path, typer.Argument(help="MCP server path or repo")],
+    snapshot: Annotated[
+        Optional[Path],
+        typer.Option("--snapshot", help="Static JSON snapshot with resources"),
+    ] = None,
+    resource_mime: Annotated[
+        Optional[str],
+        typer.Option("--resource-mime", help="Comma-separated MIME allowlist"),
+    ] = None,
+) -> None:
+    """Scan MCP resources only."""
+    mime_list = [p.strip() for p in resource_mime.split(",") if p.strip()] if resource_mime else []
+    config = ScanConfig(
+        target=target,
+        surfaces=["resource"],
+        snapshot_path=snapshot,
+        resource_mime_allowlist=mime_list,
+    )
+    report = Scanner(config).run()
+    console.print(f"[bold]MCTS[/bold] — {len(report.findings)} resource finding(s)")
+    for finding in report.findings[:15]:
+        console.print(f"  [{finding.severity.value}] {finding.title}")
+
+
+@app.command("scan-instructions")
+def scan_instructions(
+    target: Annotated[Path, typer.Argument(help="MCP server path or repo")],
+    snapshot: Annotated[
+        Optional[Path],
+        typer.Option("--snapshot", help="Static JSON snapshot with instructions"),
+    ] = None,
+) -> None:
+    """Scan server instructions only."""
+    _surface_scan(target, ["instruction"], snapshot)
 
 
 @app.command()
