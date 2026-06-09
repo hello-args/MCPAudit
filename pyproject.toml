@@ -1,7 +1,7 @@
 [project]
 name = "mcp-mcts"
 dynamic = ["version"]
-description = "Model Context Threat Scanner — security analysis for MCP servers"
+description = "Model Context Threat Scanner — local MCP security scanning, attack chains, inventory, CI gates, and optional Semgrep/LLM analysis"
 readme = "README.md"
 license = "Apache-2.0"
 authors = [
@@ -69,6 +69,9 @@ yara = [
 llm = [
     "litellm>=1.80.0",
 ]
+semgrep = [
+    "semgrep>=1.60.0",
+]
 supplychain = [
     "pip-audit>=2.9.0",
 ]
@@ -80,7 +83,6 @@ sast = [
 ]
 all = [
     "fastapi>=0.115.0",
-    "litellm>=1.80.0",
     "mcp>=1.27.2",
     "numpy>=1.24.0",
     "pip-audit>=2.9.0",
@@ -91,10 +93,13 @@ all = [
     "tree-sitter-typescript>=0.23.0",
     "uvicorn>=0.32.0",
     "yara-python>=4.5.0",
+    "litellm>=1.80.0",
+    "semgrep>=1.60.0",
 ]
 
 [project.scripts]
 mcts = "mcts.cli.main:run"
+mcts-mcp = "mcts.mcp_server.main:run"
 
 [project.urls]
 Homepage = "https://github.com/MCP-Audit/MCTS"

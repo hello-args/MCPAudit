@@ -19,6 +19,7 @@ htmlcov/
 .ruff_cache/
 
 # Reports
+mcts_analysis/
 security-report.html
 report.json
 *.scan.json

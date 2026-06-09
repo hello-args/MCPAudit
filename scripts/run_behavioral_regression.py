@@ -14,7 +14,7 @@ def main() -> int:
     root = Path(__file__).resolve().parents[1]
     examples = [
         root / "examples/vulnerable-mcp-server/server.py",
-        root / "examples/safe-mcp-server/server.py",
+        root / "examples/baseline-mcp-server/server.py",
         root / "examples/medium-risk-mcp-server/server.py",
     ]
     analyzer = BehavioralStaticAnalyzer()

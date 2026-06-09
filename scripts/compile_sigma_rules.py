@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -14,29 +15,33 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = ROOT / "tests" / "fixtures" / "sigma_fixtures"
 DEFAULT_OUTPUT = ROOT / "src" / "mcts" / "taxonomy" / "sigma" / "metadata_rules.json"
 
-_SKIP_TAGS = frozenset({"saf-mcp", "safemcp", "mcts-mcp"})
+_SKIP_TAGS = frozenset({"mcts-mcp"})
+_LEGACY_TAG = re.compile(r"^[a-z]{2,8}\.t\d", re.I)
+_NON_MCTS_TECHNIQUE = re.compile(r"^(?!MCTS-T)(?!MCTS-S-)[A-Z]{2,6}-T(\d+)", re.I)
+_LEGACY_RULE_PREFIX = re.compile(r"^(?!mcts-)[a-z]{2,6}-", re.I)
 
 
 def _sanitize_rule_row(row: dict) -> dict:
     tags: list[str] = []
     for tag in row.get("tags", []):
         lowered = str(tag).lower()
-        if lowered in _SKIP_TAGS or lowered.startswith("saf-t") or lowered.startswith("safe.t"):
+        if lowered in _SKIP_TAGS or _LEGACY_TAG.match(lowered):
             continue
         tags.append(str(tag))
     row["tags"] = tags
 
     rule_id = str(row.get("rule_id", ""))
-    if rule_id.startswith("saf-"):
-        row["rule_id"] = "mcts-" + rule_id[4:]
+    if _LEGACY_RULE_PREFIX.match(rule_id):
+        row["rule_id"] = "mcts-" + rule_id.split("-", 1)[1]
 
     technique_id = str(row.get("technique_id", ""))
-    if technique_id.startswith("SAF-T"):
-        row["technique_id"] = "MCTS-S-" + technique_id.split("-T", 1)[1]
+    match = _NON_MCTS_TECHNIQUE.match(technique_id)
+    if match:
+        row["technique_id"] = f"MCTS-S-{match.group(1)}"
 
     title = str(row.get("title", ""))
-    for prefix in ("SAF-T", "SAF-"):
-        title = title.replace(prefix, "MCTS-")
+    title = _NON_MCTS_TECHNIQUE.sub(lambda m: f"MCTS-T-{m.group(1)}", title)
+    title = title.replace("MCTS rule T", "MCTS-T-")
     row["title"] = title
     return row
 

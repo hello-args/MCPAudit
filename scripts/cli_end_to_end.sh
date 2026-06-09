@@ -18,10 +18,10 @@ echo "== scan-prompts subcommand =="
 uv run mcts scan-prompts . --snapshot examples/fixtures/prompts-snapshot.json
 
 echo "== readiness heuristics =="
-uv run mcts readiness examples/safe-mcp-server/server.py
+uv run mcts readiness examples/baseline-mcp-server/server.py
 
 echo "== raw envelope output =="
-uv run mcts scan examples/safe-mcp-server/server.py --format raw -o /tmp/mcts-raw.json --no-progress
+uv run mcts scan examples/baseline-mcp-server/server.py --format raw -o /tmp/mcts-raw.json --no-progress
 python3 -c "import json; p=json.load(open('/tmp/mcts-raw.json')); assert 'scan_results' in p"
 
 echo "== pytest =="
