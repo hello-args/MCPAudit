@@ -185,6 +185,19 @@ Rules are deduplicated via `analyzers/sigma_dedupe.py` when multiple patterns hi
 
 When adding techniques, add a fixture directory matching the ID.
 
+### Planned taxonomy expansion (gap audit)
+
+| Capability | Status | GAP | Notes |
+|------------|--------|-----|-------|
+| Full 73 SAF Sigma rules in regression | Partial | GAP-137–141 | 34 fixtures today |
+| 53 SAF mitigation dossiers | Partial | GAP-138 | `mitigation_urls.py` links only |
+| Portable technique YAML packs | Missing | GAP-142 | SAF-Scan format |
+| Dual E/W/X/TF code option | Missing | GAP-127 | Alongside MCTS-T |
+| OWASP MCP Top 10 full 10/10 map | Partial | GAP-230 | Complete category coverage |
+| MITRE ATLAS mapping | Missing | L6-04 | Framework mapping |
+
+See [Feature Expansion Plan — Taxonomy](../more/feature-expansion-plan.md#taxonomy-8).
+
 ---
 
 ## SARIF and HTML integration

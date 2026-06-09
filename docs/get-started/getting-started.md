@@ -396,3 +396,4 @@ GitHub Action: [CI Integration](../platform/ci-integration.md) · [action/README
 | Technique IDs on findings | [Threat Taxonomy](../reporting/taxonomy.md) |
 | Score formula and gates | [Scoring Specification](../reporting/scoring-spec.md) |
 | Implementation roadmap | [Feature Expansion Plan](../more/feature-expansion-plan.md) · [Product Roadmap](../more/roadmap.md) |
+| Full gap index & roadmap gaps | [Product Positioning — Complete gap index](../more/product-positioning.md#complete-gap-index) · [GAP appendix](../more/feature-expansion-plan.md#part-11-appendix--full-gap-backlog-gap-001240) |

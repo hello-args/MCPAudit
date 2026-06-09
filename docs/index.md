@@ -59,7 +59,7 @@ How findings are produced from discovered tools and source code.
 
 | Guide | Description |
 |-------|-------------|
-| [Security Checks Reference](analysis/security-checks.md) | Every analyzer — what it detects, examples, flags to enable |
+| [Security Checks Reference](analysis/security-checks.md) | Every analyzer — shipped checks + **§16 planned checks** from gap audit |
 | [Architecture](analysis/architecture.md) | Full pipeline: data models, discovery, 20+ analyzers, scoring, reporting |
 
 All pages: [analysis/](analysis/README.md)
@@ -86,7 +86,7 @@ CLI commands, flags, exit codes, and CI/CD integration.
 
 | Guide | Description |
 |-------|-------------|
-| [CLI Reference](platform/cli.md) | Complete `scan`, `report`, `inventory`, `fuzz`, `readiness`, `serve` |
+| [CLI Reference](platform/cli.md) | Complete reference + **planned commands/flags** from gap audit |
 | [REST API](platform/rest-api.md) | `mcts serve` — FastAPI scan endpoint |
 | [CI Integration](platform/ci-integration.md) | GitHub Action, SARIF, gates, workflow patterns |
 
@@ -100,10 +100,10 @@ Planning, positioning, and external references.
 
 | Guide | Description |
 |-------|-------------|
-| [Feature Expansion Plan](more/feature-expansion-plan.md) | Gap analysis, phased implementation, module layout |
+| [Feature Expansion Plan](more/feature-expansion-plan.md) | Gap analysis, phased implementation, **Part 11 + full GAP appendix (213 rows)** |
 | [Product Roadmap](more/roadmap.md) | Phases from foundation → platform |
-| [Product Positioning](more/product-positioning.md) | Strengths, personas, use cases, design principles |
-| [External Frameworks](more/external-frameworks.md) | How industry taxonomies relate to MCTS-T |
+| [Product Positioning](more/product-positioning.md) | Strengths, personas, differentiation, roadmap gaps |
+| [External Frameworks](more/external-frameworks.md) | Industry taxonomies, maintainer gap review workflow |
 | [Feature matrix (README)](../README.md#features) | Current module status |
 
 All pages: [more/](more/README.md)

@@ -15,7 +15,7 @@ MCTS (Model Context Threat Scanner) documentation — installation through CI in
 | [Analysis](analysis/README.md) | Pipeline and analyzers | [architecture.md](analysis/architecture.md) |
 | [Reporting](reporting/README.md) | Score, taxonomy, HTML | [scoring-spec.md](reporting/scoring-spec.md) |
 | [Platform](platform/README.md) | CLI and CI | [cli.md](platform/cli.md) |
-| [More](more/README.md) | Roadmap and planning | [roadmap.md](more/roadmap.md) |
+| [More](more/README.md) | Roadmap, positioning, gap backlog, expansion plan | [roadmap.md](more/roadmap.md) |
 
 ---
 

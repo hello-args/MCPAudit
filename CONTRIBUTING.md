@@ -63,10 +63,13 @@ The ruleset definition lives in `.github/rulesets/main.json`.
 Before large features, read:
 
 - [Documentation index](docs/index.md)
-- [Feature Expansion Plan](docs/more/feature-expansion-plan.md) — gap analysis, implementation how-to, module layout
+- [Feature Expansion Plan](docs/more/feature-expansion-plan.md) — gap analysis, implementation how-to, **Part 11 prioritized backlog**
 - [Product Roadmap](docs/more/roadmap.md) — phased deliverables and success criteria
+- [Product Positioning](docs/more/product-positioning.md) — positioning, differentiation, and roadmap gaps
 
-Pick a phase item and open a [feature request](https://github.com/MCP-Audit/MCTS/issues/new?template=feature_request.yml) or Discussion to align on design.
+When proposing parity with another MCP security tool, cite the capability layer (static scan, supply chain, runtime, governance, graph) and confirm it fits MCTS's local-first MCP-boundary scope — see [Feature Expansion Plan Part 8](docs/more/feature-expansion-plan.md#part-8--what-not-to-build).
+
+Pick a phase item from [Part 11](docs/more/feature-expansion-plan.md#part-11--prioritized-backlog) or the [full GAP appendix](docs/more/feature-expansion-plan.md#part-11-appendix--full-gap-backlog-gap-001240) and open a [feature request](https://github.com/MCP-Audit/MCTS/issues/new?template=feature_request.yml) or Discussion to align on design.
 
 ## Adding a New Analyzer
 

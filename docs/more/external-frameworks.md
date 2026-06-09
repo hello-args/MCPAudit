@@ -119,6 +119,21 @@ See [Feature Expansion Plan](feature-expansion-plan.md) Part 4 for phased delive
 
 ---
 
+## Maintainer gap review (local only)
+
+When evaluating new MCP security capabilities, maintainers run a structured gap review against the [Feature Expansion Plan](feature-expansion-plan.md) backlog. Detailed cross-tool file mappings and ecosystem matrices stay in a **local-only** audit — not published in this repository.
+
+Workflow:
+
+1. Map capability → MCTS module or GAP theme
+2. Assign priority (P0–P3) using [Part 11](feature-expansion-plan.md#part-11--prioritized-backlog)
+3. Implement with MCTS-T IDs — never vendor third-party IDs in SARIF
+4. Add regression fixture when detection lands
+
+**Do not** copy external rule corpora or cloud-only flows into core OSS. Prefer SARIF/event export for runtime gateway partners.
+
+---
+
 ## What not to port blindly
 
 | External artifact | Why caution |

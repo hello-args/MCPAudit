@@ -206,6 +206,16 @@ Tune limits per team risk appetite. Start strict on `max-critical` and relax `mi
 
 Grades are derived from `score.overall` in `report/data.py`.
 
+### Planned scoring modes (gap audit)
+
+| Mode | Status | GAP |
+|------|--------|-----|
+| AIVSS v2 (`--scoring aivss`) | Missing | GAP-060 |
+| CVSS v4 vector per finding | Missing | GAP-061 |
+| Runtime trust score (live/proxy) | Planned | L10-01 |
+
+See [Feature Expansion Plan — Analyzer](../more/feature-expansion-plan.md#analyzer-47).
+
 ---
 
 ## Integrity check

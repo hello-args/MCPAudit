@@ -723,6 +723,38 @@ uv run mcts report report.json -o security-report.html
 
 ---
 
+## 16. Planned checks
+
+Checks on the roadmap that MCTS does **not** yet run by default. Full tables: [Feature Expansion Plan — Analyzer appendix](../more/feature-expansion-plan.md#analyzer-47) · [Appendix B ecosystem layers](../more/feature-expansion-plan.md#part-11-appendix-b--ecosystem-layer-gaps-l1l10).
+
+| Area | Planned capability | Status | P |
+|------|-------------------|--------|---|
+| SAST depth | 10-language CFG + cross-file taint | Weak/Missing | P0 |
+| Semgrep / Java | Optional `--semgrep` backend | Missing | P0 |
+| Skills | 6-layer SKILL.md scanning + E004–E006 | Missing | P0 |
+| Agent guardrails | Prompt firewall + pre-exec action gate | Missing | P0 |
+| Supply chain | Hallucinated npm packages, typosquat engine | Missing | P0–P1 |
+| Scoring alt | AIVSS v2, CVSS v4 per finding | Missing | P1–P2 |
+| LLM pipeline | Prompt library, input guard, second review pass | Missing/Partial | P1 |
+| Toxic flows | W015–W020 / E002 taxonomy codes | Partial | P1 |
+| Registry | `server.json` manifest walker | Missing | P1 |
+| SBOM | CycloneDX, diff, hallucination check | Missing | P1 |
+| Auto-fix | MCP-specific fix templates (subset) | Missing | P1 |
+| Smuggling | ANSI / control-char in tool text | Partial | P2 |
+| Runtime proxy | Inline tool-call detectors on stdio | Missing | P1 |
+| Proxy RT | Prompt injection / exfil / rate-limit at runtime | Missing | P2–P3 |
+| Frameworks | MITRE ATLAS, SOC2/GDPR evidence bundles | Missing | P2–P4 |
+| Novel (L10) | Runtime trust score, reputation graph, benchmarking | Planned | Future |
+
+Enable today's closest equivalents while waiting:
+
+```bash
+mcts scan ./repo/ --pip-audit --npm-audit --semantic-secrets --yara --llm-judge
+mcts inventory --scan   # cross-server shadowing (partial toxic-flow coverage)
+```
+
+---
+
 ## Related
 
 - [Architecture](architecture.md) — pipeline and analyzer registry
@@ -730,3 +762,4 @@ uv run mcts report report.json -o security-report.html
 - [Scoring Specification](../reporting/scoring-spec.md) — how severities affect score
 - [CLI Reference](../platform/cli.md) — flags to enable optional checks
 - [Live Scanning](../scanning/live-scanning.md) · [Remote Scanning](../scanning/remote-scanning.md) · [Fuzzing](../scanning/fuzzing.md)
+- [Planned checks — §16](#16-planned-checks) · [Feature Expansion Plan](../more/feature-expansion-plan.md#part-11-appendix--full-gap-backlog-gap-001240)

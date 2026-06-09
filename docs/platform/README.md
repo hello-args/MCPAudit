@@ -27,8 +27,22 @@ Operational guides for running MCTS locally, in CI, and via the published GitHub
 | `mcts readiness` | Production readiness (non-security) |
 | `mcts serve` | REST API server |
 | `mcts pentest` | Stub (planned) |
+| `mcts vet` / `mcts-mcp` / `mcts watch` | Planned — see [CLI planned surface](cli.md#planned-commands-and-flags) |
 
 ---
+
+## Planned platform capabilities
+
+From the gap backlog — not yet shipped:
+
+| Area | Planned | Doc |
+|------|---------|-----|
+| CLI subcommands | `inspect`, `vet`, `diff`, `watch`, `mcts-mcp`, `review` | [CLI planned](cli.md#planned-commands-and-flags) |
+| CI | `--ci` preset, git-diff scan, PR comments, GitLab template | [CI Integration](ci-integration.md#planned-ci-capabilities) |
+| Reporting | CycloneDX AI-BOM, Nucleus/OCSF export, trend charts | [Reporting planned](reporting/README.md#planned-reporting) |
+| Discovery | 12+ clients, skills dirs, machine-wide scan | [Inventory planned](../scanning/inventory.md#planned-discovery) |
+
+Full index: [Feature Expansion Plan Appendix](../more/feature-expansion-plan.md#part-11-appendix--full-gap-backlog-gap-001240).
 
 ## Related
 

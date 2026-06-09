@@ -185,14 +185,16 @@ Scan data itself never leaves the file. See [SECURITY.md](../../SECURITY.md).
 
 ## Planned enhancements
 
-| Feature | Phase | Data source |
-|---------|-------|-------------|
+| Feature | Phase | GAP |
+|---------|-------|-----|
+| Interactive attack-graph UI (force-directed) | 2 | GAP-218 |
 | Capability Matrix | 1 | `capability/inferrer.py` profiles |
 | Technique Map (full MCTS-T grid) | 1 | All `technique_id` on findings |
-| Live trend chart | 2 | `.mcts/history/<hash>.jsonl` |
+| Live trend chart | 2 | GAP-126 — `.mcts/history/` |
 | Diff view vs baseline | 2 | `--baseline` snapshots |
+| Credential / blast-radius graph pages | 3 | L7-07 |
 
-See [Feature Expansion Plan](../more/feature-expansion-plan.md) and [Roadmap](../more/roadmap.md).
+See [Feature Expansion Plan — Reporting](../more/feature-expansion-plan.md#reporting-10) and [Roadmap](../more/roadmap.md).
 
 ---
 

@@ -50,8 +50,27 @@ Deep dive: [Architecture — Discovery](../analysis/architecture.md#discovery-la
 
 ---
 
+## Planned discovery modes
+
+| Mode | Status | Phase | Notes |
+|------|--------|-------|-------|
+| Machine-wide scan (all client configs) | Missing | 2 | GAP-006 — no explicit target |
+| 12+ agent clients (Gemini, Codex, OpenClaw…) | Partial | 3 | GAP-095 |
+| Skills directories + `SKILL.md` | Missing | 2–3 | GAP-029, GAP-099 |
+| VS Code workspaceStorage profiles | Missing | 3 | GAP-096 |
+| Claude Code project/plugin globs | Missing | 3 | GAP-097 |
+| WSL + macOS codesign trust | Missing | 3 | GAP-101–102 |
+| GitHub URL shallow-clone target | Missing | 3 | GAP-009 |
+| Remote `scan-mcp` manifest pre-check | Partial | 2 | GAP-225 |
+| `mcts fuzz --url` remote fuzz | Planned | 2 | GAP-190 |
+
+See [Inventory — planned discovery](inventory.md#planned-discovery) and [Feature Expansion Plan](../more/feature-expansion-plan.md#discovery-13).
+
+---
+
 ## Related
 
 - [Getting Started](../get-started/getting-started.md)
 - [CLI Reference](../platform/cli.md)
+- [Planned discovery modes](#planned-discovery-modes)
 - [Documentation index](../index.md)

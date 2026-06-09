@@ -291,18 +291,71 @@ See [Protocol Fuzzing](../scanning/fuzzing.md).
 
 ---
 
-## Planned commands
+## Planned commands and flags
 
-| Command | Status | Description |
-|---------|--------|-------------|
-| `mcts audit-config` | Planned | Static review of `mcpServers` JSON |
-| `mcts simulate` | Planned | Active attack-path simulation |
-| `mcts pentest` | Stub | Prints "not yet implemented" |
-| `mcts vet` | Planned | Pre-install package vetting |
-| `mcts trend` | Planned | Score history from `.mcts/history/` |
-| `mcts badge` | Planned | README certification SVG |
+From the [Feature Expansion Plan — CLI appendix](../more/feature-expansion-plan.md#scanning-29). Status reflects MCTS today vs the roadmap backlog.
 
-See [Roadmap](../more/roadmap.md).
+### Planned subcommands
+
+| Command | Status | Priority | Description |
+|---------|--------|----------|-------------|
+| `mcts audit-config` | Planned | P1 | Static review of `mcpServers` JSON |
+| `mcts diff` | Planned | P1 | Git-aware MCP config diff; PR comment output |
+| `mcts inspect` | Missing | P1 | Read-only tools/prompts/resources listing |
+| `mcts vet` | Planned | P0 | Pre-install `pypi:` / `npm:` / `oci:` vetting |
+| `mcts review` / `cr-agent` | Missing | P1 | Dedicated LLM security review CLI |
+| `mcts simulate` | Planned | P2 | Active attack-path simulation |
+| `mcts pentest` | Stub | P0 | Multi-agent red-team orchestration |
+| `mcts trend` | Planned | P2 | Score history from `.mcts/history/` |
+| `mcts badge` | Planned | P3 | README certification SVG |
+| `mcts watch` | Planned | P2 | Continuous config re-scan daemon |
+| `mcts shadow` | Planned | P1 | Unknown/shadow MCP server discovery |
+| `mcts dashboard` | Planned | P1 | Interactive attack-graph UI |
+| `mcts-mcp` | Planned | P0 | MCP server mode — scan tools for IDE agents |
+| `mcts guard install` | Missing | P0 | Agent Guard runtime hooks (defer/partner) |
+| `mcts init` / `doctor` | Missing | P1 | Client setup and dependency diagnostics |
+| `mcts rules` | Missing | P3 | Expose Sigma/rule paths |
+| `mcts scan-mcp` | Partial | P2 | Remote manifest probe before connect |
+
+### Planned global flags (selected)
+
+| Flag / behavior | GAP | Priority |
+|-----------------|-----|----------|
+| `--technique SAF-T-*` per-technique mode | GAP-001 | P0 |
+| `--semgrep` taint backend (+ Java) | GAP-002–003 | P0 |
+| Machine-wide scan (no explicit target) | GAP-006 | P0 |
+| `--skills` / SKILL.md scanning | GAP-029 | P0 |
+| `--scan-all-users` multi-home | GAP-021 | P1 |
+| `--ci` unified CI preset | GAP-024 | P1 |
+| `--full-toxic-flows` TF codes | GAP-032 | P1 |
+| `--diff-base` git-scoped scan | GAP-010 | P1 |
+| GitHub URL scan target | GAP-009 | P2 |
+| `--stdio-timeout`, `--skip-ssl-verify` | GAP-017, GAP-023 | P2 |
+| `--ignore-issues-codes` CI allowlist | GAP-025 | P2 |
+| `mcts fuzz --url` remote protocol fuzz | GAP-190 | P2 |
+
+Full CLI/scanning gap list:
+
+| GAP | Planned surface | Status | P | Phase | Notes |
+|:----|:----------------|:-------|:--|:------|:------|
+| GAP-001 | Per-technique scan mode | Missing | P0 | 2 | Run one technique pack at a time |
+| GAP-002 | Semgrep taint backend | Missing | P0 | 3 | Optional `--semgrep`; includes Java |
+| GAP-003 | Java SAST | Missing | P0 | 3 | Part of Semgrep adapter |
+| GAP-004 | Agentic multi-agent pentest | Stub | P0 | 4 | Agno team; structured JSON output |
+| GAP-005 | Pre-install package vet | Missing | P0 | 2 | npm:/pypi: before install |
+| GAP-006 | Machine-wide default scan | Missing | P0 | 2 | Scan all well-known configs |
+| GAP-007 | Batch config scan | Missing | P0 | 1 | All servers in MCP JSON |
+| GAP-008 | known-configs scan all | Partial | P0 | 1 | inventory --scan one-shot |
+| GAP-009 | GitHub URL scan target | Missing | P2 | 3 | Shallow clone / zip |
+| GAP-010 | Git-diff scoped scan | Missing | P1 | 4 | --diff-base for PR CI |
+| GAP-026 | inspect subcommand | Missing | P1 | 2 | Read-only surface listing |
+| GAP-027 | evo fleet push | Missing | P0 | 4 | Fleet upload API integration |
+| GAP-028 | guard install/uninstall | Missing | P0 | 4 | Agent Guard hooks |
+| GAP-029 | --skills / SKILL.md scan | Missing | P0 | 3 | Skills dir + SKILL.md |
+| GAP-217 | cr-agent LLM security review | Missing | P1 | 4 | Dedicated LLM security review CLI |
+| GAP-225 | Remote manifest scan-mcp | Partial | P2 | 2 | Pre-connect tools/list probe |
+
+See [Roadmap](../more/roadmap.md) and [Feature Expansion Plan Part 11](../more/feature-expansion-plan.md#part-11--prioritized-backlog).
 
 ---
 

@@ -54,7 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `MCPTool.input_schema` is now a parsed JSON Schema object (was a string)
+- **Documentation** — synced planning and operational docs with the gap backlog (213 GAP rows + 74 ecosystem layer gaps): Part 11 appendix in [Feature Expansion Plan](docs/more/feature-expansion-plan.md), roadmap gaps in [Product Positioning](docs/more/product-positioning.md), planned CLI/CI/reporting/discovery sections in [platform](docs/platform/), [scanning](docs/scanning/), [analysis/security-checks](docs/analysis/security-checks.md), [getting-started](docs/get-started/getting-started.md), [action](action/README.md)
 - `PromptInjectionAnalyzer` and `JailbreakAnalyzer` use heuristics beyond keyword/tool-count placeholders
 - HTML attack graph no longer synthesizes fake "related" edges when no chains exist
 - Renamed project and repository to **MCTS** (Model Context Threat Scanner): `mcts` package and CLI, GitHub repo `MCP-Audit/MCTS` (formerly MCPAudit / `mcpaudit` / `MCP-Audit/MCPAudit`)

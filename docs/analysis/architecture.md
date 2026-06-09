@@ -447,19 +447,26 @@ src/mcts/
 
 ## Planned evolution
 
-| Feature | Status |
-|---------|--------|
-| Remote protocol fuzz (`mcts fuzz --url`) | Planned |
-| `mcts audit-config`, `mcts simulate`, `mcts pentest`, `mcts vet` | Planned / stub |
-| Scan history / trends (`.mcts/history/`) | Planned |
-| HTML Capability Matrix + Technique Map | Planned |
-| Tree-sitter depth for TypeScript handlers | Partial (`--extra sast`) |
-| Go/Rust behavioral SAST | Shipped (regex; tree-sitter optional) |
-| SSE/HTTP live transports | Shipped (`--url`, `--transport`) |
-| REST API (`mcts serve`) | Shipped (10 endpoints) |
-| Expanded behavioral eval corpus | Partial (22 cases in `eval/behavioral/`) |
+| Feature | Status | Phase |
+|---------|--------|-------|
+| Semgrep SAST + Java (`--semgrep`) | Planned | 2–3 |
+| Skills / `SKILL.md` scanning | Planned | 2 |
+| MCP server mode (`mcts-mcp`) | Planned | 3 |
+| CycloneDX / AI-BOM export | Planned | 2–3 |
+| Interactive attack-graph HTML UI | Planned | 2 |
+| Runtime stdio proxy | Planned | 3 |
+| Remote protocol fuzz (`mcts fuzz --url`) | Planned | 2 |
+| `mcts audit-config`, `mcts simulate`, `mcts pentest`, `mcts vet` | Planned / stub | 2–4 |
+| Scan history / trends (`.mcts/history/`) | Planned | 2 |
+| HTML Capability Matrix + Technique Map | Planned | 2 |
+| Tree-sitter depth for TypeScript handlers | Partial (`--extra sast`) | 2 |
+| Go/Rust behavioral SAST | Shipped (regex; tree-sitter optional) | — |
+| SSE/HTTP live transports | Shipped (`--url`, `--transport`) | — |
+| REST API (`mcts serve`) | Shipped (10 endpoints) | — |
+| Expanded behavioral eval corpus | Partial (22 cases in `eval/behavioral/`) | 3 |
+| Governance YAML + continuous watch | Planned | 2–3 |
 
-See [Roadmap](../more/roadmap.md) and [Feature Expansion Plan](../more/feature-expansion-plan.md).
+See [Roadmap](../more/roadmap.md), [Feature Expansion Plan Part 11](../more/feature-expansion-plan.md#part-11--prioritized-backlog), and [Product Positioning](../more/product-positioning.md#known-gaps-roadmap-summary).
 
 ---
 

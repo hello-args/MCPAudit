@@ -116,6 +116,18 @@ Endpoint-specific fields:
 
 Response: full `ScanReport` JSON (`model_dump()`).
 
+### Planned API extensions
+
+| Capability | Status | GAP | Notes |
+|------------|--------|-----|-------|
+| Per-request analyzer/scoring knobs (full parity with CLI) | Partial | GAP-213 | Expand `ScanRequest` |
+| OAuth object on REST auth | Partial | GAP-093 | Beyond bearer token |
+| Taxonomy tree in API response | Missing | GAP-094 | Hierarchical MCTS-T |
+| MCP server mode over stdio | Planned | GAP-115 | `scan_mcp_target`, `explain_finding` tools |
+| Fleet upload / bootstrap ingest | Planned | GAP-116–118 | Enterprise defer |
+
+See [Feature Expansion Plan — REST API](../more/feature-expansion-plan.md#rest-api-1).
+
 ### Example
 
 ```bash

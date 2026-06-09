@@ -186,6 +186,19 @@ Never run **aggressive** fuzz against production or third-party servers.
 
 ---
 
+## Planned fuzz capabilities
+
+| Capability | Status | GAP | Notes |
+|------------|--------|-----|-------|
+| Remote protocol fuzz (`mcts fuzz --url`) | Planned | GAP-190 | HTTP/SSE targets |
+| WebSocket MCP transport fuzz | Missing | GAP-187 | WebSocket transport coverage |
+| Docker MCP server auto-detection | Missing | GAP-188 | Container-launched servers |
+| Deeper aggressive corpus | Partial | GAP-186 | Expanded dynamic analyzer corpus |
+
+See [Feature Expansion Plan — Fuzzing](../more/feature-expansion-plan.md#fuzzing-4).
+
+---
+
 ## Related
 
 - [Live Scanning](live-scanning.md)

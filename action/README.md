@@ -55,6 +55,17 @@ permissions:
 | `fail-on-critical` | `true` | Fail workflow on critical findings |
 | `min-score` | — | Fail if overall score is below threshold (0–100) |
 
+### Planned inputs
+
+| Input | Status | GAP | Notes |
+|-------|--------|-----|-------|
+| `format: sarif` native in action | Partial | — | SARIF generated; upload step separate |
+| Git-diff / PR comment mode | Planned | GAP-010, GAP-235 | PR workflow integration |
+| `inventory --scan` job | Planned | GAP-006 | Scheduled config audit |
+| `--semgrep` / `--skills` flags | Planned | GAP-002, GAP-029 | When CLI lands |
+
+See [CI Integration — planned](../docs/platform/ci-integration.md#planned-ci-capabilities).
+
 ---
 
 ## Related
