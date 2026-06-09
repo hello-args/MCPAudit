@@ -93,6 +93,15 @@ class RiskScore(BaseModel):
     basis: ScoreBasis = Field(description="Finding counts used for this score")
 
 
+class ScoreBreakdown(BaseModel):
+    """Decomposed scores across MCP surface, supply chain, and dependency hygiene."""
+
+    mcp_surface: int = Field(ge=0, le=100)
+    supply_chain: int = Field(ge=0, le=100)
+    dependency_hygiene: int = Field(ge=0, le=100)
+    composite: int = Field(ge=0, le=100, description="Weighted composite across buckets")
+
+
 class ScanReport(BaseModel):
     version: str
     target: str
@@ -102,3 +111,12 @@ class ScanReport(BaseModel):
     summary: ScanSummary
     score: RiskScore
     attack_graph: dict[str, Any] = Field(default_factory=dict)
+    scan_scope: str = "repository"
+    scan_notes: list[str] = Field(default_factory=list)
+    score_breakdown: ScoreBreakdown | None = None
+    tool_discovery_notice: str | None = None
+    analyzers_executed: list[str] = Field(default_factory=list)
+    scan_history: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description="Prior scan scores for this target (embedded for trend charts)",
+    )

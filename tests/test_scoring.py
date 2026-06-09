@@ -122,7 +122,7 @@ def test_verify_detects_tampered_score() -> None:
 @pytest.mark.parametrize(
     ("path", "min_score", "max_score", "min_raw", "max_raw"),
     [
-        ("examples/safe-mcp-server/server.py", 95, 100, 0, 10),
+        ("examples/baseline-mcp-server/server.py", 95, 100, 0, 10),
         ("examples/medium-risk-mcp-server/server.py", 60, 75, 15, 30),
         ("examples/vulnerable-mcp-server/server.py", 0, 5, 180, 290),
     ],
@@ -156,8 +156,8 @@ def test_json_roundtrip_preserves_verifiable_score(tmp_path: Path) -> None:
     assert RiskScoringEngine.verify(loaded.findings, loaded.score)
 
 
-def test_safe_beats_vulnerable() -> None:
-    safe = Scanner(ScanConfig(target=Path("examples/safe-mcp-server/server.py"))).run()
+def test_baseline_beats_vulnerable() -> None:
+    baseline = Scanner(ScanConfig(target=Path("examples/baseline-mcp-server/server.py"))).run()
     bad = Scanner(ScanConfig(target=Path("examples/vulnerable-mcp-server/server.py"))).run()
-    assert safe.score.overall > bad.score.overall
-    assert safe.score.raw_risk < bad.score.raw_risk
+    assert baseline.score.overall > bad.score.overall
+    assert baseline.score.raw_risk < bad.score.raw_risk
