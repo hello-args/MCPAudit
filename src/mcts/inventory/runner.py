@@ -10,7 +10,7 @@ from mcts.inventory.skills import discover_skills
 from mcts.inventory.targets import resolve_entrypoint
 
 
-def run_inventory(*, skills: bool = False) -> InventoryReport:
+def run_inventory(*, skills: bool = False, skills_dirs: list[Path] | None = None) -> InventoryReport:
     entries: list[InventoryEntry] = []
     clients: set[str] = set()
     files_found = 0
@@ -20,7 +20,7 @@ def run_inventory(*, skills: bool = False) -> InventoryReport:
         clients.add(client)
         entries.extend(parse_config_file(client, path))
 
-    skill_entries = discover_skills(project_root=Path.cwd()) if skills else []
+    skill_entries = discover_skills(project_root=Path.cwd(), extra_dirs=skills_dirs) if skills else []
 
     return InventoryReport(
         entries=entries,

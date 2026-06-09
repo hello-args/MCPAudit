@@ -78,6 +78,7 @@ SKILL_DIR_CANDIDATES: dict[str, tuple[str, ...]] = {
     "roo": ("~/.roo/skills", ".roo/skills"),
     "continue": ("~/.continue/skills", ".continue/skills"),
     "amazonq": ("~/.amazonq/skills", ".amazonq/skills"),
+    "repo": ("skills", "agent/skills", ".agents/skills"),
 }
 
 

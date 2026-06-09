@@ -30,6 +30,7 @@ from mcts.analyzers.schema_surface import SchemaSurfaceAnalyzer
 from mcts.analyzers.semgrep_adapter import SemgrepAdapterAnalyzer
 from mcts.analyzers.sigma_dedupe import dedupe_sigma_findings
 from mcts.analyzers.sigma_metadata import SigmaMetadataAnalyzer
+from mcts.analyzers.skill_md import SkillMdAnalyzer
 from mcts.analyzers.supply_chain import SupplyChainAnalyzer
 from mcts.analyzers.surface_metadata import SurfaceMetadataAnalyzer
 from mcts.analyzers.tool_abuse import ToolAbuseAnalyzer
@@ -40,6 +41,7 @@ from mcts.analyzers.vulnerable_package import VulnerablePackageAnalyzer
 from mcts.analyzers.yara_metadata import YaraMetadataAnalyzer
 from mcts.compliance.checks import ComplianceChecker
 from mcts.core.config import ScanConfig
+from mcts.core.surface_analyzers import analyzer_allowed_for_surfaces
 from mcts.inventory.models import InventoryEntry
 from mcts.mcp.client import MCPClient
 from mcts.mcp.models import MCPServerInfo, SurfaceScanOptions
@@ -101,6 +103,7 @@ class Scanner:
             rows.insert(1, SurfaceMetadataAnalyzer(surfaces=cfg.surfaces))
         if cfg.enable_prompt_defense:
             rows.append(PromptDefenseAnalyzer())
+        rows.append(SkillMdAnalyzer())
         if cfg.enable_behavioral_static:
             rows.append(BehavioralStaticAnalyzer())
         if cfg.pip_audit:
@@ -201,6 +204,14 @@ class Scanner:
             save_baseline(server_info, self.config.save_baseline_path, target=str(self.config.target))
 
         scan_scope = infer_scan_scope(self.config)
+        scan_notes = build_scan_notes(self.config)
+        if server_info.agent_skills or server_info.instruction_sources:
+            scan_notes.append(
+                "Instruction discovery: found "
+                f"{len(server_info.prompts)} prompt surface(s), "
+                f"{len(server_info.agent_skills)} SKILL.md file(s), "
+                f"{len(server_info.instruction_sources)} system instruction file(s) in repository markdown."
+            )
 
         return ScanReport(
             version=__version__,
@@ -212,7 +223,7 @@ class Scanner:
             score=score,
             attack_graph=attack_graph,
             scan_scope=scan_scope,
-            scan_notes=build_scan_notes(self.config),
+            scan_notes=scan_notes,
             score_breakdown=score_partitioned(findings),
             tool_discovery_notice=tool_discovery_notice_text(server_info, scan_scope=scan_scope),
             analyzers_executed=analyzers_executed,
@@ -252,10 +263,15 @@ class Scanner:
         return True
 
     def _analyzer_allowed(self, analyzer: object) -> bool:
-        if not self.config.analyzers:
-            return True
-        name = getattr(analyzer, "name", type(analyzer).__name__)
-        return name in self.config.analyzers or type(analyzer).__name__ in self.config.analyzers
+        if self.config.analyzers:
+            name = getattr(analyzer, "name", type(analyzer).__name__)
+            if name not in self.config.analyzers and type(analyzer).__name__ not in self.config.analyzers:
+                return False
+        return analyzer_allowed_for_surfaces(
+            analyzer,
+            self.config.surfaces,
+            enabled=self.config.surface_scoped_analyzers,
+        )
 
     def _apply_filters(self, findings: list[Finding]) -> list[Finding]:
         rows = findings

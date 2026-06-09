@@ -54,6 +54,18 @@ class MCPPrompt(BaseModel):
     name: str
     description: str = ""
     arguments: list[dict[str, Any]] = Field(default_factory=list)
+    source_file: str | None = None
+    source_line: int | None = None
+    discovered_via: str = "mcp"
+
+
+class AgentSkillFile(BaseModel):
+    """Agent skill instruction file discovered outside MCP prompts/list."""
+
+    name: str
+    path: str
+    content: str = ""
+    origin: str = "repo"
 
 
 class MCPResource(BaseModel):
@@ -78,6 +90,8 @@ class MCPServerInfo(BaseModel):
     prompts: list[MCPPrompt] = Field(default_factory=list)
     resources: list[MCPResource] = Field(default_factory=list)
     instructions: str | None = None
+    instruction_sources: list[str] = Field(default_factory=list)
+    agent_skills: list[AgentSkillFile] = Field(default_factory=list)
     transport: str = "stdio"
     discovery_mode: str = "static"
     source_files: dict[str, str] = Field(default_factory=dict)

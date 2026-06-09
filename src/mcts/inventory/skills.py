@@ -8,7 +8,11 @@ from mcts.inventory.client_registry import SKILL_DIR_CANDIDATES
 from mcts.inventory.models import SkillEntry
 
 
-def discover_skills(*, project_root: Path | None = None) -> list[SkillEntry]:
+def discover_skills(
+    *,
+    project_root: Path | None = None,
+    extra_dirs: list[Path] | None = None,
+) -> list[SkillEntry]:
     """Return SKILL.md files from well-known agent skill directories."""
     seen: set[Path] = set()
     entries: list[SkillEntry] = []
@@ -30,6 +34,23 @@ def discover_skills(*, project_root: Path | None = None) -> list[SkillEntry]:
                     continue
                 seen.add(resolved)
                 entries.append(_entry_from_path(client, resolved))
+
+    for raw in extra_dirs or []:
+        root = Path(raw).expanduser().resolve()
+        if root.is_file() and root.name == "SKILL.md":
+            resolved = root.resolve()
+            if resolved not in seen:
+                seen.add(resolved)
+                entries.append(_entry_from_path("custom", resolved))
+            continue
+        if not root.is_dir():
+            continue
+        for skill_md in sorted(root.rglob("SKILL.md")):
+            resolved = skill_md.resolve()
+            if resolved in seen:
+                continue
+            seen.add(resolved)
+            entries.append(_entry_from_path("custom", resolved))
 
     return entries
 

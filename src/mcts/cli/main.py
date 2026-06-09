@@ -442,6 +442,41 @@ def scan(
         Path | None,
         typer.Option("--policy", help="Governance policy YAML (default: .mcts/policy.yaml)"),
     ] = None,
+    discover_instructions: Annotated[
+        bool,
+        typer.Option(
+            "--discover-instructions/--no-discover-instructions",
+            help="Discover prompt/instruction content from repository markdown (SKILL.md, *prompt*.md)",
+        ),
+    ] = True,
+    instruction_glob: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--instruction-glob",
+            help="Glob for markdown instruction files under TARGET (repeatable)",
+        ),
+    ] = None,
+    instruction_file: Annotated[
+        list[Path] | None,
+        typer.Option(
+            "--instruction-file",
+            help="Explicit markdown instruction file to include (repeatable)",
+        ),
+    ] = None,
+    skills_dir: Annotated[
+        list[Path] | None,
+        typer.Option(
+            "--skills-dir",
+            help="Skills directory to scan for SKILL.md files (repeatable)",
+        ),
+    ] = None,
+    surface_scoped: Annotated[
+        bool,
+        typer.Option(
+            "--surface-scoped-analyzers/--no-surface-scoped-analyzers",
+            help="When --surfaces is a subset, run only analyzers relevant to those surfaces",
+        ),
+    ] = True,
 ) -> None:
     """Run a full security scan against an MCP server."""
     import json
@@ -617,6 +652,11 @@ def scan(
         technique_filter=technique_filters,
         governance_policy=policy,
         ci_preset=ci,
+        discover_instructions=discover_instructions,
+        instruction_globs=instruction_glob or [],
+        instruction_files=instruction_file or [],
+        skills_dirs=skills_dir or [],
+        surface_scoped_analyzers=surface_scoped,
     )
 
     if machine_wide:
@@ -763,6 +803,10 @@ def inventory(
         bool,
         typer.Option("--skills", help="Discover and scan SKILL.md files in agent skill directories"),
     ] = False,
+    skills_dir: Annotated[
+        list[Path] | None,
+        typer.Option("--skills-dir", help="Additional skills directory to scan (repeatable)"),
+    ] = None,
     scan_all: Annotated[
         bool,
         typer.Option("--scan-all", help="Run full security scan on each discovered MCP server"),
@@ -818,7 +862,7 @@ def inventory(
             raise typer.Exit(code=1)
         return
 
-    report = run_inventory(skills=skills)
+    report = run_inventory(skills=skills, skills_dirs=skills_dir)
     entries = enrich_with_tool_names(report.entries) if scan else report.entries
 
     shadow_findings = enrich_findings(CrossServerAnalyzer(entries).analyze_inventory(entries))
@@ -1240,6 +1284,8 @@ def _surface_scan(
         target=target,
         surfaces=surfaces,
         snapshot_path=snapshot,
+        surface_scoped_analyzers=True,
+        discover_instructions=True,
     )
     report = Scanner(config).run()
     console.print(f"[bold]MCTS[/bold] — {len(report.findings)} finding(s) on surfaces: {', '.join(surfaces)}")

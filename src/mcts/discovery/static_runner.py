@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from mcts.core.config import ScanConfig
 from mcts.core.target import ScanTarget, TargetKind
+from mcts.discovery.instruction_files import MARKDOWN_SUFFIXES, discover_instruction_surfaces
 from mcts.discovery.static import StaticDiscovery
 from mcts.discovery.static_js import JS_EXTENSIONS, JsStaticDiscovery
 from mcts.discovery.static_merge import merge_static_server_info
@@ -17,17 +18,27 @@ def discover_static(config: ScanConfig) -> MCPServerInfo:
 
     if target.kind == TargetKind.FILE:
         suffix = target.path.suffix.lower()
+        if suffix in MARKDOWN_SUFFIXES:
+            return discover_instruction_surfaces(config)
         if suffix == ".py" and _python_enabled(langs):
-            return StaticDiscovery(config).discover()
+            return merge_static_server_info(
+                StaticDiscovery(config).discover(),
+                discover_instruction_surfaces(config),
+            )
         if suffix in JS_EXTENSIONS and _js_enabled(langs):
-            return JsStaticDiscovery(config).discover()
-        return MCPServerInfo(name=target.path.stem, discovery_mode="empty")
+            return merge_static_server_info(
+                JsStaticDiscovery(config).discover(),
+                discover_instruction_surfaces(config),
+            )
+        empty = MCPServerInfo(name=target.path.stem, discovery_mode="empty")
+        return merge_static_server_info(empty, discover_instruction_surfaces(config))
 
     results: list[MCPServerInfo] = []
     if _python_enabled(langs):
         results.append(StaticDiscovery(config).discover())
     if _js_enabled(langs):
         results.append(JsStaticDiscovery(config).discover())
+    results.append(discover_instruction_surfaces(config))
 
     if not results:
         return MCPServerInfo(name=target.path.name, discovery_mode="empty")

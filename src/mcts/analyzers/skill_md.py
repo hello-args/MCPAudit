@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import re
 
+from mcts.analyzers.base import BaseAnalyzer
 from mcts.analyzers.tpa_patterns import find_control_chars, has_ansi_smuggling, has_hidden_unicode
 from mcts.inventory.models import SkillEntry
+from mcts.mcp.models import AgentSkillFile, MCPServerInfo
 from mcts.reporting.models import Finding, Severity, SourceLocation
 
 _INSTRUCTION_OVERRIDE = re.compile(
@@ -77,6 +79,26 @@ def analyze_skills(entries: list[SkillEntry]) -> list[Finding]:
     for entry in entries:
         findings.extend(analyze_skill(entry))
     return findings
+
+
+class SkillMdAnalyzer(BaseAnalyzer):
+    """Scan discovered agent SKILL.md files for injection and exfil patterns."""
+
+    name = "skill_md"
+
+    def analyze(self, server: MCPServerInfo) -> list[Finding]:
+        entries = [_skill_entry_from_agent(skill) for skill in server.agent_skills]
+        return analyze_skills(entries)
+
+
+def _skill_entry_from_agent(skill: AgentSkillFile) -> SkillEntry:
+    return SkillEntry(
+        client=skill.origin,
+        skill_name=skill.name,
+        skill_path=skill.path,
+        content_length=len(skill.content),
+        content=skill.content,
+    )
 
 
 def _finding(

@@ -89,6 +89,8 @@ def iter_surfaces(
                     name=prompt.name,
                     description=prompt.description or "",
                     extra_text=arg_text,
+                    source_file=prompt.source_file,
+                    source_line=prompt.source_line,
                 )
             )
 
@@ -111,11 +113,14 @@ def iter_surfaces(
             )
 
     if ScanSurfaceKind.INSTRUCTION in active and server.instructions:
+        source_file = server.instruction_sources[0] if server.instruction_sources else None
         rows.append(
             ScanSurface(
                 kind=ScanSurfaceKind.INSTRUCTION,
                 name="server-instructions",
                 description=server.instructions,
+                source_file=source_file,
+                source_line=1,
             )
         )
 

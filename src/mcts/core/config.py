@@ -116,3 +116,8 @@ class ScanConfig(BaseModel):
     full_toxic_flows: bool = False
     governance_policy: Path | None = None
     ci_preset: bool = False
+    discover_instructions: bool = True
+    instruction_globs: list[str] = Field(default_factory=list)
+    instruction_files: list[Path] = Field(default_factory=list)
+    skills_dirs: list[Path] = Field(default_factory=list)
+    surface_scoped_analyzers: bool = True
