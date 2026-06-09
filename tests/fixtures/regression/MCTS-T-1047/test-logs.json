@@ -1,0 +1,14 @@
+[
+  {
+    "case_id": "implicit",
+    "config": {
+      "response_type": "token"
+    }
+  },
+  {
+    "case_id": "pkce",
+    "config": {
+      "response_type": "code"
+    }
+  }
+]

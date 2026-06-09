@@ -1,0 +1,7 @@
+{
+  "api_key_pattern": true,
+  "credential_keywords": true,
+  "semantic_phrase": true,
+  "benign": false,
+  "benign_math": false
+}

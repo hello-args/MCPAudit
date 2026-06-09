@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "flood",
+    "tool_name": "http.post",
+    "requests_per_minute": 120
+  },
+  {
+    "case_id": "normal",
+    "tool_name": "http.post",
+    "requests_per_minute": 5
+  }
+]

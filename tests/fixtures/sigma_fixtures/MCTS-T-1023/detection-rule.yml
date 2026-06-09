@@ -130,7 +130,6 @@ tags:
   - attack.t1055          # Process Injection
   - attack.defense_evasion
   - attack.t1140          # Deobfuscate/Decode Files or Information
-  - safe.t1101
   - cve.2025.pending      # Placeholder for when CVE is assigned
 fields:
   - tool_name

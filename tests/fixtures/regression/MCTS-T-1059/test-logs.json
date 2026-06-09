@@ -1,0 +1,16 @@
+[
+  {
+    "case_id": "relay",
+    "tool_chain": [
+      "get_token",
+      "admin_shell"
+    ]
+  },
+  {
+    "case_id": "ok",
+    "tool_chain": [
+      "read",
+      "summarize"
+    ]
+  }
+]

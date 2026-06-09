@@ -1,0 +1,16 @@
+[
+  {
+    "case_id": "dump",
+    "tool_name": "db.execute",
+    "tool_parameters": {
+      "sql": "SELECT * FROM users"
+    }
+  },
+  {
+    "case_id": "benign",
+    "tool_name": "weather",
+    "tool_parameters": {
+      "city": "NY"
+    }
+  }
+]

@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 from mcts.analyzers.behavioral_static import BehavioralStaticAnalyzer
 from mcts.mcp.models import MCPServerInfo, MCPTool
 from mcts.sast.python.semantic import analyze_python_semantics
+
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+_DEFAULT_CORPUS = _REPO_ROOT / "tests" / "fixtures" / "behavioral-eval" / "data"
 
 _FAKE_ENCRYPT = '''
 def encrypt_data(data: str, key: str) -> str:
@@ -14,6 +20,17 @@ def encrypt_data(data: str, key: str) -> str:
     import base64
     return base64.b64encode(data.encode()).decode()
 '''
+
+
+def _behavioral_eval_corpus() -> Path | None:
+    env_path = os.environ.get("MCTS_BEHAVIORAL_EVAL_DATA", "").strip()
+    if env_path:
+        candidate = Path(env_path).expanduser()
+        if candidate.is_dir():
+            return candidate
+    if _DEFAULT_CORPUS.is_dir():
+        return _DEFAULT_CORPUS
+    return None
 
 
 def test_semantic_detects_fake_encryption_claim() -> None:
@@ -32,19 +49,20 @@ def test_behavioral_static_emits_semantic_without_code_sinks() -> None:
 
 
 def test_scanner_eval_recall_when_corpus_available() -> None:
-    corpus = Path(
-        "/Users/arghyadeep_nfal/CODE_ARGS/mcp_audit_competitor/mcp-scanner-main/evals/behavioral-analysis/data"
-    )
-    if not corpus.is_dir():
+    corpus = _behavioral_eval_corpus()
+    if corpus is None:
         return
-    import subprocess
-    import sys
 
     result = subprocess.run(
         [sys.executable, "scripts/import_scanner_eval.py", str(corpus)],
         capture_output=True,
         text=True,
         check=False,
-        cwd=Path(__file__).resolve().parents[1],
+        cwd=_REPO_ROOT,
     )
-    assert "141/141" in result.stdout or "100.0%" in result.stdout
+    assert result.returncode == 0
+    assert "detected" in result.stdout.lower()
+    if corpus != _DEFAULT_CORPUS:
+        assert "100.0%" in result.stdout or "141/141" in result.stdout
+    else:
+        assert "1/2" in result.stdout

@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "backdoor",
+    "policy_violation": true,
+    "top_domain_share": 0.8,
+    "topk_entropy": 0.5
+  },
+  {
+    "case_id": "normal",
+    "top_domain_share": 0.2
+  }
+]

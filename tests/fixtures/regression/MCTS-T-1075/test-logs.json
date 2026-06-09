@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "token",
+    "tool_name": "debug_token",
+    "response_body": "{\"access_token\":\"eyJhbGciOiJIUzI1NiJ9\"}"
+  },
+  {
+    "case_id": "plain",
+    "tool_name": "get_weather",
+    "response_body": "{\"temp\":72}"
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "case_id": "scan",
+    "probe_count": 25
+  },
+  {
+    "case_id": "one",
+    "probe_count": 1
+  }
+]

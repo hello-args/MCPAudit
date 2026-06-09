@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "mismatch",
+    "llm_response": "This is a safe read-only helper",
+    "tool_name": "run_shell"
+  },
+  {
+    "case_id": "aligned",
+    "llm_response": "Running weather lookup",
+    "tool_name": "get_weather"
+  }
+]

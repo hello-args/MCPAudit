@@ -1,207 +1,318 @@
 {
   "MCTS-T-1001": {
     "aitech": "AITech-PAI",
-    "aisubtech": "AISubtech-PAI-001",
-    "saf_mcp": "SAF-T1001"
+    "aisubtech": "AISubtech-PAI-001"
   },
   "MCTS-T-1001.002": {
     "aitech": "AITech-PAI",
-    "aisubtech": "AISubtech-PAI-002",
-    "saf_mcp": "SAF-T1501"
+    "aisubtech": "AISubtech-PAI-002"
   },
   "MCTS-T-1002": {
     "aitech": "AITech-ACE",
-    "aisubtech": "AISubtech-ACE-003",
-    "saf_mcp": "SAF-T1105"
+    "aisubtech": "AISubtech-ACE-003"
   },
   "MCTS-T-1003": {
     "aitech": "AITech-ACE",
-    "aisubtech": "AISubtech-ACE-001",
-    "saf_mcp": "SAF-T1101"
+    "aisubtech": "AISubtech-ACE-001"
   },
   "MCTS-T-1004": {
     "aitech": "AITech-NE",
-    "aisubtech": "AISubtech-NE-002",
-    "saf_mcp": "SAF-T1502"
+    "aisubtech": "AISubtech-NE-002"
   },
   "MCTS-T-1005": {
     "aitech": "AITech-PAI",
-    "aisubtech": "AISubtech-PAI-003",
-    "saf_mcp": "SAF-T1910"
+    "aisubtech": "AISubtech-PAI-003"
   },
   "MCTS-T-1006": {
     "aitech": "AITech-PAI",
-    "aisubtech": "AISubtech-PAI-004",
-    "saf_mcp": "SAF-T1104"
+    "aisubtech": "AISubtech-PAI-004"
   },
   "MCTS-T-1007": {
     "aitech": "AITech-TP",
-    "aisubtech": "AISubtech-TP-001",
-    "saf_mcp": "SAF-T1102"
+    "aisubtech": "AISubtech-TP-001"
   },
   "MCTS-T-1008": {
     "aitech": "AITech-PAI",
-    "aisubtech": "AISubtech-PAI-005",
-    "saf_mcp": "SAF-T1008"
+    "aisubtech": "AISubtech-PAI-005"
   },
   "MCTS-T-1009": {
     "aitech": "AITech-NE",
-    "aisubtech": "AISubtech-NE-001",
-    "saf_mcp": "SAF-T1106"
+    "aisubtech": "AISubtech-NE-001"
   },
   "MCTS-T-1010": {
     "aitech": "AITech-TP",
-    "aisubtech": "AISubtech-TP-001",
-    "saf_mcp": "SAF-T1001"
+    "aisubtech": "AISubtech-TP-001"
   },
   "MCTS-T-1011": {
     "aitech": "AITech-IA",
-    "aisubtech": "AISubtech-IA-001",
-    "saf_mcp": "SAF-T1007"
+    "aisubtech": "AISubtech-IA-001"
   },
   "MCTS-T-1012": {
     "aitech": "AITech-IA",
-    "aisubtech": "AISubtech-IA-002",
-    "saf_mcp": "SAF-T1009"
+    "aisubtech": "AISubtech-IA-002"
   },
   "MCTS-T-1013": {
     "aitech": "AITech-PAI",
-    "aisubtech": "AISubtech-PAI-006",
-    "saf_mcp": "SAF-T1201"
+    "aisubtech": "AISubtech-PAI-006"
   },
   "MCTS-T-1014": {
     "aitech": "AITech-SC",
-    "aisubtech": "AISubtech-SC-001",
-    "saf_mcp": "SAF-T1002"
+    "aisubtech": "AISubtech-SC-001"
   },
   "MCTS-T-1015": {
     "aitech": "AITech-SC",
-    "aisubtech": "AISubtech-SC-002",
-    "saf_mcp": "SAF-T1006"
+    "aisubtech": "AISubtech-SC-002"
   },
   "MCTS-T-1016": {
     "aitech": "AITech-NE",
-    "aisubtech": "AISubtech-NE-003",
-    "saf_mcp": "SAF-T1112"
+    "aisubtech": "AISubtech-NE-003"
   },
   "MCTS-T-1017": {
     "aitech": "AITech-IA",
-    "aisubtech": "AISubtech-IA-003",
-    "saf_mcp": "SAF-T1306"
+    "aisubtech": "AISubtech-IA-003"
   },
   "MCTS-T-1018": {
     "aitech": "AITech-IA",
-    "aisubtech": "AISubtech-IA-004",
-    "saf_mcp": "SAF-T1307"
+    "aisubtech": "AISubtech-IA-004"
   },
   "MCTS-T-1019": {
     "aitech": "AITech-IA",
-    "aisubtech": "AISubtech-IA-005",
-    "saf_mcp": "SAF-T1308"
+    "aisubtech": "AISubtech-IA-005"
   },
   "MCTS-T-1020": {
     "aitech": "AITech-PAI",
-    "aisubtech": "AISubtech-PAI-005",
-    "saf_mcp": "SAF-T1008"
+    "aisubtech": "AISubtech-PAI-005"
   },
   "MCTS-T-1021": {
     "aitech": "AITech-TP",
-    "aisubtech": "AISubtech-TP-002",
-    "saf_mcp": "SAF-T1401"
+    "aisubtech": "AISubtech-TP-002"
   },
   "MCTS-T-1022": {
     "aitech": "AITech-NE",
-    "aisubtech": "AISubtech-NE-002",
-    "saf_mcp": "SAF-T1505"
+    "aisubtech": "AISubtech-NE-002"
   },
   "MCTS-T-1023": {
     "aitech": "AITech-ACE",
-    "aisubtech": "AISubtech-ACE-001",
-    "saf_mcp": "SAF-T1101"
+    "aisubtech": "AISubtech-ACE-001"
   },
   "MCTS-T-1024": {
     "aitech": "AITech-NE",
-    "aisubtech": "AISubtech-NE-002",
-    "saf_mcp": "SAF-T1502"
+    "aisubtech": "AISubtech-NE-002"
   },
   "MCTS-T-1026": {
     "aitech": "AITech-TP",
-    "aisubtech": "AISubtech-TP-003",
-    "saf_mcp": "SAF-T1603"
+    "aisubtech": "AISubtech-TP-003"
   },
   "MCTS-T-1027": {
     "aitech": "AITech-NE",
-    "aisubtech": "AISubtech-NE-001",
-    "saf_mcp": "SAF-T1005"
+    "aisubtech": "AISubtech-NE-001"
   },
   "MCTS-T-1028": {
     "aitech": "AITech-SC",
-    "aisubtech": "AISubtech-SC-001",
-    "saf_mcp": "SAF-T1003"
+    "aisubtech": "AISubtech-SC-001"
   },
   "MCTS-T-1029": {
     "aitech": "AITech-PAI",
-    "aisubtech": "AISubtech-PAI-005",
-    "saf_mcp": "SAF-T1301"
+    "aisubtech": "AISubtech-PAI-005"
   },
   "MCTS-T-1030": {
     "aitech": "AITech-PAI",
-    "aisubtech": "AISubtech-PAI-004",
-    "saf_mcp": "SAF-T1104"
+    "aisubtech": "AISubtech-PAI-004"
   },
   "MCTS-T-1031": {
     "aitech": "AITech-SC",
-    "aisubtech": "AISubtech-SC-002",
-    "saf_mcp": "SAF-T1003"
+    "aisubtech": "AISubtech-SC-002"
   },
   "MCTS-T-1032": {
     "aitech": "AITech-ACE",
-    "aisubtech": "AISubtech-ACE-002",
-    "saf_mcp": "SAF-T1103"
+    "aisubtech": "AISubtech-ACE-002"
   },
   "MCTS-T-1033": {
     "aitech": "AITech-ACE",
-    "aisubtech": "AISubtech-ACE-004",
-    "saf_mcp": "SAF-T1109"
+    "aisubtech": "AISubtech-ACE-004"
   },
   "MCTS-T-1034": {
     "aitech": "AITech-PAI",
-    "aisubtech": "AISubtech-PAI-007",
-    "saf_mcp": "SAF-T2106"
+    "aisubtech": "AISubtech-PAI-007"
   },
   "MCTS-T-1035": {
     "aitech": "AITech-NE",
-    "aisubtech": "AISubtech-NE-003",
-    "saf_mcp": "SAF-T1106"
+    "aisubtech": "AISubtech-NE-003"
   },
   "MCTS-T-1036": {
     "aitech": "AITech-ACE",
-    "aisubtech": "AISubtech-ACE-004",
-    "saf_mcp": "SAF-T1109"
+    "aisubtech": "AISubtech-ACE-004"
   },
   "MCTS-T-1037": {
     "aitech": "AITech-IA",
-    "aisubtech": "AISubtech-IA-005",
-    "saf_mcp": "SAF-T1308"
+    "aisubtech": "AISubtech-IA-005"
   },
   "MCTS-T-1038": {
     "aitech": "AITech-SC",
-    "aisubtech": "AISubtech-SC-002",
-    "saf_mcp": "SAF-T1003"
+    "aisubtech": "AISubtech-SC-002"
   },
   "MCTS-T-1039": {
     "aitech": "AITech-PAI",
-    "aisubtech": "AISubtech-PAI-008",
-    "saf_mcp": "SAF-T1204"
+    "aisubtech": "AISubtech-PAI-008"
   },
   "MCTS-T-1040": {
     "aitech": "AITech-PAI",
-    "aisubtech": "AISubtech-PAI-006",
-    "saf_mcp": "SAF-T1205"
+    "aisubtech": "AISubtech-PAI-006"
   },
   "MCTS-T-1041": {
     "aitech": "AITech-TP",
-    "aisubtech": "AISubtech-TP-004",
-    "saf_mcp": "SAF-T1402"
+    "aisubtech": "AISubtech-TP-004"
+  },
+  "MCTS-T-1042": {
+    "aitech": "AITech-TP",
+    "aisubtech": "AISubtech-TP-005"
+  },
+  "MCTS-T-1043": {
+    "aitech": "AITech-NE",
+    "aisubtech": "AISubtech-NE-003"
+  },
+  "MCTS-T-1044": {
+    "aitech": "AITech-NE",
+    "aisubtech": "AISubtech-NE-003"
+  },
+  "MCTS-T-1045": {
+    "aitech": "AITech-ACE",
+    "aisubtech": "AISubtech-ACE-005"
+  },
+  "MCTS-T-1046": {
+    "aitech": "AITech-TP",
+    "aisubtech": "AISubtech-TP-006"
+  },
+  "MCTS-T-1047": {
+    "aitech": "AITech-IA",
+    "aisubtech": "AISubtech-IA-006"
+  },
+  "MCTS-T-1048": {
+    "aitech": "AITech-ACE",
+    "aisubtech": "AISubtech-ACE-006"
+  },
+  "MCTS-T-1049": {
+    "aitech": "AITech-NE",
+    "aisubtech": "AISubtech-NE-004"
+  },
+  "MCTS-T-1050": {
+    "aitech": "AITech-PAI",
+    "aisubtech": "AISubtech-PAI-009"
+  },
+  "MCTS-T-1051": {
+    "aitech": "AITech-ACE",
+    "aisubtech": "AISubtech-ACE-007"
+  },
+  "MCTS-T-1052": {
+    "aitech": "AITech-IA",
+    "aisubtech": "AISubtech-IA-007"
+  },
+  "MCTS-T-1053": {
+    "aitech": "AITech-IA",
+    "aisubtech": "AISubtech-IA-008"
+  },
+  "MCTS-T-1054": {
+    "aitech": "AITech-TP",
+    "aisubtech": "AISubtech-TP-007"
+  },
+  "MCTS-T-1055": {
+    "aitech": "AITech-TP",
+    "aisubtech": "AISubtech-TP-008"
+  },
+  "MCTS-T-1056": {
+    "aitech": "AITech-ACE",
+    "aisubtech": "AISubtech-ACE-008"
+  },
+  "MCTS-T-1057": {
+    "aitech": "AITech-NE",
+    "aisubtech": "AISubtech-NE-005"
+  },
+  "MCTS-T-1058": {
+    "aitech": "AITech-NE",
+    "aisubtech": "AISubtech-NE-006"
+  },
+  "MCTS-T-1059": {
+    "aitech": "AITech-IA",
+    "aisubtech": "AISubtech-IA-009"
+  },
+  "MCTS-T-1060": {
+    "aitech": "AITech-PAI",
+    "aisubtech": "AISubtech-PAI-010"
+  },
+  "MCTS-T-1061": {
+    "aitech": "AITech-TP",
+    "aisubtech": "AISubtech-TP-009"
+  },
+  "MCTS-T-1062": {
+    "aitech": "AITech-PAI",
+    "aisubtech": "AISubtech-PAI-011"
+  },
+  "MCTS-T-1063": {
+    "aitech": "AITech-IA",
+    "aisubtech": "AISubtech-IA-010"
+  },
+  "MCTS-T-1064": {
+    "aitech": "AITech-ACE",
+    "aisubtech": "AISubtech-ACE-009"
+  },
+  "MCTS-T-1065": {
+    "aitech": "AITech-SC",
+    "aisubtech": "AISubtech-SC-003"
+  },
+  "MCTS-T-1066": {
+    "aitech": "AITech-PAI",
+    "aisubtech": "AISubtech-PAI-012"
+  },
+  "MCTS-T-1067": {
+    "aitech": "AITech-NE",
+    "aisubtech": "AISubtech-NE-002"
+  },
+  "MCTS-T-1068": {
+    "aitech": "AITech-TP",
+    "aisubtech": "AISubtech-TP-010"
+  },
+  "MCTS-T-1069": {
+    "aitech": "AITech-NE",
+    "aisubtech": "AISubtech-NE-003"
+  },
+  "MCTS-T-1070": {
+    "aitech": "AITech-NE",
+    "aisubtech": "AISubtech-NE-004"
+  },
+  "MCTS-T-1071": {
+    "aitech": "AITech-ACE",
+    "aisubtech": "AISubtech-ACE-010"
+  },
+  "MCTS-T-1072": {
+    "aitech": "AITech-ACE",
+    "aisubtech": "AISubtech-ACE-011"
+  },
+  "MCTS-T-1073": {
+    "aitech": "AITech-TP",
+    "aisubtech": "AISubtech-TP-011"
+  },
+  "MCTS-T-1074": {
+    "aitech": "AITech-NE",
+    "aisubtech": "AISubtech-NE-005"
+  },
+  "MCTS-T-1075": {
+    "aitech": "AITech-IA",
+    "aisubtech": "AISubtech-IA-011"
+  },
+  "MCTS-T-1076": {
+    "aitech": "AITech-PAI",
+    "aisubtech": "AISubtech-PAI-013"
+  },
+  "MCTS-T-1077": {
+    "aitech": "AITech-SC",
+    "aisubtech": "AISubtech-SC-004"
+  },
+  "MCTS-T-1078": {
+    "aitech": "AITech-NE",
+    "aisubtech": "AISubtech-NE-006"
+  },
+  "MCTS-T-1079": {
+    "aitech": "AITech-PAI",
+    "aisubtech": "AISubtech-PAI-014"
   }
 }

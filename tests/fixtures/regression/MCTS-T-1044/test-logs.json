@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "burst",
+    "tool_name": "read_file",
+    "call_count": 30
+  },
+  {
+    "case_id": "normal",
+    "tool_name": "read_file",
+    "call_count": 2
+  }
+]

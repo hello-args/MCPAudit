@@ -104,7 +104,6 @@ tags:
   - attack.t1574
   - attack.t1543
   - attack.t1505
-  - safe.t1205
   - mcp.persistence
 
 fields:
@@ -169,7 +168,6 @@ level: high
 tags:
   - attack.persistence
   - attack.t1505
-  - safe.t1205
   - mcp.database
 
 ---
@@ -220,5 +218,4 @@ level: medium
 tags:
   - attack.persistence
   - attack.t1195
-  - safe.t1205
   - mcp.supply_chain

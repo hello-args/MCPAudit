@@ -1,0 +1,17 @@
+[
+  {
+    "case_id": "pivot",
+    "token_id": "t1",
+    "audiences": [
+      "a.com",
+      "b.com"
+    ]
+  },
+  {
+    "case_id": "single",
+    "token_id": "t1",
+    "audiences": [
+      "a.com"
+    ]
+  }
+]

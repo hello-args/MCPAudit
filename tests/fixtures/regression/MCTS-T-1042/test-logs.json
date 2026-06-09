@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "high-volume",
+    "method": "tools/list",
+    "count_per_credential": 60
+  },
+  {
+    "case_id": "benign",
+    "method": "tools/list",
+    "count_per_credential": 3
+  }
+]

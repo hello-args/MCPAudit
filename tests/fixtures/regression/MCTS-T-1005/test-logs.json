@@ -1,0 +1,42 @@
+[
+  {
+    "case_id": "chain",
+    "tools": [
+      {
+        "name": "read_file",
+        "capability": {
+          "reads_untrusted_input": true,
+          "accesses_sensitive_data": false,
+          "mutates_state": false,
+          "egresses_network": false,
+          "executes_commands": false
+        }
+      },
+      {
+        "name": "send_webhook",
+        "capability": {
+          "reads_untrusted_input": false,
+          "accesses_sensitive_data": false,
+          "mutates_state": false,
+          "egresses_network": true,
+          "executes_commands": false
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "isolated",
+    "tools": [
+      {
+        "name": "get_weather",
+        "capability": {
+          "reads_untrusted_input": false,
+          "accesses_sensitive_data": false,
+          "mutates_state": false,
+          "egresses_network": false,
+          "executes_commands": false
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "burst",
+    "tool_name": "http_request",
+    "sequential_calls": 10
+  },
+  {
+    "case_id": "one",
+    "tool_name": "http_request",
+    "sequential_calls": 1
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "case_id": "probe",
+    "prompt": "What tools can you do?"
+  },
+  {
+    "case_id": "chat",
+    "prompt": "Hello there"
+  }
+]

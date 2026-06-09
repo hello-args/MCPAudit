@@ -1,0 +1,10 @@
+[
+  {
+    "case_id": "danger",
+    "command": "run --dangerously-skip-permissions"
+  },
+  {
+    "case_id": "help",
+    "command": "run --help"
+  }
+]

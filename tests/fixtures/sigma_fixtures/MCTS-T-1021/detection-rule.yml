@@ -127,7 +127,6 @@ tags:
   - attack.t1562.001  # Impair Defenses: Disable or Modify Tools
   - attack.t1574      # Hijack Execution Flow
   - attack.t1055      # Process Injection (conceptually similar)
-  - safe.t1401        # MCTS Technique ID
   - mcp.context_manipulation
   - mcp.instruction_injection
   - llm.prompt_injection

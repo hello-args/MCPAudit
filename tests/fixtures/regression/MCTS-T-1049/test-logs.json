@@ -1,0 +1,14 @@
+[
+  {
+    "case_id": "b64",
+    "tool_parameters": {
+      "x": "QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB"
+    }
+  },
+  {
+    "case_id": "plain",
+    "tool_parameters": {
+      "x": "hello"
+    }
+  }
+]

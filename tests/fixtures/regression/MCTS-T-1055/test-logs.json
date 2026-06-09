@@ -1,0 +1,10 @@
+[
+  {
+    "case_id": "version",
+    "path": "/version"
+  },
+  {
+    "case_id": "tools",
+    "path": "/mcp/tools"
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "env",
+    "tool_name": "read_file",
+    "file_path": "/app/.env"
+  },
+  {
+    "case_id": "readme",
+    "tool_name": "read_file",
+    "file_path": "/app/README.md"
+  }
+]

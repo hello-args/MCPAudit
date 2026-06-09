@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "subprocess",
+    "tool_name": "run_shell",
+    "handler_snippet": "import subprocess\nsubprocess.run(['ls'])"
+  },
+  {
+    "case_id": "benign",
+    "tool_name": "format_text",
+    "handler_snippet": "return text.upper()"
+  }
+]

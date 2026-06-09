@@ -417,6 +417,310 @@
       ],
       "owasp": "LLM01",
       "cwe": "CWE-74"
+    },
+    "MCTS-T-1042": {
+      "name": "Tool Manifest Enumeration Abuse",
+      "tactic": "discovery",
+      "severity_default": "medium",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM07",
+      "cwe": "CWE-200"
+    },
+    "MCTS-T-1043": {
+      "name": "SQL Database Dump via MCP Tool",
+      "tactic": "collection",
+      "severity_default": "critical",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM02",
+      "cwe": "CWE-89"
+    },
+    "MCTS-T-1044": {
+      "name": "Automated Data Harvesting Burst",
+      "tactic": "collection",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM02",
+      "cwe": "CWE-200"
+    },
+    "MCTS-T-1045": {
+      "name": "Privilege-Escalating Tool Chain",
+      "tactic": "lateral_movement",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM06",
+      "cwe": "CWE-269"
+    },
+    "MCTS-T-1046": {
+      "name": "Consent Fatigue Exploitation",
+      "tactic": "defense_evasion",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM01",
+      "cwe": "CWE-693"
+    },
+    "MCTS-T-1047": {
+      "name": "OAuth Implicit Flow Downgrade",
+      "tactic": "defense_evasion",
+      "severity_default": "high",
+      "analyzers": ["oauth_config"],
+      "owasp": "LLM06",
+      "cwe": "CWE-287"
+    },
+    "MCTS-T-1048": {
+      "name": "Destructive Tool Invocation",
+      "tactic": "impact",
+      "severity_default": "critical",
+      "analyzers": ["runtime_events", "permission_analyzer"],
+      "owasp": "LLM06",
+      "cwe": "CWE-400"
+    },
+    "MCTS-T-1049": {
+      "name": "Covert Channel Exfiltration",
+      "tactic": "exfiltration",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM02",
+      "cwe": "CWE-116"
+    },
+    "MCTS-T-1050": {
+      "name": "Multimodal Prompt Injection",
+      "tactic": "execution",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM01",
+      "cwe": "CWE-74"
+    },
+    "MCTS-T-1051": {
+      "name": "Agent CLI Weaponization",
+      "tactic": "execution",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM06",
+      "cwe": "CWE-78"
+    },
+    "MCTS-T-1052": {
+      "name": "OAuth Authorization Code Interception",
+      "tactic": "credential_access",
+      "severity_default": "critical",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM06",
+      "cwe": "CWE-287"
+    },
+    "MCTS-T-1053": {
+      "name": "Cross-Service Token Pivot",
+      "tactic": "lateral_movement",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM06",
+      "cwe": "CWE-287"
+    },
+    "MCTS-T-1054": {
+      "name": "Capability Mapping Enumeration",
+      "tactic": "discovery",
+      "severity_default": "medium",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM07",
+      "cwe": "CWE-200"
+    },
+    "MCTS-T-1055": {
+      "name": "Server Version Fingerprinting",
+      "tactic": "discovery",
+      "severity_default": "medium",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM07",
+      "cwe": "CWE-200"
+    },
+    "MCTS-T-1056": {
+      "name": "Cross-Tool Contamination",
+      "tactic": "lateral_movement",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM06",
+      "cwe": "CWE-269"
+    },
+    "MCTS-T-1057": {
+      "name": "Chat-Based Covert Backchannel",
+      "tactic": "command_and_control",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM02",
+      "cwe": "CWE-116"
+    },
+    "MCTS-T-1058": {
+      "name": "Steganographic Code-Block Exfiltration",
+      "tactic": "exfiltration",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM02",
+      "cwe": "CWE-116"
+    },
+    "MCTS-T-1059": {
+      "name": "Credential Relay Chain",
+      "tactic": "privilege_escalation",
+      "severity_default": "critical",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM06",
+      "cwe": "CWE-269"
+    },
+    "MCTS-T-1060": {
+      "name": "RAG Backdoor Retrieval Skew",
+      "tactic": "impact",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM01",
+      "cwe": "CWE-74"
+    },
+    "MCTS-T-1061": {
+      "name": "MCP Server Network Enumeration",
+      "tactic": "discovery",
+      "severity_default": "medium",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM07",
+      "cwe": "CWE-200"
+    },
+    "MCTS-T-1062": {
+      "name": "Cross-Agent Instruction Injection",
+      "tactic": "lateral_movement",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM01",
+      "cwe": "CWE-74"
+    },
+    "MCTS-T-1063": {
+      "name": "CSRF OAuth Token Relay",
+      "tactic": "lateral_movement",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM06",
+      "cwe": "CWE-352"
+    },
+    "MCTS-T-1064": {
+      "name": "Compromised Server Workspace Pivot",
+      "tactic": "lateral_movement",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM06",
+      "cwe": "CWE-269"
+    },
+    "MCTS-T-1065": {
+      "name": "Agentic Pull Request Sabotage",
+      "tactic": "impact",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM05",
+      "cwe": "CWE-506"
+    },
+    "MCTS-T-1066": {
+      "name": "Training Data Pipeline Poisoning",
+      "tactic": "resource_development",
+      "severity_default": "critical",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM01",
+      "cwe": "CWE-74"
+    },
+    "MCTS-T-1067": {
+      "name": "Environment File Access via MCP",
+      "tactic": "credential_access",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM02",
+      "cwe": "CWE-200"
+    },
+    "MCTS-T-1068": {
+      "name": "Sensitive Directory Listing",
+      "tactic": "discovery",
+      "severity_default": "medium",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM07",
+      "cwe": "CWE-200"
+    },
+    "MCTS-T-1069": {
+      "name": "REST/API Endpoint Harvesting",
+      "tactic": "collection",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM02",
+      "cwe": "CWE-200"
+    },
+    "MCTS-T-1070": {
+      "name": "Collection-to-Exfil Parameter Chain",
+      "tactic": "exfiltration",
+      "severity_default": "critical",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM02",
+      "cwe": "CWE-116"
+    },
+    "MCTS-T-1071": {
+      "name": "MCP Server Root Privilege Abuse",
+      "tactic": "privilege_escalation",
+      "severity_default": "critical",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM06",
+      "cwe": "CWE-269"
+    },
+    "MCTS-T-1072": {
+      "name": "Authority-Claim Privileged Tool Invocation",
+      "tactic": "privilege_escalation",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM06",
+      "cwe": "CWE-269"
+    },
+    "MCTS-T-1073": {
+      "name": "MCP Response Tampering",
+      "tactic": "defense_evasion",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM01",
+      "cwe": "CWE-116"
+    },
+    "MCTS-T-1074": {
+      "name": "MCP API Endpoint DNS Anomaly",
+      "tactic": "defense_evasion",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM06",
+      "cwe": "CWE-350"
+    },
+    "MCTS-T-1075": {
+      "name": "Token Theft via API Response",
+      "tactic": "credential_access",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM02",
+      "cwe": "CWE-200"
+    },
+    "MCTS-T-1076": {
+      "name": "Shared Memory Poisoning",
+      "tactic": "lateral_movement",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM01",
+      "cwe": "CWE-74"
+    },
+    "MCTS-T-1077": {
+      "name": "Cross-Chain Bridge Hopping",
+      "tactic": "impact",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM06",
+      "cwe": "CWE-840"
+    },
+    "MCTS-T-1078": {
+      "name": "External API Flooding",
+      "tactic": "impact",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM04",
+      "cwe": "CWE-770"
+    },
+    "MCTS-T-1079": {
+      "name": "Disinformation Output",
+      "tactic": "impact",
+      "severity_default": "high",
+      "analyzers": ["runtime_events"],
+      "owasp": "LLM01",
+      "cwe": "CWE-74"
     }
   },
   "mitigations": {

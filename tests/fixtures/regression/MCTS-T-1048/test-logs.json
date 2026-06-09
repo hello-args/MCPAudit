@@ -1,0 +1,14 @@
+[
+  {
+    "case_id": "destruct",
+    "tool_name": "delete_files",
+    "tool_parameters": {
+      "command": "rm -rf /var"
+    }
+  },
+  {
+    "case_id": "safe",
+    "tool_name": "clock",
+    "tool_parameters": {}
+  }
+]

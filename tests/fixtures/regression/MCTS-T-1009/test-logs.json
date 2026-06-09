@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "stack_trace",
+    "probe_id": "malformed-json",
+    "response_text": "Traceback (most recent call last):\n  File \"server.py\", line 1"
+  },
+  {
+    "case_id": "clean",
+    "probe_id": "malformed-json",
+    "response_text": "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32700,\"message\":\"Parse error\"},\"id\":null}"
+  }
+]

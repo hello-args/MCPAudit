@@ -31,4 +31,3 @@ level: high
 tags:
   - attack.initial_access
   - attack.t1566
-  - safe.t1007

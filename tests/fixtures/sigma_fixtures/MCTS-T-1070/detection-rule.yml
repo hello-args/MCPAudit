@@ -1,0 +1,26 @@
+title: MCP Collection Followed by Parameter Exfiltration
+id: mcts-t1070-parameter-exfil-chain
+status: experimental
+description: Detects sensitive data collection chained to outbound exfiltration tools
+author: MCTS Team
+date: 2026-06-09
+logsource:
+  product: mcp
+  service: tool_invocation
+detection:
+  selection_collect:
+    tool_name|contains:
+      - read_file
+      - get_env
+      - database_query
+  selection_exfil:
+    tool_name|contains:
+      - webhook
+      - post_
+      - upload_
+      - http.post
+  condition: selection_collect and selection_exfil
+level: critical
+tags:
+  - attack.exfiltration
+  - attack.collection

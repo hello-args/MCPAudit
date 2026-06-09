@@ -1,0 +1,14 @@
+[
+  {
+    "case_id": "rapid",
+    "event_type": "approval_granted",
+    "risk_level": "critical",
+    "operation_type": "secret_access",
+    "response_time_ms": 400
+  },
+  {
+    "case_id": "normal",
+    "event_type": "approval_granted",
+    "risk_level": "low"
+  }
+]

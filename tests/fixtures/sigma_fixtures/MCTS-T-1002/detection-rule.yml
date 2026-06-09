@@ -1,5 +1,5 @@
 title: MCTS-T-1002 Path Traversal via File Tool
-id: saf-t1105-path-traversal
+id: mcts-t1002-path-traversal
 status: experimental
 description: Detects path traversal attempts through MCP file tools using various encoding and bypass techniques
 author: MCTS Team
@@ -7,7 +7,6 @@ date: 2025-07-24
 tags:
   - attack.execution
   - mcts
-  - saf-t1105
   - path-traversal
   - file-access
 logsource:

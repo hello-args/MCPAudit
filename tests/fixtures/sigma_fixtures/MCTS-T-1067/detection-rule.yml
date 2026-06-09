@@ -1,0 +1,23 @@
+title: MCP Environment Variable File Access
+id: mcts-t1067-env-file-access
+status: experimental
+description: Detects MCP file tools reading environment or credential files
+author: MCTS Team
+date: 2026-06-09
+logsource:
+  product: mcp
+  service: tool_invocation
+detection:
+  selection:
+    tool_name|contains:
+      - read_file
+      - file_reader
+      - get_file_contents
+    path|contains:
+      - .env
+      - credentials
+  condition: selection
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1552

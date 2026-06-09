@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "root",
+    "tool_name": "run_shell",
+    "user": "root"
+  },
+  {
+    "case_id": "benign",
+    "tool_name": "get_weather",
+    "user": "app"
+  }
+]

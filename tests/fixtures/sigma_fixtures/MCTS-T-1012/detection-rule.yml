@@ -25,7 +25,6 @@ logsource:
 tags:
   - attack.initial-access
   - attack.t1566.002
-  - safe.t1009
   - oauth.security
 
 ---
@@ -99,7 +98,6 @@ level: critical
 tags:
   - attack.initial_access
   - attack.t1566.002
-  - safe.t1009
 
 ---
 title: OAuth Authorization Response Missing Issuer Identification (RFC 9207)
@@ -131,7 +129,6 @@ level: high
 tags:
   - attack.initial_access
   - attack.t1566.002
-  - safe.t1009
 
 ---
 title: OAuth Issuer Identifier Mismatch
@@ -162,7 +159,6 @@ level: critical
 tags:
   - attack.initial_access
   - attack.t1566.002
-  - safe.t1009
 
 ---
 title: OAuth IDN Homograph Domain Detection
@@ -208,7 +204,6 @@ level: high
 tags:
   - attack.initial_access
   - attack.t1566.002
-  - safe.t1009
 
 ---
 title: Suspicious OAuth AS TLD Substitution
@@ -254,7 +249,6 @@ level: medium
 tags:
   - attack.initial_access
   - attack.t1566.002
-  - safe.t1009
 
 ---
 title: Suspicious OAuth AS Certificate Characteristics
@@ -308,7 +302,6 @@ level: medium
 tags:
   - attack.initial_access
   - attack.t1566.002
-  - safe.t1009
 
 ---
 title: OAuth First-Seen Authorization Server Domain
@@ -348,7 +341,6 @@ level: medium
 tags:
   - attack.initial_access
   - attack.t1566.002
-  - safe.t1009
 
 ---
 title: OAuth Multiple AS Configurations for Single Service
@@ -376,7 +368,6 @@ level: medium
 tags:
   - attack.initial_access
   - attack.t1566.002
-  - safe.t1009
 
 ---
 title: OAuth AS Configuration Sudden Change
@@ -409,4 +400,3 @@ level: high
 tags:
   - attack.initial_access
   - attack.t1566.002
-  - safe.t1009

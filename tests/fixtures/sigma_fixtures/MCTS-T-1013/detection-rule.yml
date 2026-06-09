@@ -68,7 +68,6 @@ tags:
   - attack.t1195
   - attack.t1554
   - attack.t1027
-  - safe.t1201
   - mcp.rug_pull
   - mcp.behavioral_change
   - supply_chain

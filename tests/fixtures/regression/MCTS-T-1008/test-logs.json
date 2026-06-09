@@ -1,0 +1,40 @@
+[
+  {
+    "case_id": "collision",
+    "inventory": [
+      {
+        "client": "cursor",
+        "server_name": "alpha",
+        "tools": [
+          "read_file"
+        ]
+      },
+      {
+        "client": "claude",
+        "server_name": "beta",
+        "tools": [
+          "read_file"
+        ]
+      }
+    ]
+  },
+  {
+    "case_id": "unique",
+    "inventory": [
+      {
+        "client": "cursor",
+        "server_name": "alpha",
+        "tools": [
+          "read_file"
+        ]
+      },
+      {
+        "client": "claude",
+        "server_name": "beta",
+        "tools": [
+          "get_weather"
+        ]
+      }
+    ]
+  }
+]

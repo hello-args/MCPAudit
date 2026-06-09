@@ -1,0 +1,14 @@
+[
+  {
+    "case_id": "pivot",
+    "source_tool": "file_reader",
+    "destination_tool": "admin_execute",
+    "chain_length": 2,
+    "execution_method": "indirect"
+  },
+  {
+    "case_id": "benign",
+    "source_tool": "read",
+    "destination_tool": "summarize"
+  }
+]

@@ -13,7 +13,6 @@ _TECHNIQUES_PATH = Path(__file__).with_name("techniques.json")
 _CROSSWALK_PATH = Path(__file__).with_name("crosswalk.json")
 
 
-@lru_cache(maxsize=1)
 def load_crosswalk() -> dict[str, Any]:
     if not _CROSSWALK_PATH.exists():
         return {}
@@ -53,7 +52,6 @@ def enrich_finding(finding: Finding) -> Finding:
             finding.evidence = {}
         finding.evidence.setdefault("aitech", entry.get("aitech"))
         finding.evidence.setdefault("aisubtech", entry.get("aisubtech"))
-        finding.evidence.setdefault("saf_mcp", entry.get("saf_mcp"))
 
     return finding
 

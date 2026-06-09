@@ -1,4 +1,4 @@
-"""SAF-MCP / AITech crosswalk coverage tests."""
+"""AITech crosswalk coverage tests."""
 
 from __future__ import annotations
 
@@ -13,11 +13,12 @@ def test_crosswalk_covers_all_mcts_techniques() -> None:
     assert technique_ids
     assert technique_ids.issubset(set(crosswalk))
     for tech_id, entry in crosswalk.items():
-        assert entry.get("saf_mcp", "").startswith("SAF-T"), tech_id
         assert entry.get("aitech"), tech_id
+        assert entry.get("aisubtech"), tech_id
+        assert set(entry) <= {"aitech", "aisubtech"}
 
 
-def test_enrich_finding_attaches_saf_mcp_id() -> None:
+def test_enrich_finding_attaches_aitech_ids() -> None:
     finding = Finding(
         id="test-1",
         analyzer="prompt_injection",
@@ -28,5 +29,6 @@ def test_enrich_finding_attaches_saf_mcp_id() -> None:
         technique_id="MCTS-T-1001",
     )
     enriched = enrich_finding(finding)
-    assert enriched.evidence.get("saf_mcp") == "SAF-T1001"
     assert enriched.evidence.get("aitech") == "AITech-PAI"
+    assert enriched.evidence.get("aisubtech") == "AISubtech-PAI-001"
+    assert set(enriched.evidence or {}) <= {"aitech", "aisubtech"}

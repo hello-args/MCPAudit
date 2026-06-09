@@ -1,0 +1,16 @@
+[
+  {
+    "case_id": "pivot",
+    "event_type": "file_access",
+    "source_type": "mcp_server",
+    "target_path": "/workspace/shared/deploy.sh",
+    "access_type": "write"
+  },
+  {
+    "case_id": "benign",
+    "event_type": "file_access",
+    "source_type": "mcp_server",
+    "target_path": "/tmp/readme.txt",
+    "access_type": "read"
+  }
+]

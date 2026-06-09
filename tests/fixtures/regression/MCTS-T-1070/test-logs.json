@@ -1,0 +1,13 @@
+[
+  {
+    "case_id": "chain",
+    "prior_tool": "read_file",
+    "tool_name": "webhook_post",
+    "path": "/app/.env"
+  },
+  {
+    "case_id": "read",
+    "prior_tool": "read_file",
+    "tool_name": "summarize"
+  }
+]

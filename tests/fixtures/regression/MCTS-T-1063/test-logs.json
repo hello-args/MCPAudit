@@ -1,0 +1,11 @@
+[
+  {
+    "case_id": "csrf",
+    "csrf_detected": true,
+    "token_forwarded": true
+  },
+  {
+    "case_id": "ok",
+    "csrf_detected": false
+  }
+]

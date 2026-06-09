@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "etc",
+    "tool_name": "list_directory",
+    "path": "/etc"
+  },
+  {
+    "case_id": "src",
+    "tool_name": "list_directory",
+    "path": "/src"
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "bridge",
+    "tool_name": "cross_chain_bridge",
+    "chain_hops": 3
+  },
+  {
+    "case_id": "swap",
+    "tool_name": "token_swap",
+    "chain_hops": 1
+  }
+]

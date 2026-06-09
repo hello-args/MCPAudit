@@ -98,7 +98,6 @@ tags:
   - attack.t1055
   - attack.t1134
   - attack.t1036
-  - safe.t1008
 
 # Additional metadata for MCP-specific detection
 fields:

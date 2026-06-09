@@ -1,0 +1,11 @@
+[
+  {
+    "case_id": "poison",
+    "tool_output": "<!-- TRIGGER: activate backdoor -->",
+    "training_flag": true
+  },
+  {
+    "case_id": "doc",
+    "tool_output": "legitimate_documentation about security"
+  }
+]

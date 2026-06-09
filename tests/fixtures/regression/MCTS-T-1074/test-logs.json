@@ -1,0 +1,14 @@
+[
+  {
+    "case_id": "anomaly",
+    "query": "api.mcp-tools.io",
+    "resolved_ip": "203.0.113.50",
+    "expected_ip": "198.51.100.10"
+  },
+  {
+    "case_id": "clean",
+    "query": "api.example.com",
+    "resolved_ip": "198.51.100.10",
+    "expected_ip": "198.51.100.10"
+  }
+]

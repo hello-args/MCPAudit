@@ -1,0 +1,10 @@
+[
+  {
+    "case_id": "hex",
+    "response": "```\ndeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef\n```"
+  },
+  {
+    "case_id": "code",
+    "response": "```python\nprint(1)\n```"
+  }
+]

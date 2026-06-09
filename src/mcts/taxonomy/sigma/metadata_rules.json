@@ -49,8 +49,7 @@
     ],
     "rule_id": "5894b8fe-29f0-44d8-ad9b-2266a132ec57",
     "tags": [
-      "attack.initial_access",
-      "attack.t1195"
+      "attack.initial_access"
     ],
     "technique_id": "MCTS-T-1001",
     "title": "MCP Tool Description Poisoning Detection"
@@ -206,13 +205,10 @@
     "rule_id": "7c8d9e0f-1a2b-3c4d-5e6f-789012345678",
     "tags": [
       "attack.initial_access",
-      "attack.execution",
-      "attack.t1055",
-      "attack.t1134",
-      "attack.t1036"
+      "attack.execution"
     ],
     "technique_id": "MCTS-T-1020",
-    "title": "MCP Tool Shadowing Attack Detection (MCTS rule T1008)"
+    "title": "MCP Tool Shadowing Attack Detection (MCTS-T-1008)"
   },
   {
     "level": "high",
@@ -401,7 +397,7 @@
       "file-access"
     ],
     "technique_id": "MCTS-T-1002",
-    "title": "MCTS rule T1105 Path Traversal via File Tool"
+    "title": "MCTS-T-1105 Path Traversal via File Tool"
   },
   {
     "level": "high",
@@ -494,11 +490,6 @@
     "rule_id": "0f397773-638b-4eee-b3b8-20cf9d284573",
     "tags": [
       "attack.persistence",
-      "attack.t1546",
-      "attack.t1546.004",
-      "attack.t1574",
-      "attack.t1543",
-      "attack.t1505",
       "mcp.persistence"
     ],
     "technique_id": "MCTS-T-1040",
@@ -575,7 +566,6 @@
     "rule_id": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
     "tags": [
       "attack.persistence",
-      "attack.t1505",
       "mcp.database"
     ],
     "technique_id": "MCTS-T-1040",
@@ -603,8 +593,7 @@
     ],
     "rule_id": "1A20BBC7-3491-4028-8960-813CA5AB5ABF",
     "tags": [
-      "attack.privilege_escalation",
-      "attack.t1548"
+      "attack.privilege_escalation"
     ],
     "technique_id": "MCTS-T-1030",
     "title": "High-Privilege Tool Abuse"
@@ -696,14 +685,11 @@
     "rule_id": "942bded6-c291-4f07-bf3c-2a8932c4ec6f",
     "tags": [
       "attack.privilege_escalation",
-      "attack.t1068",
-      "attack.t1611",
-      "attack.t1548",
       "mcp.root_abuse",
       "mcp.privilege_escalation",
       "mcp.rce"
     ],
-    "technique_id": "MCTS-S-1305",
+    "technique_id": "MCTS-T-1071",
     "title": "MCP Server Root Privilege Abuse Detection"
   },
   {
@@ -768,11 +754,10 @@
       "attack.ta0004",
       "attack.execution",
       "attack.ta0002",
-      "attack.t1548",
       "mcp.security",
       "mcp.tool_invocation"
     ],
-    "technique_id": "MCTS-S-1309",
+    "technique_id": "MCTS-T-1072",
     "title": "MCP Privileged Tool Invocation Following Authority-Claim Pretext"
   },
   {
@@ -797,8 +782,7 @@
     ],
     "rule_id": "3ba9af96-ad37-409b-9b18-fbf6c1432a30",
     "tags": [
-      "attack.defense_evasion",
-      "attack.t0005"
+      "attack.defense_evasion"
     ],
     "technique_id": "MCTS-T-1041",
     "title": "MCP Tool Metadata Steganography Detection"
@@ -847,8 +831,8 @@
     "tags": [
       "attack.defense_evasion"
     ],
-    "technique_id": "MCTS-S-1404",
-    "title": "MCTS rule T1404 MCP Response Tampering (Narrative/Tool Mismatch)"
+    "technique_id": "MCTS-T-1073",
+    "title": "MCTS-T-1404 MCP Response Tampering (Narrative/Tool Mismatch)"
   },
   {
     "level": "high",
@@ -885,10 +869,9 @@
     "rule_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     "tags": [
       "attack.defense_evasion",
-      "attack.t1557",
       "mcp.dns"
     ],
-    "technique_id": "MCTS-S-1407",
+    "technique_id": "MCTS-T-1074",
     "title": "MCP API Endpoint DNS Resolution Anomaly"
   },
   {
@@ -949,9 +932,7 @@
     ],
     "rule_id": "2fe0d755-ef84-43a0-8cd8-de7f4f11027c",
     "tags": [
-      "attack.credential_access",
-      "attack.t1552",
-      "attack.t1552.001"
+      "attack.credential_access"
     ],
     "technique_id": "MCTS-T-1024",
     "title": "MCP File-Based Credential Harvest"
@@ -1018,11 +999,9 @@
     ],
     "rule_id": "13f1dfef-4612-40e8-8be2-0ae3e5f4718d",
     "tags": [
-      "attack.credential_access",
-      "attack.t1552",
-      "attack.t1552.001"
+      "attack.credential_access"
     ],
-    "technique_id": "MCTS-S-1503",
+    "technique_id": "MCTS-T-1067",
     "title": "MCP Environment Variable File Access"
   },
   {
@@ -1080,13 +1059,11 @@
     "rule_id": "72591379-34f3-4e48-94fc-4206e0f128b8",
     "tags": [
       "attack.credential-access",
-      "attack.T1528",
-      "attack.T1550.001",
       "mcp",
       "oauth"
     ],
-    "technique_id": "MCTS-S-1504",
-    "title": "MCTS rule T1504 - Token Theft via API Response"
+    "technique_id": "MCTS-T-1075",
+    "title": "MCTS-T-1504 - Token Theft via API Response"
   },
   {
     "level": "medium",
@@ -1106,10 +1083,9 @@
     ],
     "rule_id": "9e5b2d7a-8c1f-4b5e-9a3d-1f2c3e4d5b6a",
     "tags": [
-      "attack.discovery",
-      "attack.t1083"
+      "attack.discovery"
     ],
-    "technique_id": "MCTS-S-1606",
+    "technique_id": "MCTS-T-1068",
     "title": "Suspicious Directory Listing"
   },
   {
@@ -1134,10 +1110,9 @@
     ],
     "rule_id": "D0101B15-ECF5-468A-ACA5-E35EECBEF217",
     "tags": [
-      "attack.lateral_movement",
-      "attack.t1565"
+      "attack.lateral_movement"
     ],
-    "technique_id": "MCTS-S-1702",
+    "technique_id": "MCTS-T-1076",
     "title": "Shared-Memory Poisoning Detection"
   },
   {
@@ -1206,12 +1181,9 @@
     ],
     "rule_id": "7c4a8f92-1b3d-4e56-9a8f-2c3d4e5f6a7b",
     "tags": [
-      "attack.collection",
-      "attack.t1213",
-      "attack.t1119",
-      "attack.t1005"
+      "attack.collection"
     ],
-    "technique_id": "MCTS-S-1804",
+    "technique_id": "MCTS-T-1069",
     "title": "MCP API Data Harvest Detection"
   },
   {
@@ -1232,10 +1204,9 @@
     ],
     "rule_id": "8d5b9g03-2c4e-5f67-0b9g-3d4e5f6a7b8c",
     "tags": [
-      "attack.collection",
-      "attack.t1213"
+      "attack.collection"
     ],
-    "technique_id": "MCTS-S-1804",
+    "technique_id": "MCTS-T-1069",
     "title": "MCP API Harvesting - Cumulative Data Volume Alert"
   },
   {
@@ -1252,10 +1223,9 @@
     ],
     "rule_id": "9e6c0h14-3d5f-6g78-1c0h-4e5f6a7b8c9d",
     "tags": [
-      "attack.collection",
-      "attack.t1119"
+      "attack.collection"
     ],
-    "technique_id": "MCTS-S-1804",
+    "technique_id": "MCTS-T-1069",
     "title": "MCP API Harvesting - Sequential Pattern Detection"
   },
   {
@@ -1272,10 +1242,9 @@
     ],
     "rule_id": "0f7d1i25-4e6g-7h89-2d1i-5f6a7b8c9d0e",
     "tags": [
-      "attack.collection",
-      "attack.t1213"
+      "attack.collection"
     ],
-    "technique_id": "MCTS-S-1804",
+    "technique_id": "MCTS-T-1069",
     "title": "MCP API Harvesting - Multi-Round Extraction Pattern"
   },
   {
@@ -1362,11 +1331,9 @@
     "tags": [
       "attack.exfiltration",
       "attack.collection",
-      "attack.t1119",
-      "attack.t1041",
       "mcp.multi_stage"
     ],
-    "technique_id": "MCTS-S-1911",
+    "technique_id": "MCTS-T-1070",
     "title": "MCP Data Collection Followed by Parameter Exfiltration"
   },
   {
@@ -1413,7 +1380,7 @@
       "blockchain.dex",
       "crypto.laundering"
     ],
-    "technique_id": "MCTS-S-1915",
+    "technique_id": "MCTS-T-1077",
     "title": "Cross-Chain Laundering via Bridge Hopping"
   },
   {
@@ -1454,11 +1421,9 @@
     ],
     "rule_id": "B5FD1186-18C3-4BEF-8BD8-895E234E48B4",
     "tags": [
-      "attack.impact",
-      "attack.t1499",
-      "attack.t1499.003"
+      "attack.impact"
     ],
-    "technique_id": "MCTS-S-2102",
+    "technique_id": "MCTS-T-1078",
     "title": "MCP Agent External API Flooding Detection"
   },
   {
@@ -1487,11 +1452,9 @@
     ],
     "rule_id": "a367ee9a-44ff-4c5c-9032-917436940104",
     "tags": [
-      "attack.impact",
-      "attack.t1565",
-      "attack.t1496"
+      "attack.impact"
     ],
-    "technique_id": "MCTS-S-2105",
+    "technique_id": "MCTS-T-1079",
     "title": "MCP Disinformation Output Detection"
   },
   {
@@ -1835,10 +1798,7 @@
     "rule_id": "7c8d9e0f-1a2b-3c4d-5e6f-789012345678",
     "tags": [
       "attack.initial_access",
-      "attack.execution",
-      "attack.t1055",
-      "attack.t1134",
-      "attack.t1036"
+      "attack.execution"
     ],
     "technique_id": "MCTS-T-1020",
     "title": "MCP Tool Shadowing Attack Detection (MCTS-T-1020)"
@@ -2023,7 +1983,7 @@
         "pattern": "*..%2f*..%2f*..%2f*"
       }
     ],
-    "rule_id": "mcts-t1105-path-traversal",
+    "rule_id": "mcts-t1002-path-traversal",
     "tags": [
       "attack.execution",
       "mcts",
@@ -2032,5 +1992,76 @@
     ],
     "technique_id": "MCTS-T-1002",
     "title": "MCTS-T-1002 Path Traversal via File Tool"
+  },
+  {
+    "level": "high",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "file_reader"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "get_file_contents"
+      },
+      {
+        "field": "path",
+        "pattern": ".env"
+      },
+      {
+        "field": "path",
+        "pattern": "credentials"
+      }
+    ],
+    "rule_id": "mcts-t1067-env-file-access",
+    "tags": [
+      "attack.credential_access"
+    ],
+    "technique_id": "MCTS-T-1067",
+    "title": "MCP Environment Variable File Access"
+  },
+  {
+    "level": "critical",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "read_file"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "get_env"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "database_query"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "webhook"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "post_"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "upload_"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "http.post"
+      }
+    ],
+    "rule_id": "mcts-t1070-parameter-exfil-chain",
+    "tags": [
+      "attack.exfiltration",
+      "attack.collection"
+    ],
+    "technique_id": "MCTS-T-1070",
+    "title": "MCP Collection Followed by Parameter Exfiltration"
   }
 ]

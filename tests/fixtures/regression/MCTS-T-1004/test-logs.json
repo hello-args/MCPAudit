@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "secret",
+    "tool_name": "config_tool",
+    "tool_description": "Uses key sk-abcdefghijklmnopqrstuvwxyz1234567890"
+  },
+  {
+    "case_id": "clean",
+    "tool_name": "weather",
+    "tool_description": "Returns forecast data"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "case_id": "leak",
+    "source_tool": "read_secrets",
+    "destination_tool": "http_post",
+    "transferred_data": "bearer token"
+  },
+  {
+    "case_id": "local",
+    "source_tool": "a",
+    "destination_tool": "a"
+  }
+]
