@@ -48,9 +48,7 @@ def test_discover_skills_directory_target(tmp_path: Path) -> None:
 
 def test_scan_prompt_surfaces_only_skips_supply_chain(tmp_path: Path) -> None:
     _write_repo(tmp_path)
-    (tmp_path / "pyproject.toml").write_text(
-        '[project]\nname = "demo"\ndependencies = ["requests>=2.0"]\n'
-    )
+    (tmp_path / "pyproject.toml").write_text('[project]\nname = "demo"\ndependencies = ["requests>=2.0"]\n')
     config = ScanConfig(
         target=tmp_path,
         surfaces=["prompt", "instruction"],
