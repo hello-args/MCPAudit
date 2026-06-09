@@ -16,6 +16,71 @@ class ConfigDiscoveryError(RuntimeError):
     """Raised when a config file or server entry cannot be loaded."""
 
 
+def load_servers_dict(config_path: Path) -> dict:
+    """Load the mcpServers mapping from a client config file."""
+    path = config_path.expanduser().resolve()
+    if not path.exists():
+        raise ConfigDiscoveryError(f"Config file not found: {path}")
+    try:
+        if path.suffix.lower() in (".json5", ".jsonc"):
+            payload = load_json5(path)
+        else:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        raise ConfigDiscoveryError(f"Invalid config JSON: {path}") from exc
+    servers = payload.get("mcpServers")
+    if servers is None and isinstance(payload.get("mcp"), dict):
+        servers = payload["mcp"].get("servers", {})
+    if not isinstance(servers, dict):
+        raise ConfigDiscoveryError(f"No mcpServers block in {path}")
+    return servers
+
+
+def list_server_names(config_path: Path) -> list[str]:
+    """Return sorted server names from an MCP client config."""
+    return sorted(load_servers_dict(config_path))
+
+
+_BARE_PYTHON = frozenset({"python", "python3", "python3.11", "python3.12", "python3.13"})
+
+
+def _venv_python_candidates(config_dir: Path) -> list[Path]:
+    import sys
+
+    if sys.platform == "win32":
+        return [
+            config_dir / ".venv" / "Scripts" / "python.exe",
+            config_dir / ".venv" / "Scripts" / "python3.exe",
+            config_dir / "venv" / "Scripts" / "python.exe",
+            config_dir / "venv" / "Scripts" / "python3.exe",
+        ]
+    return [
+        config_dir / ".venv" / "bin" / "python",
+        config_dir / ".venv" / "bin" / "python3",
+        config_dir / "venv" / "bin" / "python",
+        config_dir / "venv" / "bin" / "python3",
+    ]
+
+
+def resolve_interpreter(command: str, config_dir: Path) -> tuple[str, str | None]:
+    """Resolve relative interpreters and bare python to project venv when present."""
+    cmd_path = Path(command)
+    if cmd_path.is_absolute() and cmd_path.exists():
+        return command, None
+    if command in _BARE_PYTHON:
+        for candidate in _venv_python_candidates(config_dir):
+            if candidate.is_file():
+                return str(candidate.resolve()), None
+        return command, (
+            f"Config uses bare {command!r}; no project .venv interpreter found under {config_dir}. "
+            "Set an explicit path such as .venv/bin/python in the MCP config."
+        )
+    candidate = (config_dir / command).resolve()
+    if candidate.exists():
+        return str(candidate), None
+    return command, f"Interpreter not found: {candidate}"
+
+
 def load_server_from_config(
     config_path: Path,
     server_name: str,
@@ -36,10 +101,13 @@ def load_server_from_config(
         args = expand_args(args, mode=expand_vars)
         env = expand_mapping(env, mode=expand_vars)
     merged_env = {**os.environ, **env}
+    config_dir = config_path.expanduser().resolve().parent
+    resolved_command, _ = resolve_interpreter(str(command), config_dir)
     return LiveServerConfig(
-        command=str(command),
+        command=resolved_command,
         args=args,
         env=merged_env,
+        cwd=str(config_dir),
         server_name=server_name,
     )
 
@@ -73,20 +141,7 @@ def load_remote_from_config(
 
 def _load_entry(config_path: Path, server_name: str) -> dict:
     path = config_path.expanduser().resolve()
-    if not path.exists():
-        raise ConfigDiscoveryError(f"Config file not found: {path}")
-    try:
-        if path.suffix.lower() in (".json5", ".jsonc"):
-            payload = load_json5(path)
-        else:
-            payload = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError, ValueError) as exc:
-        raise ConfigDiscoveryError(f"Invalid config JSON: {path}") from exc
-    servers = payload.get("mcpServers")
-    if servers is None and isinstance(payload.get("mcp"), dict):
-        servers = payload["mcp"].get("servers", {})
-    if not isinstance(servers, dict):
-        raise ConfigDiscoveryError(f"No mcpServers block in {path}")
+    servers = load_servers_dict(path)
     if server_name not in servers:
         available = ", ".join(sorted(servers)) or "(none)"
         raise ConfigDiscoveryError(f"Server {server_name!r} not found in {path}. Available: {available}")

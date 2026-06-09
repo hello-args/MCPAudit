@@ -15,6 +15,8 @@ from mcts.analyzers.embedding_secrets import EmbeddingSecretsAnalyzer
 from mcts.analyzers.jailbreak import JailbreakAnalyzer
 from mcts.analyzers.line_jumping import LineJumpingAnalyzer
 from mcts.analyzers.llm_judge import LlmJudgeAnalyzer
+from mcts.analyzers.llm_metadata_triage import LlmMetadataTriageAnalyzer
+from mcts.analyzers.semgrep_adapter import SemgrepAdapterAnalyzer
 from mcts.analyzers.metadata_dedupe import dedupe_metadata_findings
 from mcts.analyzers.metadata_diff import MetadataDiffAnalyzer, save_baseline
 from mcts.analyzers.metadata_integrity import MetadataIntegrityAnalyzer
@@ -32,6 +34,7 @@ from mcts.analyzers.supply_chain import SupplyChainAnalyzer
 from mcts.analyzers.surface_metadata import SurfaceMetadataAnalyzer
 from mcts.analyzers.tool_abuse import ToolAbuseAnalyzer
 from mcts.analyzers.tool_shadowing import ToolShadowingAnalyzer
+from mcts.analyzers.toxic_flows import ToxicFlowAnalyzer
 from mcts.analyzers.virustotal import VirusTotalAnalyzer
 from mcts.analyzers.vulnerable_package import VulnerablePackageAnalyzer
 from mcts.analyzers.yara_metadata import YaraMetadataAnalyzer
@@ -41,8 +44,15 @@ from mcts.inventory.models import InventoryEntry
 from mcts.mcp.client import MCPClient
 from mcts.mcp.models import MCPServerInfo, SurfaceScanOptions
 from mcts.probe.protocol_checks import probe_protocol_security
+from mcts.report.scan_meta import (
+    build_scan_notes,
+    infer_scan_scope,
+    is_config_static_scan,
+    tool_discovery_notice_text,
+)
 from mcts.reporting.models import Finding, ScanReport, ScanSummary
 from mcts.scoring.engine import RiskScoringEngine
+from mcts.scoring.partitions import score_partitioned
 from mcts.taxonomy.mapper import enrich_findings
 
 
@@ -85,6 +95,8 @@ class Scanner:
             CrossServerAnalyzer(inventory=self.inventory),
             self.attack_chains,
         ]
+        if len(self.inventory) >= 2:
+            rows.append(ToxicFlowAnalyzer(inventory=self.inventory))
         if cfg.enable_surface_metadata:
             rows.insert(1, SurfaceMetadataAnalyzer(surfaces=cfg.surfaces))
         if cfg.enable_prompt_defense:
@@ -99,6 +111,15 @@ class Scanner:
             rows.append(YaraMetadataAnalyzer(rules_path=cfg.yara_rules_path))
         if cfg.enable_llm_judge:
             rows.append(LlmJudgeAnalyzer(model=cfg.llm_model))
+        if cfg.enable_llm_triage:
+            rows.append(LlmMetadataTriageAnalyzer(model=cfg.llm_model))
+        if cfg.enable_semgrep:
+            rows.append(
+                SemgrepAdapterAnalyzer(
+                    target=cfg.target,
+                    rules_path=cfg.semgrep_rules_path,
+                )
+            )
         if cfg.enable_cloud_inspect:
             rows.append(CloudInspectAnalyzer(endpoint=cfg.cloud_endpoint))
         if cfg.enable_virustotal:
@@ -108,6 +129,8 @@ class Scanner:
     def run(self) -> ScanReport:
         """Execute all enabled analyzers against the target MCP server."""
         server_info = self._attach_surface_options(self.client.discover())
+        if is_config_static_scan(self.config):
+            server_info = server_info.model_copy(update={"discovery_mode": "config-static"})
         return self.analyze_server(server_info)
 
     def analyze_server(self, server_info: MCPServerInfo) -> ScanReport:
@@ -141,16 +164,20 @@ class Scanner:
                 }
             )
         findings: list[Finding] = []
+        analyzers_executed: list[str] = []
         if server_info.discovery_warnings:
             from mcts.probe.discovery_meta import discovery_meta_findings
 
             findings.extend(discovery_meta_findings(server_info))
+            analyzers_executed.append("live_discovery")
 
         for analyzer in self.analyzers:
             if not self._is_enabled(analyzer):
                 continue
             if not self._analyzer_allowed(analyzer):
                 continue
+            name = getattr(analyzer, "name", type(analyzer).__name__)
+            analyzers_executed.append(name)
             findings.extend(analyzer.analyze(server_info))
 
         if self.config.protocol_probe and self.config.remote_url:
@@ -161,6 +188,7 @@ class Scanner:
         findings = dedupe_sigma_findings(findings)
         findings = enrich_findings(findings)
         findings.extend(self.compliance.check(findings))
+        analyzers_executed.append("compliance")
         score = self.scoring.score(findings)
         summary = ScanSummary.from_findings(findings)
 
@@ -172,6 +200,8 @@ class Scanner:
         if self.config.save_baseline_path is not None:
             save_baseline(server_info, self.config.save_baseline_path, target=str(self.config.target))
 
+        scan_scope = infer_scan_scope(self.config)
+
         return ScanReport(
             version=__version__,
             target=str(self.config.target),
@@ -181,6 +211,11 @@ class Scanner:
             summary=summary,
             score=score,
             attack_graph=attack_graph,
+            scan_scope=scan_scope,
+            scan_notes=build_scan_notes(self.config),
+            score_breakdown=score_partitioned(findings),
+            tool_discovery_notice=tool_discovery_notice_text(server_info, scan_scope=scan_scope),
+            analyzers_executed=analyzers_executed,
         )
 
     def _attach_surface_options(self, server_info: MCPServerInfo) -> MCPServerInfo:
@@ -233,4 +268,7 @@ class Scanner:
         if self.config.tool_filter:
             allowed = set(self.config.tool_filter)
             rows = [f for f in rows if f.tool is None or f.tool in allowed]
+        if self.config.technique_filter:
+            allowed = set(self.config.technique_filter)
+            rows = [f for f in rows if f.technique_id in allowed]
         return rows

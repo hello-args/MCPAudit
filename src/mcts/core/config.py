@@ -87,7 +87,10 @@ class ScanConfig(BaseModel):
     enable_yara: bool = False
     yara_rules_path: Path | None = None
     enable_llm_judge: bool = False
+    enable_llm_triage: bool = False
     llm_model: str | None = None
+    enable_semgrep: bool = False
+    semgrep_rules_path: Path | None = None
     enable_cloud_inspect: bool = False
     cloud_endpoint: str | None = None
     enable_prompt_defense: bool = True
@@ -106,3 +109,10 @@ class ScanConfig(BaseModel):
     readiness_llm: bool = False
     readiness_llm_model: str | None = None
     raw_envelope: bool = False
+    auto: bool = False
+    auto_server: str | None = None
+    auto_html: Path | None = None
+    technique_filter: list[str] = Field(default_factory=list)
+    full_toxic_flows: bool = False
+    governance_policy: Path | None = None
+    ci_preset: bool = False

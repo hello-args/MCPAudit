@@ -48,14 +48,23 @@ def build_sarif(report: ScanReport) -> dict[str, Any]:
     if taxonomies:
         driver["supportedTaxonomies"] = [{"name": MCTS_TAXONOMY_NAME, "guid": MCTS_TAXONOMY_GUID}]
 
+    run_props: dict[str, Any] = {
+        "target": report.target,
+        "securityScore": report.score.overall,
+        "riskIndex": report.score.risk_index,
+        "mcts/scanMode": report.scan_scope,
+    }
+    if report.scan_notes:
+        run_props["mcts/scanNotes"] = list(report.scan_notes)
+    if report.score_breakdown is not None:
+        run_props["mcts/scoreBreakdown"] = report.score_breakdown.model_dump()
+    if report.tool_discovery_notice:
+        run_props["mcts/toolDiscoveryNotice"] = report.tool_discovery_notice
+
     run: dict[str, Any] = {
         "tool": {"driver": driver},
         "results": results,
-        "properties": {
-            "target": report.target,
-            "securityScore": report.score.overall,
-            "riskIndex": report.score.risk_index,
-        },
+        "properties": run_props,
     }
     if taxonomies:
         run["taxonomies"] = taxonomies

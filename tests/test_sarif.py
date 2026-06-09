@@ -8,9 +8,22 @@ from typer.testing import CliRunner
 from mcts.cli.main import app
 from mcts.core.config import ScanConfig
 from mcts.core.scanner import Scanner
+from mcts.output.analysis_dir import ANALYSIS_DIR_NAME
 from mcts.reporting.sarif import build_sarif, write_sarif_report
 
 runner = CliRunner()
+
+
+def test_sarif_includes_mcts_metadata(tmp_path: Path) -> None:
+    config = tmp_path / ".mcp.json"
+    config.write_text('{"mcpServers":{"demo":{"command":"python","args":[]}}}')
+    (tmp_path / "main.py").write_text("print(1)\n")
+    report = Scanner(ScanConfig(target=tmp_path, config_path=config, config_server="demo")).run()
+    sarif = build_sarif(report)
+    props = sarif["runs"][0]["properties"]
+    assert props["mcts/scanMode"] == "config-static"
+    assert props.get("mcts/scanNotes")
+    assert props.get("mcts/scoreBreakdown") is not None
 
 
 def test_sarif_report_structure(example_server_path: Path) -> None:
@@ -40,7 +53,8 @@ def test_write_sarif_report_is_valid_json(example_server_path: Path) -> None:
     assert parsed["runs"][0]["results"]
 
 
-def test_cli_sarif_output(example_server_path: Path, tmp_path: Path) -> None:
+def test_cli_sarif_output(example_server_path: Path, tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
     out = tmp_path / "report.sarif"
     result = runner.invoke(
         app,
@@ -57,20 +71,22 @@ def test_cli_sarif_output(example_server_path: Path, tmp_path: Path) -> None:
     assert result.exit_code == 0, result.output
     data = json.loads(out.read_text())
     assert data["version"] == "2.1.0"
+    assert (tmp_path / ANALYSIS_DIR_NAME / "scan-report.json").exists()
+    assert (tmp_path / ANALYSIS_DIR_NAME / "scan-report.html").exists()
 
 
 def test_min_score_gate_fails(example_server_path: Path) -> None:
     result = runner.invoke(
         app,
-        ["scan", str(example_server_path), "--min-score", "99", "--no-progress"],
+        ["scan", str(example_server_path), "--min-score", "99", "--no-progress", "--no-save"],
     )
     assert result.exit_code == 1
 
 
-def test_min_score_gate_passes_on_safe_server() -> None:
-    safe = Path(__file__).parent.parent / "examples" / "safe-mcp-server" / "server.py"
+def test_min_score_gate_passes_on_baseline_server() -> None:
+    baseline = Path(__file__).parent.parent / "examples" / "baseline-mcp-server" / "server.py"
     result = runner.invoke(
         app,
-        ["scan", str(safe), "--min-score", "90", "--no-progress"],
+        ["scan", str(baseline), "--min-score", "90", "--no-progress", "--no-save"],
     )
     assert result.exit_code == 0, result.output

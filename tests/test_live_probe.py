@@ -43,6 +43,7 @@ def test_load_server_from_config(tmp_path: Path) -> None:
     assert live.command == "uv"
     assert live.args == ["run", "server.py"]
     assert live.env["FOO"] == "bar"
+    assert live.cwd == str(config.parent.resolve())
 
 
 def test_resolve_live_config_from_python_target() -> None:

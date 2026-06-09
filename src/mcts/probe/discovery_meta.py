@@ -20,12 +20,26 @@ def discovery_meta_findings(server: MCPServerInfo) -> list[Finding]:
         return []
 
     tools_warning = any(w.startswith("list_tools") for w in server.discovery_warnings)
-    severity = Severity.HIGH if tools_warning else Severity.MEDIUM
-    description = (
-        "Live MCP discovery completed after initialize, but one or more list_* "
-        "operations failed. Analyzers may run against incomplete tool/prompt/resource "
-        "metadata and miss security findings."
-    )
+    if not server.initialize_succeeded:
+        severity = Severity.HIGH
+        description = (
+            "MCP server subprocess never completed the initialize handshake. "
+            "Tool metadata was not discovered; use startup diagnostics (--stderr-file) "
+            "or fix the server launch command before relying on this scan."
+        )
+    elif tools_warning:
+        severity = Severity.HIGH
+        description = (
+            "Live MCP discovery completed after initialize, but list_tools failed. "
+            "Analyzers may run against incomplete tool metadata and miss security findings."
+        )
+    else:
+        severity = Severity.MEDIUM
+        description = (
+            "Live MCP discovery completed after initialize, but one or more list_* "
+            "operations failed. Analyzers may run against incomplete prompt/resource "
+            "metadata and miss security findings."
+        )
 
     return [
         Finding(

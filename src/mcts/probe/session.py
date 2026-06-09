@@ -5,22 +5,17 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import tempfile
 from typing import Any
 
 from mcts.capability.inferrer import infer_capability
 from mcts.mcp.models import MCPPrompt, MCPResource, MCPServerInfo, MCPTool
 from mcts.probe.discovery_meta import list_failure_warning
+from mcts.probe.errors import MCPNotInstalledError, MCPProbeError
 from mcts.probe.models import LiveServerConfig
+from mcts.probe.startup_errors import classify_startup_failure, read_stderr_tail
 
 logger = logging.getLogger(__name__)
-
-
-class MCPProbeError(RuntimeError):
-    """Raised when live MCP probing fails."""
-
-
-class MCPNotInstalledError(MCPProbeError):
-    """Raised when the optional ``mcp`` package is not installed."""
 
 
 def probe_stdio_sync(config: LiveServerConfig, timeout_seconds: int = 120) -> MCPServerInfo:
@@ -39,9 +34,21 @@ async def probe_stdio(config: LiveServerConfig, timeout_seconds: int = 120) -> M
         ) from exc
 
     merged_env = {**os.environ, **config.env}
+    temp_stderr_path: str | None = None
+    stderr_path = config.stderr_file
     errlog = None
-    if config.stderr_file:
-        errlog = open(config.stderr_file, "w", encoding="utf-8")  # noqa: SIM115
+    if stderr_path:
+        errlog = open(stderr_path, "w", encoding="utf-8")  # noqa: SIM115
+    else:
+        tmp = tempfile.NamedTemporaryFile(  # noqa: SIM115
+            mode="w+",
+            encoding="utf-8",
+            delete=False,
+            suffix=".stderr",
+        )
+        temp_stderr_path = tmp.name
+        stderr_path = temp_stderr_path
+        errlog = tmp
     server_params = StdioServerParameters(
         command=config.command,
         args=config.args,
@@ -99,13 +106,32 @@ async def probe_stdio(config: LiveServerConfig, timeout_seconds: int = 120) -> M
                         initialize_succeeded=True,
                     )
     except TimeoutError as exc:
+        stderr_tail = read_stderr_tail(stderr_path)
+        startup = classify_startup_failure(
+            str(exc),
+            stderr_tail,
+            command=config.command,
+        )
+        if startup:
+            raise startup from exc
         raise MCPProbeError(
             f"Timed out connecting to MCP server '{config.command}' after {connect_timeout}s"
         ) from exc
     except MCPProbeError:
         raise
     except Exception as exc:
+        stderr_tail = read_stderr_tail(stderr_path)
+        startup = classify_startup_failure(
+            str(exc),
+            stderr_tail,
+            command=config.command,
+        )
+        if startup:
+            raise startup from exc
         raise MCPProbeError(f"Live probe failed for '{config.command}': {exc}") from exc
+    finally:
+        if errlog is not None and not config.stderr_file:
+            errlog.close()
 
 
 async def _list_tools(

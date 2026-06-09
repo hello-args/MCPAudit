@@ -11,7 +11,8 @@ from mcts.fuzz.classifier import classify_response, finding_from_classification
 from mcts.fuzz.payloads import FuzzLevel, probes_for_level
 from mcts.fuzz.transport import run_probe_messages
 from mcts.probe.consent import require_live_consent
-from mcts.probe.session import probe_stdio
+from mcts.probe.session import MCPProbeError, probe_stdio
+from mcts.probe.startup_errors import MCPStartupError
 from mcts.reporting.models import Finding
 
 
@@ -41,13 +42,13 @@ class FuzzRunner:
                 "Aggressive fuzz may invoke tools/call. Pass --i-understand-fuzz-risk to proceed."
             )
 
-        tool_names: tuple[str, ...] = ()
-        if level != FuzzLevel.SAFE:
-            try:
-                server = await probe_stdio(live_config, timeout_seconds=min(self.config.timeout_seconds, 30))
-                tool_names = tuple(tool.name for tool in server.tools)
-            except Exception:
-                tool_names = ()
+        try:
+            server = await probe_stdio(live_config, timeout_seconds=min(self.config.timeout_seconds, 30))
+            tool_names = tuple(tool.name for tool in server.tools)
+        except MCPStartupError:
+            raise
+        except MCPProbeError:
+            raise
 
         probes = probes_for_level(level, tool_names)
         findings: list[Finding] = []

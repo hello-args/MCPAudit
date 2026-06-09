@@ -26,6 +26,10 @@ class ScanRequest(BaseModel):
     url: str | None = None
     transport: str = "streamable-http"
     bearer_token: str | None = None
+    oauth_client_id: str | None = None
+    oauth_client_secret: str | None = None
+    oauth_token_url: str | None = None
+    oauth_scopes: str | None = None
     surfaces: list[str] = Field(default_factory=lambda: ["tool", "prompt", "resource", "instruction"])
     resource_mime_allowlist: list[str] = Field(default_factory=list)
     pip_audit: bool = False
@@ -33,6 +37,13 @@ class ScanRequest(BaseModel):
     hide_safe: bool = False
     tool_filter: list[str] = Field(default_factory=list)
     analyzer_filter: list[str] = Field(default_factory=list)
+    severity_filter: list[str] = Field(default_factory=list)
+    analyzers: list[str] = Field(default_factory=list)
+    technique_filter: list[str] = Field(default_factory=list)
+    semantic_secrets: bool = False
+    runtime_events: list[dict[str, Any]] = Field(default_factory=list)
+    fail_on_critical: bool = False
+    min_score: int | None = Field(default=None, ge=0, le=100)
 
 
 class ToolScanRequest(ScanRequest):
@@ -75,6 +86,17 @@ def _build_config(req: ScanRequest, *, live_consent: bool | None = None) -> Scan
         hide_safe=req.hide_safe,
         tool_filter=req.tool_filter,
         analyzer_filter=req.analyzer_filter,
+        severity_filter=req.severity_filter,
+        analyzers=req.analyzers,
+        technique_filter=req.technique_filter,
+        semantic_secrets=req.semantic_secrets,
+        runtime_events=req.runtime_events,
+        fail_on_critical=req.fail_on_critical,
+        min_score=req.min_score,
+        oauth_client_id=req.oauth_client_id,
+        oauth_client_secret=req.oauth_client_secret,
+        oauth_token_url=req.oauth_token_url,
+        oauth_scopes=req.oauth_scopes,
     )
 
 

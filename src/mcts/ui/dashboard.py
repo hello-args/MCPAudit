@@ -78,7 +78,31 @@ def build_scan_status(meta: ScanDisplayMeta, report: ScanReport, theme: Theme) -
     grid.add_row("Scan Time:", f"{max(meta.duration_seconds, 0.01):.2f}s")
     grid.add_row("Tools Discovered:", str(len(report.server.tools)))
     grid.add_row("Analyzers Run:", str(meta.analyzers_run))
+    if getattr(report, "scan_scope", None):
+        grid.add_row("Scan Scope:", str(report.scan_scope))
+    if _needs_tool_notice(report):
+        grid.add_row(
+            "",
+            Text(
+                "Static scan — tools/list was not called. Use --live, --snapshot, or scan an entrypoint.",
+                style=theme.style(p.yellow),
+            ),
+        )
+    for note in getattr(report, "scan_notes", []) or []:
+        grid.add_row(
+            "",
+            Text(note, style=theme.style(p.cyan)),
+        )
     return grid
+
+
+def _needs_tool_notice(report: ScanReport) -> bool:
+    if report.server.tools:
+        return False
+    mode = report.server.discovery_mode or "static"
+    if mode in ("live", "static-json"):
+        return False
+    return report.scan_scope not in ("live", "snapshot")
 
 
 REPORT_DIVIDER = "=" * 20 + " MCTS Security Report " + "=" * 20
@@ -125,6 +149,24 @@ def build_score_block(report: ScanReport, theme: Theme) -> Table:
                 "shown in report but excluded from score",
                 style=theme.style(p.grey, dim=True),
             ),
+        )
+    breakdown = getattr(report, "score_breakdown", None)
+    if breakdown is not None:
+        grid.add_row(
+            "MCP Surface:",
+            Text(f"{breakdown.mcp_surface}/100", style=theme.style(p.white)),
+        )
+        grid.add_row(
+            "Supply Chain:",
+            Text(f"{breakdown.supply_chain}/100", style=theme.style(p.white)),
+        )
+        grid.add_row(
+            "Dependency Hygiene:",
+            Text(f"{breakdown.dependency_hygiene}/100", style=theme.style(p.white)),
+        )
+        grid.add_row(
+            "Composite:",
+            Text(f"{breakdown.composite}/100", style=theme.style(p.cyan, bold=True)),
         )
     return grid
 
@@ -272,10 +314,9 @@ def build_footer_tip(theme: Theme) -> RenderableType:
     tip = Text()
     tip.append("💡 ", style=theme.style(p.tip_icon))
     tip.append("Tip: ", style=theme.style(p.grey, bold=True))
-    tip.append("Save detailed report with ", style=theme.style(p.muted))
-    tip.append("-o report.json", style=theme.style(p.command, bold=True))
-    tip.append("\n     or generate HTML report with ", style=theme.style(p.muted))
-    tip.append("'mcts report <file>'", style=theme.style(p.command, bold=True))
+    tip.append("Reports saved under ", style=theme.style(p.muted))
+    tip.append("mcts_analysis/", style=theme.style(p.command, bold=True))
+    tip.append(" (JSON + HTML + SARIF; trend builds across runs)", style=theme.style(p.muted))
     return tip
 
 
