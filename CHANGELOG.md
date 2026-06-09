@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-06-09
+
 ### Added
 
 - **Semgrep SAST adapter** — `--semgrep` runs bundled MCP rule pack (Python, JS/TS, Java) via `semgrep` CLI; optional `--semgrep-rules`; `semgrep` extra in `pyproject.toml`
@@ -86,10 +88,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Brand assets in `src/mcts/brand/` (canonical logo + HTML-optimized embed)
 - Docs: [HTML Security Dashboard](docs/reporting/html-report.md), [CLI](docs/platform/cli.md), [Getting Started](docs/get-started/getting-started.md), [Architecture](docs/analysis/architecture.md), and README
 
-### FIxed
+### Fixed
 
+- GitHub Action and CI smoke tests use absolute output paths after `mcts_analysis/` routing
+- `mcts report report.json` resolves scan JSON under `mcts_analysis/` when run from project root
 - `CrossServerAnalyzer` no longer counted in "analyzers run" when inventory is empty (was a silent no-op during `mcts scan`)
-- Docs: updated 'setup-uv' version from '@v4' to '@v7' in CI integration guide.
+- Docs: updated `setup-uv` version from `@v4` to `@v7` in CI integration guide
 
 ### Changed
 
