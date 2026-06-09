@@ -14,7 +14,8 @@ Run one command to find permission issues, injection risks, attack chains, and m
 > **New to MCP or MCTS?** See the [documentation index](docs/index.md) and [glossary](docs/glossary.md).
 
 ```bash
-mcts scan ./server.py
+mcts scan ./server.py   # single entrypoint
+mcts scan ./            # entire repository
 ```
 
 ## Demo
@@ -119,15 +120,29 @@ uv sync --all-extras
 
 ### Scan an MCP server
 
+**Single entrypoint** — when you know the server file:
+
 ```bash
-uv run mcts scan examples/vulnerable-mcp-server/server.py
+mcts scan ./server.py
+mcts scan examples/vulnerable-mcp-server/server.py
 ```
+
+**Entire repository** — when tools are spread across multiple files:
+
+```bash
+mcts scan .
+mcts scan ./path/to/mcp-repo
+mcts scan examples/bench/multi-file-server/
+```
+
+Repo mode walks Python and TypeScript sources, discovers MCP tools across the tree, and merges them into one report (skips `tests/`, venvs, and other excluded paths).
 
 Save JSON and generate an executive HTML dashboard:
 
 ```bash
-uv run mcts scan examples/vulnerable-mcp-server/server.py -o report.json
-uv run mcts report report.json -o security-report.html
+mcts scan ./server.py -o report.json
+mcts scan . -o report.json
+mcts report report.json -o security-report.html
 open security-report.html
 ```
 
@@ -136,8 +151,9 @@ The HTML report includes a dark-themed overview (score gauge, letter grade, seve
 ### CI gate (fail on critical or score)
 
 ```bash
-uv run mcts scan ./server.py --fail-on-critical --min-score 70
-uv run mcts scan ./server.py -o report.sarif --format sarif
+mcts scan ./server.py --fail-on-critical --min-score 70
+mcts scan . --fail-on-critical --min-score 70
+mcts scan . -o report.sarif --format sarif
 ```
 
 See [docs/platform/ci-integration.md](docs/platform/ci-integration.md) and [action/README.md](action/README.md).
