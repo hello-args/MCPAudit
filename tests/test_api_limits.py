@@ -44,7 +44,7 @@ def test_api_scan_all_tools_pagination(monkeypatch: pytest.MonkeyPatch) -> None:
     tools = [MCPTool(name=f"tool_{index}") for index in range(4)]
     server = MCPServerInfo(name="mock", tools=tools)
 
-    async def fake_discover(_req):  # noqa: ANN001
+    async def fake_discover(_req, *, request=None):  # noqa: ANN001, ARG001
         return server
 
     monkeypatch.setattr(app_module, "_discover_async", fake_discover)
