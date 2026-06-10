@@ -24,6 +24,12 @@ security-report.html
 report.json
 *.scan.json
 
+# Scan artifacts
+*.sarif
+mcts-report.*
+regression-report.json
+inventory.json
+
 # Local analysis mirrors (not shipped)
 competitors/
 local/
