@@ -124,7 +124,9 @@ def validate_scan_request_payload(payload: dict[str, Any]) -> None:
 class RequestLimitsMiddleware(BaseHTTPMiddleware):
     """Enforce body size and per-client rate limits."""
 
-    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
         if request.method in {"POST", "PUT", "PATCH"}:
             content_length = request.headers.get("content-length")
             if content_length:

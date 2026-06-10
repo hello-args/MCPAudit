@@ -219,8 +219,7 @@ async def scan_all_prompts(req: ScanRequest) -> dict[str, Any]:
     server = await _discover_async(req)
     prompts = cap_fanout(server.prompts, label="prompts")
     reports = [
-        await _scan_server_async(req, _filter_server(server, prompt_name=prompt.name))
-        for prompt in prompts
+        await _scan_server_async(req, _filter_server(server, prompt_name=prompt.name)) for prompt in prompts
     ]
     return {
         "server_url": req.url or req.target,
