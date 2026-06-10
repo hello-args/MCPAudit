@@ -99,8 +99,24 @@ All scan endpoints accept these fields (plus endpoint-specific fields where note
 | `hide_safe` | bool | `false` | Omit low-severity informational findings |
 | `tool_filter` | string[] | `[]` | Limit scan to named tools |
 | `analyzer_filter` | string[] | `[]` | Limit output to named analyzers |
+| `fanout_offset` | int | `0` | Pagination offset for batch scan endpoints |
+| `fanout_limit` | int | env max (50) | Page size for batch scan endpoints |
 
-Endpoint-specific fields:
+Batch endpoints (`/scan-all-tools`, `/scan-all-prompts`, `/scan-all-resources`) run one full analyzer pass per item. Use `fanout_offset` and `fanout_limit` to paginate; responses include `truncated` and `truncation_warning` when more items remain.
+
+---
+
+## Rate limits
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MCTS_API_RATE_LIMIT_PER_MINUTE` | 30 | Per-client POST rate limit |
+| `MCTS_API_MAX_BODY_BYTES` | 1048576 | Max request body size |
+| `MCTS_API_MAX_CONCURRENT_SCANS` | 2 | Concurrent scan workers |
+| `MCTS_API_MAX_FANOUT_ITEMS` | 50 | Max items per batch page |
+| `MCTS_API_SCAN_TIMEOUT_SECONDS` | 300 | Per-scan timeout |
+
+---
 
 | Endpoint | Extra fields |
 |----------|--------------|

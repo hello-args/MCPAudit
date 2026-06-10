@@ -8,6 +8,7 @@ import threading
 import time
 from collections import defaultdict
 from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 from typing import Any
 
 from fastapi import HTTPException, Request
@@ -20,6 +21,31 @@ DEFAULT_MAX_FANOUT_ITEMS = 50
 DEFAULT_RATE_LIMIT_PER_MINUTE = 30
 DEFAULT_MAX_LIST_ITEMS = 100
 DEFAULT_MAX_RUNTIME_EVENTS = 500
+DEFAULT_SCAN_TIMEOUT_SECONDS = 300
+
+
+@dataclass(frozen=True)
+class PaginatedFanout:
+    items: list[Any]
+    total: int
+    offset: int
+    limit: int
+    truncated: bool
+
+    def metadata(self, *, label: str) -> dict[str, Any]:
+        payload: dict[str, Any] = {
+            f"total_{label}": self.total,
+            "returned": len(self.items),
+            "offset": self.offset,
+            "limit": self.limit,
+            "truncated": self.truncated,
+        }
+        if self.truncated:
+            payload["truncation_warning"] = (
+                f"Scanned {len(self.items)} of {self.total} {label}; "
+                f"set fanout_offset={self.offset + self.limit} for the next page."
+            )
+        return payload
 
 
 class _ScanConcurrencyState:
@@ -64,6 +90,10 @@ def max_list_items() -> int:
 
 def max_runtime_events() -> int:
     return _env_int("MCTS_API_MAX_RUNTIME_EVENTS", DEFAULT_MAX_RUNTIME_EVENTS)
+
+
+def scan_timeout_seconds() -> int:
+    return _env_int("MCTS_API_SCAN_TIMEOUT_SECONDS", DEFAULT_SCAN_TIMEOUT_SECONDS)
 
 
 def _scan_semaphore_for(limit: int) -> asyncio.Semaphore:
@@ -159,14 +189,41 @@ async def run_scan_with_limits(func: Callable[[], Any]) -> Any:
 
     async with semaphore:
         loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(None, func)
+        try:
+            return await asyncio.wait_for(
+                loop.run_in_executor(None, func),
+                timeout=scan_timeout_seconds(),
+            )
+        except TimeoutError as exc:
+            raise HTTPException(status_code=504, detail="Scan timed out; retry later") from exc
+
+
+def paginate_fanout(
+    items: list[Any],
+    *,
+    offset: int,
+    limit: int | None,
+    label: str,
+) -> PaginatedFanout:
+    """Return one page of fan-out items instead of scanning an unbounded list."""
+    total = len(items)
+    if offset > total:
+        raise HTTPException(
+            status_code=400,
+            detail=f"fanout_offset {offset} exceeds total {label} count ({total})",
+        )
+    ceiling = max_fanout_items()
+    page_size = min(limit or ceiling, ceiling)
+    page = items[offset : offset + page_size]
+    return PaginatedFanout(
+        items=page,
+        total=total,
+        offset=offset,
+        limit=page_size,
+        truncated=offset + page_size < total,
+    )
 
 
 def cap_fanout(items: list[Any], *, label: str) -> list[Any]:
-    limit = max_fanout_items()
-    if len(items) > limit:
-        raise HTTPException(
-            status_code=413,
-            detail=f"Too many {label} ({len(items)}); maximum fan-out is {limit}",
-        )
-    return items
+    """Legacy helper — prefer paginate_fanout for batch endpoints."""
+    return paginate_fanout(items, offset=0, limit=None, label=label).items

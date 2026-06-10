@@ -12,7 +12,7 @@ from mcts.api import limits
 from mcts.api.auth import require_api_key
 from mcts.api.limits import (
     RequestLimitsMiddleware,
-    cap_fanout,
+    paginate_fanout,
     run_scan_with_limits,
 )
 from mcts.core.config import ScanConfig
@@ -51,6 +51,8 @@ class ScanRequest(BaseModel):
     runtime_events: list[dict[str, Any]] = Field(default_factory=list)
     fail_on_critical: bool = False
     min_score: int | None = Field(default=None, ge=0, le=100)
+    fanout_offset: int = Field(default=0, ge=0)
+    fanout_limit: int | None = Field(default=None, ge=1)
 
     @field_validator("runtime_events")
     @classmethod
@@ -190,16 +192,23 @@ async def scan_tool(req: ToolScanRequest) -> dict[str, Any]:
 
 @app.post("/scan-all-tools", dependencies=_auth)
 async def scan_all_tools(req: ScanRequest) -> dict[str, Any]:
+    """Scan each discovered tool separately. Use fanout_offset/limit to paginate."""
     server = await _discover_async(req)
-    tools = cap_fanout(server.tools, label="tools")
+    page = paginate_fanout(
+        server.tools,
+        offset=req.fanout_offset,
+        limit=req.fanout_limit,
+        label="tools",
+    )
     reports = []
-    for tool in tools:
+    for tool in page.items:
         filtered = _filter_server(server, tool_name=tool.name)
         reports.append(await _scan_server_async(req, filtered))
     return {
         "server_url": req.url or req.target,
-        "tool_count": len(tools),
+        "tool_count": page.total,
         "reports": reports,
+        **page.metadata(label="tools"),
     }
 
 
@@ -216,15 +225,23 @@ async def scan_prompt(req: PromptScanRequest) -> dict[str, Any]:
 
 @app.post("/scan-all-prompts", dependencies=_auth)
 async def scan_all_prompts(req: ScanRequest) -> dict[str, Any]:
+    """Scan each prompt separately. Use fanout_offset/limit to paginate."""
     server = await _discover_async(req)
-    prompts = cap_fanout(server.prompts, label="prompts")
+    page = paginate_fanout(
+        server.prompts,
+        offset=req.fanout_offset,
+        limit=req.fanout_limit,
+        label="prompts",
+    )
     reports = [
-        await _scan_server_async(req, _filter_server(server, prompt_name=prompt.name)) for prompt in prompts
+        await _scan_server_async(req, _filter_server(server, prompt_name=prompt.name))
+        for prompt in page.items
     ]
     return {
         "server_url": req.url or req.target,
-        "total_prompts": len(prompts),
+        "total_prompts": page.total,
         "reports": reports,
+        **page.metadata(label="prompts"),
     }
 
 
@@ -241,16 +258,23 @@ async def scan_resource(req: ResourceScanRequest) -> dict[str, Any]:
 
 @app.post("/scan-all-resources", dependencies=_auth)
 async def scan_all_resources(req: ScanRequest) -> dict[str, Any]:
+    """Scan each resource separately. Use fanout_offset/limit to paginate."""
     server = await _discover_async(req)
-    resources = cap_fanout(server.resources, label="resources")
+    page = paginate_fanout(
+        server.resources,
+        offset=req.fanout_offset,
+        limit=req.fanout_limit,
+        label="resources",
+    )
     reports = [
         await _scan_server_async(req, _filter_server(server, resource_uri=resource.uri))
-        for resource in resources
+        for resource in page.items
     ]
     return {
         "server_url": req.url or req.target,
-        "total_resources": len(resources),
+        "total_resources": page.total,
         "reports": reports,
+        **page.metadata(label="resources"),
     }
 
 
