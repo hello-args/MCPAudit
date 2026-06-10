@@ -42,7 +42,7 @@ jobs:
 
 ## What the action does
 
-1. Installs MCTS from the pinned action ref (`pip install` from the checked-out `MCTS` repo — not PyPI), so the action version always matches the scanner
+1. Installs MCTS with `uv sync --frozen` from the pinned action ref (reproducible lockfile; default extras: `mcp`, `sast`)
 2. Runs `mcts scan` on your target
 3. Writes `mcts-report.json` and `mcts-report.sarif`
 4. Generates `mcts-report.html` via `mcts report`
@@ -50,6 +50,16 @@ jobs:
 6. Fails the workflow if `fail-on-critical` or `min-score` thresholds are not met
 
 You upload SARIF separately (step 2 above) to show findings in GitHub's Security tab.
+
+### Installed capabilities (default extras)
+
+| Feature | Extra | Default action |
+|---------|-------|----------------|
+| Python / TS static scan | core | Yes |
+| Live probe (`--live`) | `mcp` | Yes |
+| Tree-sitter SAST (TS/Go/Rust) | `sast` | Yes |
+| `--pip-audit` | `supplychain` | Opt-in via `extras` input |
+| `--yara`, `--llm-judge`, `--semgrep` | respective extras | Opt-in via `extras` input |
 
 ---
 
@@ -74,6 +84,7 @@ If the action lives in your repo under `action/`:
 | `target` | `./server.py` | Path to MCP server entrypoint or repo directory |
 | `fail-on-critical` | `true` | Fail workflow if any critical finding is detected |
 | `min-score` | — | Fail if overall score is below this threshold (0–100) |
+| `extras` | `mcp,sast` | Comma-separated optional extras (`all` installs every extra) |
 
 ---
 

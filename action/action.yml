@@ -17,23 +17,46 @@ inputs:
     description: Fail if security score is below this value (0-100). Leave empty to skip.
     required: false
     default: ""
+  extras:
+    description: >
+      Comma-separated pyproject optional extras (mcp, sast, supplychain, yara,
+      llm, semgrep, api, all). Default installs mcp and sast for live probe and
+      tree-sitter SAST.
+    required: false
+    default: "mcp,sast"
 
 runs:
   using: composite
   steps:
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v7
       with:
         python-version: "3.12"
+        enable-cache: true
 
     - name: Install MCTS
       shell: bash
-      # Install from the action's checked-out ref so the action version always
-      # matches the scanner code (works before and after PyPI publish).
-      run: pip install "${{ github.action_path }}/.."
+      working-directory: ${{ github.action_path }}/..
+      run: |
+        set -euo pipefail
+        EXTRAS="${{ inputs.extras }}"
+        if [ "$EXTRAS" = "all" ]; then
+          uv sync --frozen --no-dev --all-extras
+        else
+          ARGS=()
+          IFS=',' read -ra PARTS <<< "$EXTRAS"
+          for extra in "${PARTS[@]}"; do
+            trimmed="$(echo "$extra" | xargs)"
+            if [ -n "$trimmed" ]; then
+              ARGS+=(--extra "$trimmed")
+            fi
+          done
+          uv sync --frozen --no-dev "${ARGS[@]}"
+        fi
 
     - name: Run security scan
       shell: bash
+      working-directory: ${{ github.action_path }}/..
       run: |
         set -euo pipefail
         TARGET="${{ inputs.target }}"
@@ -48,12 +71,13 @@ runs:
           ARGS+=(--min-score "${{ inputs.min-score }}")
         fi
 
-        mcts "${ARGS[@]}"
-        mcts scan "$TARGET" --no-progress --format sarif -o "$SARIF_OUT"
+        uv run mcts "${ARGS[@]}"
+        uv run mcts scan "$TARGET" --no-progress --format sarif -o "$SARIF_OUT"
 
     - name: Generate HTML dashboard
       shell: bash
-      run: mcts report "${{ github.workspace }}/mcts-report.json" -o "${{ github.workspace }}/mcts-report.html"
+      working-directory: ${{ github.action_path }}/..
+      run: uv run mcts report "${{ github.workspace }}/mcts-report.json" -o "${{ github.workspace }}/mcts-report.html"
 
     - name: Upload JSON report
       if: always()

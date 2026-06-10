@@ -66,7 +66,7 @@ jobs:
 
 ### What the action does
 
-1. Installs MCTS from the **pinned action ref** (the checked-out `MCTS` tag/commit), not from PyPI — so `@v1` always runs the matching scanner code
+1. Installs MCTS with **`uv sync --frozen`** from the pinned action ref (lockfile-pinned deps; default extras `mcp`, `sast`)
 2. Runs `mcts scan` on `target`
 3. Writes `mcts-report.json` and `mcts-report.sarif`
 4. Runs `mcts report` → `mcts-report.html`
@@ -83,6 +83,7 @@ Full reference: [action/README.md](../../action/README.md)
 | `target` | `./server.py` | Scan target path |
 | `fail-on-critical` | `true` | Fail workflow on critical findings |
 | `min-score` | — | Fail if score below threshold |
+| `extras` | `mcp,sast` | Optional extras to install (`all` for full set) |
 
 ---
 
