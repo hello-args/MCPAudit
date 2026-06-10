@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Validate governance `--policy` files before scan execution so missing or invalid policy files fail before reports are written.
+
 ## [0.1.2] - 2026-06-10
 
 ### Added

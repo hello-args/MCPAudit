@@ -704,6 +704,12 @@ def scan(
         surface_scoped_analyzers=surface_scoped,
     )
 
+    try:
+        gov = load_policy(config_obj.governance_policy)
+    except (FileNotFoundError, ValueError) as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(code=2) from exc
+
     if machine_wide:
         try:
             resolved_theme = get_theme(theme)
@@ -819,11 +825,6 @@ def scan(
     _check_strict_live(report, config_obj)
     _check_strict_discovery(report, config_obj)
     _check_gates(report, config_obj)
-    try:
-        gov = load_policy(config_obj.governance_policy)
-    except (FileNotFoundError, ValueError) as exc:
-        console.print(f"[red]Error:[/red] {exc}")
-        raise typer.Exit(code=2) from exc
     if gov is not None:
         violations = evaluate_policy(
             policy=gov,
