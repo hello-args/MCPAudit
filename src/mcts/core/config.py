@@ -75,6 +75,7 @@ class ScanConfig(BaseModel):
     protocol_probe: bool = False
     stderr_file: str | None = None
     strict_live: bool = False
+    strict_discovery: bool = False
     expand_vars: str = "auto"
     # P1 — static snapshot + supply chain
     snapshot_path: Path | None = None

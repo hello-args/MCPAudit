@@ -179,6 +179,14 @@ class Scanner:
             findings.extend(discovery_meta_findings(server_info))
             analyzers_executed.append("live_discovery")
 
+        if not self.config.live and not self.config.remote_url and not self.config.snapshot_path:
+            from mcts.discovery.static_meta import static_discovery_meta_findings
+
+            static_meta = static_discovery_meta_findings(server_info, self.config)
+            if static_meta:
+                findings.extend(static_meta)
+                analyzers_executed.append("static_discovery")
+
         for analyzer in self.analyzers:
             if not self._is_enabled(analyzer):
                 continue
