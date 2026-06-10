@@ -75,6 +75,25 @@ def _print_discovery_warnings(server, stderr_file: str | None) -> None:
         )
 
 
+def _check_strict_discovery(report, config: ScanConfig) -> None:
+    if not config.strict_discovery:
+        return
+    from mcts.reporting.models import Severity
+
+    incomplete = [
+        finding
+        for finding in report.findings
+        if finding.analyzer == "static_discovery"
+        and finding.severity in {Severity.HIGH, Severity.CRITICAL}
+    ]
+    if not incomplete:
+        return
+    console.print("[red]Error:[/red] --strict-discovery: static tool discovery looks incomplete.")
+    for finding in incomplete:
+        console.print(f"  [red]•[/red] {finding.title}")
+    raise typer.Exit(code=2)
+
+
 def _check_strict_live(report, config: ScanConfig) -> None:
     if not config.strict_live:
         return
@@ -240,7 +259,7 @@ def scan(
         str | None,
         typer.Option(
             "--languages",
-            help="Comma-separated discovery languages: python, typescript (default: both)",
+            help="Comma-separated discovery languages: python, typescript, go, rust (auto-detects go/rust in repos)",
         ),
     ] = None,
     baseline: Annotated[
@@ -345,6 +364,13 @@ def scan(
         typer.Option(
             "--strict-live",
             help="Exit 2 when live discovery is incomplete (e.g. list_tools failed after initialize)",
+        ),
+    ] = False,
+    strict_discovery: Annotated[
+        bool,
+        typer.Option(
+            "--strict-discovery",
+            help="Exit 2 when static discovery finds MCP sources but zero tools",
         ),
     ] = False,
     enable_yara: Annotated[
@@ -539,11 +565,12 @@ def scan(
 
     scan_target = config if (config and target == Path(".")) else target
     live_args = [part.strip() for part in args.split(",") if part.strip()] if args else []
-    language_list = (
-        [part.strip() for part in languages.split(",") if part.strip()]
-        if languages
-        else ["python", "typescript"]
-    )
+    if languages:
+        language_list = [part.strip() for part in languages.split(",") if part.strip()]
+    else:
+        from mcts.discovery.language_detect import resolve_default_languages
+
+        language_list = resolve_default_languages(Path(scan_target))
     surface_list = (
         [part.strip() for part in surfaces.split(",") if part.strip()]
         if surfaces
@@ -645,6 +672,7 @@ def scan(
         protocol_probe=protocol_probe,
         stderr_file=stderr_file,
         strict_live=strict_live,
+        strict_discovery=strict_discovery,
         expand_vars=expand_vars,
         snapshot_path=snapshot,
         pip_audit=pip_audit,
@@ -787,6 +815,7 @@ def scan(
 
     _print_discovery_warnings(report.server, stderr_file)
     _check_strict_live(report, config_obj)
+    _check_strict_discovery(report, config_obj)
     _check_gates(report, config_obj)
     try:
         gov = load_policy(config_obj.governance_policy)

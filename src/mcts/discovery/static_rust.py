@@ -20,6 +20,8 @@ MCP_FILE_INDICATORS = (
     "Tool::new",
     "Server::tool",
     ".tool(",
+    "#[tool",
+    "tool_router",
     "ListToolsRequest",
     "CallToolRequest",
     "call_tool",
@@ -42,6 +44,12 @@ DESCRIPTION_PATTERN = re.compile(
 MATCH_ARM_PATTERN = re.compile(
     r"[\"']([^\"']+)[\"']\s*=>\s*\{",
 )
+TOOL_ATTR_PATTERN = re.compile(
+    r"#\[tool(?:\((?P<attrs>[^)]*)\))?\]\s*(?:pub\s+)?(?:async\s+)?fn\s+(?P<fn>\w+)",
+    re.MULTILINE,
+)
+ATTR_NAME_PATTERN = re.compile(r"""name\s*=\s*["']([^"']+)["']""")
+ATTR_DESC_PATTERN = re.compile(r"""description\s*=\s*["']([^"']+)["']""")
 
 
 class RustStaticDiscovery:
@@ -151,6 +159,33 @@ class RustStaticDiscovery:
                 tool.capability = infer_capability(tool)
                 tools.append(tool)
         tools.extend(self._tools_from_match_arms(file_path, content, tools))
+        tools.extend(self._tools_from_tool_attrs(file_path, content, tools))
+        return tools
+
+    def _tools_from_tool_attrs(
+        self, file_path: Path, content: str, existing: list[MCPTool]
+    ) -> list[MCPTool]:
+        known = {tool.name for tool in existing}
+        tools: list[MCPTool] = []
+        for match in TOOL_ATTR_PATTERN.finditer(content):
+            attrs = match.group("attrs") or ""
+            fn_name = match.group("fn")
+            tool_name = _first_match(ATTR_NAME_PATTERN, attrs) or fn_name
+            if tool_name in known:
+                continue
+            line = content[: match.start()].count("\n") + 1
+            description = _first_match(ATTR_DESC_PATTERN, attrs) or ""
+            tool = MCPTool(
+                name=tool_name,
+                description=description,
+                input_schema={"type": "object", "properties": {}},
+                source_file=str(file_path),
+                source_line=line,
+                handler_snippet=_handler_snippet(content, match.start()),
+            )
+            tool.capability = infer_capability(tool)
+            tools.append(tool)
+            known.add(tool_name)
         return tools
 
     def _tools_from_match_arms(self, file_path: Path, content: str, existing: list[MCPTool]) -> list[MCPTool]:
