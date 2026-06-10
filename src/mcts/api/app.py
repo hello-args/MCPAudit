@@ -10,12 +10,12 @@ from pydantic import BaseModel, Field, field_validator
 
 from mcts.api import limits
 from mcts.api.auth import require_api_key
-from mcts.api.live_consent import require_api_live_consent
 from mcts.api.limits import (
     RequestLimitsMiddleware,
     cap_fanout,
     run_scan_with_limits,
 )
+from mcts.api.live_consent import require_api_live_consent
 from mcts.core.config import ScanConfig
 from mcts.core.scanner import Scanner
 from mcts.mcp.client import MCPClient
@@ -138,7 +138,12 @@ def _discover(req: ScanRequest, *, request: Request | None = None) -> MCPServerI
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-def _scan_server(req: ScanRequest, server: MCPServerInfo, *, request: Request | None = None) -> dict[str, Any]:
+def _scan_server(
+    req: ScanRequest,
+    server: MCPServerInfo,
+    *,
+    request: Request | None = None,
+) -> dict[str, Any]:
     config = _build_config(req, request=request)
     try:
         report: ScanReport = Scanner(config).analyze_server(server)
