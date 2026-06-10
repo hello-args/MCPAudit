@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`mcts vet pypi:` version misses** — distinguish missing packages from missing versions, suggest recent available releases on PyPI, and accept `pypi:name:version` / `pypi:name==version` specs in addition to `pypi:name@version`
+
 ## [0.1.2] - 2026-06-10
 
 ### Added

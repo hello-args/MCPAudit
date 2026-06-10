@@ -18,6 +18,20 @@ def test_parse_package_spec_pypi() -> None:
     assert spec.version == "2.31.0"
 
 
+def test_parse_package_spec_pypi_colon_version() -> None:
+    spec = parse_package_spec("pypi:requests:2.31.0")
+    assert spec.ecosystem == "pypi"
+    assert spec.name == "requests"
+    assert spec.version == "2.31.0"
+
+
+def test_parse_package_spec_pypi_double_equals_version() -> None:
+    spec = parse_package_spec("pypi:requests==2.31.0")
+    assert spec.ecosystem == "pypi"
+    assert spec.name == "requests"
+    assert spec.version == "2.31.0"
+
+
 def test_parse_package_spec_npm_scoped() -> None:
     spec = parse_package_spec("npm:@types/node@20.0.0")
     assert spec.ecosystem == "npm"
@@ -59,6 +73,39 @@ def test_vet_pypi_not_found() -> None:
         report = run_vet("pypi:missing-package-xyz")
     assert report.verdict == "not_found"
     assert report.findings[0].severity == Severity.HIGH
+    assert report.findings[0].title == "Package not found on PyPI"
+
+
+def test_vet_pypi_missing_version_suggests_recent_releases() -> None:
+    version_response = MagicMock(status_code=404)
+    project_payload = {
+        "info": {
+            "name": "kubernetes",
+            "version": "32.0.1",
+            "summary": "Kubernetes Python client",
+            "description": "Safe description",
+            "project_urls": {},
+        },
+        "releases": {
+            "32.0.1": [],
+            "31.0.0": [],
+            "30.1.0": [],
+            "25.0.0": [],
+        },
+    }
+    project_response = MagicMock(status_code=200, json=lambda: project_payload)
+    project_response.raise_for_status = MagicMock()
+
+    with patch("mcts.vet.pypi.httpx.get", side_effect=[version_response, project_response]):
+        report = run_vet("pypi:kubernetes==25.0.0")
+
+    assert report.verdict == "not_found"
+    assert report.findings[0].id == "vet-version-not-found"
+    assert report.findings[0].title == "Version not found on PyPI"
+    assert "25.0.0" in report.findings[0].description
+    assert report.findings[0].evidence["latest_version"] == "32.0.1"
+    assert report.findings[0].evidence["suggestions"] == ["32.0.1", "31.0.0", "30.1.0"]
+    assert "32.0.1" in report.findings[0].recommendation
 
 
 def test_vet_npm_flags_lifecycle_script() -> None:

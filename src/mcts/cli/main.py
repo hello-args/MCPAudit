@@ -969,7 +969,12 @@ def inventory(
 def vet(
     package: Annotated[
         str,
-        typer.Argument(help="Package spec: pypi:name, npm:pkg, or oci:registry/repo:tag"),
+        typer.Argument(
+            help=(
+                "Package spec: pypi:name, pypi:name:version, pypi:name==version, "
+                "npm:pkg[@version], or oci:registry/repo:tag"
+            )
+        ),
     ],
     output: Annotated[
         Path | None,

@@ -29,11 +29,20 @@ def parse_package_spec(spec: str) -> PackageSpec:
     if eco == "oci":
         return PackageSpec(ecosystem=eco, name=rest, version=_oci_tag(rest))
 
-    name, version = _split_name_version(rest)
+    name, version = _split_name_version(eco, rest)
     return PackageSpec(ecosystem=eco, name=name, version=version)
 
 
-def _split_name_version(rest: str) -> tuple[str, str | None]:
+def _split_name_version(ecosystem: str, rest: str) -> tuple[str, str | None]:
+    if ecosystem == "pypi":
+        if "==" in rest:
+            name, version = rest.split("==", 1)
+            return name, version or None
+        if ":" in rest:
+            name, version = rest.rsplit(":", 1)
+            if name and version:
+                return name, version
+
     if rest.startswith("@"):
         if rest.count("@") >= 2:
             name, version = rest.rsplit("@", 1)
