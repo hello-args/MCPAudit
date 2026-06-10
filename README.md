@@ -26,6 +26,11 @@ Scan the included vulnerable MCP server:
 uv run mcts scan examples/vulnerable-mcp-server/server.py
 ```
 
+![MCTS scan demo](docs/assets/scan-demo.gif)
+
+<details>
+<summary>Example terminal output</summary>
+
 ```
 $ mcts scan examples/vulnerable-mcp-server/server.py
 [✓] Discovering tools...
@@ -44,7 +49,7 @@ Severity Summary          Top Findings
 ● Medium      2           ...
 ```
 
-> **Tip:** Record a terminal GIF of the scan above and add it here as `docs/assets/scan-demo.gif` for maximum README impact.
+</details>
 
 ## Problem
 
