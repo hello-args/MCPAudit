@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scope OAuth HTTP findings to OAuth config keys and skip fixture/data JSON during repo scans (#164).
 - Classify SQL database tools separately from filesystem tools so names like `read_query` are not flagged for path traversal (#165).
 - Exclude design prompt markdown under `docs/prompts/` from default instruction discovery (#162).
+- Scope `mcts scan-resources` to MCP resources only by disabling instruction-file discovery on resource-only surface scans (#221).
 
 ### Changed
 
