@@ -958,6 +958,9 @@ def score_trend(report: ScanReport) -> list[dict[str, Any]]:
         "score": report.score.overall,
         "scoring_version": report.scoring_version,
         "trend_value": report.score.overall,
+        "findings_total": report.summary.total,
+        "critical": report.summary.critical,
+        "high": report.summary.high,
     }
     if report.score_v2 is not None:
         row["absolute_risk"] = report.score_v2.absolute_risk

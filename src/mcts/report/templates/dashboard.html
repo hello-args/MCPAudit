@@ -222,22 +222,26 @@
             <div class="card v2-contributors-card" id="v2-contributors-card">
               <h3 class="card-heading">Biggest risk contributors</h3>
               <p class="card-microcopy">Findings that added the most to your absolute risk number.</p>
-              <table class="data-table" id="v2-contributors-table" aria-label="Top risk contributors">
-                <thead>
-                  <tr>
-                    <th>Finding</th>
-                    <th>Tool</th>
-                    <th>Risk added</th>
-                    <th>Why</th>
-                  </tr>
-                </thead>
-                <tbody id="v2-contributors-body"></tbody>
-              </table>
+              <div class="v2-contributors-table-wrap">
+                <table class="data-table" id="v2-contributors-table" aria-label="Top risk contributors">
+                  <thead>
+                    <tr>
+                      <th>Finding</th>
+                      <th>Tool</th>
+                      <th>Risk added</th>
+                      <th>Why</th>
+                    </tr>
+                  </thead>
+                  <tbody id="v2-contributors-body"></tbody>
+                </table>
+              </div>
             </div>
             <div class="card v2-categories-card" id="v2-categories-card">
               <h3 class="card-heading">Category health</h3>
               <p class="card-microcopy">100 = no problems in that OWASP bucket · lower = more findings there.</p>
-              <ul class="category-list" id="v2-category-list"></ul>
+              <div class="v2-categories-list-wrap">
+                <ul class="category-list" id="v2-category-list"></ul>
+              </div>
             </div>
           </div>
         </div>

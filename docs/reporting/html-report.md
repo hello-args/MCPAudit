@@ -202,7 +202,7 @@ report/data.py → build_dashboard_payload()
 report/generators/html_report.py
   ├── Jinja2: templates/dashboard.html
   ├── Inline: assets/styles.css, assets/dashboard.js
-  └── Embed: brand/logo-report 2.png (base64)
+  └── Embed: brand/Logo 2.jpg (base64)
         │
         ▼
 security-report.html (single file)
@@ -219,7 +219,7 @@ security-report.html (single file)
 | `report/data.py` | ScanReport → dashboard JSON |
 | `report/generators/html_report.py` | Assembly and inlining |
 | `compliance/checks.py` | MCP Top 10 analyzer map (shared with compliance) |
-| `brand/logo-report 2.png` | Hex icon embed (no wordmark — legible at 44×44) |
+| `brand/Logo 2.jpg` | Logo embed in sidebar and exports |
 
 Entry: `mcts.reporting.html.write_html_report()` delegates to generator.
 

@@ -90,7 +90,7 @@ def build_logo_text(theme: Theme, *, use_unicode: bool = True) -> Text:
 
 
 def render_brand_logo(console: Console, theme: Theme, *, layout_width: int) -> bool:
-    """Render the canonical PNG logo when the terminal supports inline images."""
+    """Render the canonical brand logo when the terminal supports inline images."""
     del theme, layout_width
     if not _terminal_supports_inline_image():
         return False

@@ -893,7 +893,7 @@
     const topFindings = [...(DATA.findings || [])]
       .sort((a, b) => (severityRank[a.severity] ?? 9) - (severityRank[b.severity] ?? 9))
       .slice(0, 6);
-    const passed = (DATA.analyzers || []).filter((a) => a.status === "passed");
+    const passed = (DATA.analyzers || []).filter((a) => a.status === "passed").slice(0, 6);
 
     if (!topFindings.length && !passed.length) {
       split.hidden = true;
@@ -1111,18 +1111,61 @@
     return `${value} / 100 pts`;
   }
 
+  function trendTableColumns(points) {
+    const hasV2Risk = points.some((point) => point.absolute_risk != null);
+    const hasRiskLevel = points.some((point) => point.risk_level);
+    const hasSecurityScore = points.some((point) => point.security_score != null);
+    const hasIssues = points.some((point) => point.findings_total != null);
+    const hasCritical = points.some((point) => point.critical != null);
+    const hasHigh = points.some((point) => point.high != null);
+    const hasLegacyScore = points.some(
+      (point) => point.scoring_version === "legacy" || (!hasV2Risk && point.score != null)
+    );
+    const columns = [{ key: "date", label: "Date" }];
+    if (hasV2Risk) columns.push({ key: "absolute_risk", label: "Absolute risk", num: true });
+    if (hasRiskLevel) columns.push({ key: "risk_level", label: "Risk level" });
+    if (hasSecurityScore) columns.push({ key: "security_score", label: "Security score", num: true });
+    if (hasIssues) columns.push({ key: "findings_total", label: "Issues", num: true });
+    if (hasCritical) columns.push({ key: "critical", label: "Critical", num: true });
+    if (hasHigh) columns.push({ key: "high", label: "High", num: true });
+    if (hasLegacyScore) columns.push({ key: "score", label: "Legacy score", num: true });
+    return columns;
+  }
+
+  function trendTableCell(point, column) {
+    if (column.key === "date") return escapeHtml(point.date || "—");
+    if (column.key === "risk_level") {
+      const level = point.risk_level ? String(point.risk_level).toLowerCase() : "";
+      if (!level) return "—";
+      return `<span class="sev-badge ${escapeHtml(level)}">${escapeHtml(level)}</span>`;
+    }
+    const value = point[column.key];
+    if (value == null || value === "") return "—";
+    if (column.key === "absolute_risk") return escapeHtml(String(value));
+    if (column.key === "security_score" || column.key === "score") return escapeHtml(`${value} / 100`);
+    return escapeHtml(String(value));
+  }
+
   function renderTrendTable(points) {
     const wrap = document.getElementById("trend-table-wrap");
     if (!wrap || !points.length) return;
     wrap.hidden = false;
-    const col = trendSeriesKey() === "absolute_risk" ? "Absolute risk" : "Score";
-    const rows = points
-      .map(
-        (point) =>
-          `<tr><td>${escapeHtml(point.date)}</td><td>${escapeHtml(trendValueLabel(trendValue(point)))}</td></tr>`
-      )
+    const columns = trendTableColumns(points);
+    const header = columns
+      .map((column) => `<th${column.num ? ' class="num"' : ""}>${escapeHtml(column.label)}</th>`)
       .join("");
-    wrap.innerHTML = `<table class="trend-table" aria-label="Scan history"><thead><tr><th>Date</th><th>${escapeHtml(col)}</th></tr></thead><tbody>${rows}</tbody></table>`;
+    const rows = points
+      .map((point) => {
+        const cells = columns
+          .map(
+            (column) =>
+              `<td${column.num ? ' class="num"' : ""}>${trendTableCell(point, column)}</td>`
+          )
+          .join("");
+        return `<tr>${cells}</tr>`;
+      })
+      .join("");
+    wrap.innerHTML = `<table class="trend-table" aria-label="Scan history"><thead><tr>${header}</tr></thead><tbody>${rows}</tbody></table>`;
   }
 
   function trendYRange(values) {
@@ -1148,14 +1191,24 @@
     };
   }
 
+  function trendChartWidth(wrap) {
+    wrap.hidden = false;
+    wrap.setAttribute("aria-hidden", "false");
+    let w = wrap.clientWidth;
+    if (w < 2 && wrap.parentElement) {
+      w = wrap.parentElement.clientWidth;
+    }
+    return Math.max(320, Math.round(w) || 640);
+  }
+
   function renderTrendSparkline(points) {
     const wrap = document.getElementById("trend-chart-wrap");
     if (!wrap || !points.length) return;
 
     const values = points.map((p) => trendValue(p));
     const { min: yMin, max: yMax } = trendYRange(values);
-    const width = 640;
-    const height = 220;
+    const width = trendChartWidth(wrap);
+    const height = 160;
     const pad = { top: 18, right: 20, bottom: 36, left: 44 };
     const innerW = width - pad.left - pad.right;
     const innerH = height - pad.top - pad.bottom;
@@ -1210,9 +1263,16 @@
         ? `<text class="trend-flat-label" x="${(pad.left + innerW / 2).toFixed(1)}" y="${(pad.top + 14).toFixed(1)}" text-anchor="middle">Flat at ${escapeHtml(trendValueLabel(values[0]))} across ${count} scans</text>`
         : "";
 
-    wrap.hidden = false;
-    wrap.setAttribute("aria-hidden", "false");
-    wrap.innerHTML = `<svg class="trend-sparkline" viewBox="0 0 ${width} ${height}" role="img" aria-label="Security score trend over ${count} scans">${gridLines}${areaPath ? `<path d="${areaPath}" fill="rgba(239,68,68,0.12)" stroke="none"/>` : ""}${linePath ? `<path class="trend-line" d="${linePath}"/>` : ""}${dots}${xLabels}${flatLabel}</svg>`;
+    wrap.innerHTML = `<svg class="trend-sparkline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Security score trend over ${count} scans">${gridLines}${areaPath ? `<path d="${areaPath}" fill="rgba(239,68,68,0.12)" stroke="none"/>` : ""}${linePath ? `<path class="trend-line" d="${linePath}"/>` : ""}${dots}${xLabels}${flatLabel}</svg>`;
+  }
+
+  let trendResizeTimer = null;
+  function scheduleTrendSparklineResize() {
+    if (trendResizeTimer) window.clearTimeout(trendResizeTimer);
+    trendResizeTimer = window.setTimeout(() => {
+      const points = DATA.trend || [];
+      if (points.length) renderTrendSparkline(points);
+    }, 120);
   }
 
   function fillTrendNote() {
@@ -1277,6 +1337,9 @@
     fillTrendNote();
     renderTrendSparkline(points);
     renderTrendTable(points);
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => renderTrendSparkline(points));
+    });
 
     if (empty) {
       empty.hidden = true;
@@ -1947,6 +2010,7 @@
     initGaugeChart();
     initRadarChart();
     initTrendChart();
+    window.addEventListener("resize", scheduleTrendSparklineResize);
   }
 
   if (document.readyState === "loading") {

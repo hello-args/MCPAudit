@@ -34,6 +34,7 @@ def _minimal_report(**kwargs) -> ScanReport:
 def test_record_scan_run_includes_scoring_version(tmp_path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
     report = _minimal_report(
+        summary=ScanSummary(critical=1, high=2, medium=1, low=1, total=5),
         scoring_version="both",
         score_v2=RiskScoreV2(
             absolute_risk=340,
@@ -56,6 +57,9 @@ def test_record_scan_run_includes_scoring_version(tmp_path, monkeypatch) -> None
     assert points[0]["scoring_version"] == "both"
     assert points[0]["absolute_risk"] == 340
     assert points[0]["security_score"] == 28
+    assert points[0]["findings_total"] == 5
+    assert points[0]["critical"] == 1
+    assert points[0]["high"] == 2
 
 
 def test_trend_meta_uses_v2_series_when_uniform(tmp_path, monkeypatch) -> None:
