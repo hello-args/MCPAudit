@@ -411,7 +411,10 @@ def category_gate_failures(findings: list[Finding], gates: dict[str, int]) -> li
         if not row:
             continue
         if row["score"] >= limit:
-            failures.append(f"{row['label']} scored {row['display']} (limit {limit})")
+            failures.append(
+                f"{row['label']}: risk score {row['score']} >= limit {limit} "
+                f"(inclusive gate — '{row['display']}' is category label, not CI result)"
+            )
     return failures
 
 
