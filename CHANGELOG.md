@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `-o` / `--output` to `mcts doctor` and surface scan subcommands for CI artifact paths (#156, #157).
 - Accept `--no-progress` on `readiness`, `fuzz`, `scan-mcp`, and surface scan subcommands for shared CI scripts (#158).
 - Explain when `mcts doctor --deep` import checks are skipped (no MCP config or no `-m` module in launch args).
+- Classify SQL database tools separately from filesystem tools so names like `read_query` are not flagged for path traversal (#165).
 
 ### Changed
 
