@@ -235,13 +235,19 @@ def scan(
         int | None,
         typer.Option("--max-critical", help="Exit 1 if critical finding count exceeds this"),
     ] = None,
-    fail_on_category: Annotated[
+    
+   fail_on_category: Annotated[
         list[str] | None,
         typer.Option(
             "--fail-on-category",
-            help="Exit 1 when category risk score reaches threshold (e.g. permissions:10). Repeatable.",
+            help=(
+                "Exit 1 when category risk score meets or exceeds threshold (inclusive). "
+                "e.g. permissions:0 fails when score is 0 or more. "
+                "Use permissions:1 to allow zero-point categories. Repeatable."
+            ),
         ),
     ] = None,
+    
     theme: Annotated[
         str,
         typer.Option(
