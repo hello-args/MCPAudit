@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Document PEP 508 `pypi:package==version` syntax for `mcts vet` alongside existing `@` pin form.
 - Parse `pyproject.toml` dependencies with structured TOML instead of line heuristics so Poetry metadata and tool config are not flagged as unpinned packages (#155, #160).
 - Skip unpinned-range findings for packages pinned in adjacent `poetry.lock`, `uv.lock`, or `Pipfile.lock` (#151).
+- Ignore PEP 621 `requires-python` metadata in supply-chain dependency findings (#192).
 - Add `-o` / `--output` to `mcts doctor` and surface scan subcommands for CI artifact paths (#156, #157).
 - Accept `--no-progress` on `readiness`, `fuzz`, `scan-mcp`, and surface scan subcommands for shared CI scripts (#158).
 - Explain when `mcts doctor --deep` import checks are skipped (no MCP config or no `-m` module in launch args).
