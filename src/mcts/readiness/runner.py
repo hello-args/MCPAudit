@@ -44,8 +44,7 @@ def run_readiness(config: ScanConfig) -> ReadinessReport:
                 title="LLM readiness judge skipped",
                 description=_llm_unavailable_reason(),
                 recommendation=(
-                    "Set MCTS_LLM_API_KEY and install litellm (`uv sync --extra llm`), "
-                    "or omit --llm-judge."
+                    "Set MCTS_LLM_API_KEY and install litellm (`uv sync --extra llm`), or omit --llm-judge."
                 ),
             )
         )
