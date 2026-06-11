@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import json
 import math
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 from mcts.core.config import ScanConfig
 from mcts.core.scanner import Scanner
@@ -109,7 +110,7 @@ def spearman_rho(ranked_a: list[float], ranked_b: list[float]) -> float:
 
     ra = ranks(ranked_a)
     rb = ranks(ranked_b)
-    d2 = sum((a - b) ** 2 for a, b in zip(ra, rb))
+    d2 = sum((a - b) ** 2 for a, b in zip(ra, rb, strict=True))
     return 1.0 - (6.0 * d2) / (n * (n * n - 1))
 
 

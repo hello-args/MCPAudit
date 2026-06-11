@@ -5,8 +5,8 @@ from mcts.analyzers.command_execution import CommandExecutionAnalyzer
 from mcts.analyzers.cross_server import CrossServerAnalyzer
 from mcts.analyzers.data_leakage import DataLeakageAnalyzer
 from mcts.analyzers.jailbreak import JailbreakAnalyzer
-from mcts.analyzers.permissions import PermissionAnalyzer
 from mcts.analyzers.path_validation import PathValidationAnalyzer
+from mcts.analyzers.permissions import PermissionAnalyzer
 from mcts.analyzers.prompt_injection import PromptInjectionAnalyzer
 from mcts.analyzers.schema_surface import SchemaSurfaceAnalyzer
 from mcts.analyzers.tool_abuse import ToolAbuseAnalyzer

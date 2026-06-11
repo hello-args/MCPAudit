@@ -58,7 +58,8 @@ def evaluate_policy(
     if policy.min_security_score is not None:
         if security_score is None:
             violations.append(
-                f"min_security_score {policy.min_security_score} requires v2 scoring (use --scoring v2 or both)"
+                f"min_security_score {policy.min_security_score} requires v2 scoring "
+                "(use --scoring v2 or both)"
             )
         elif security_score < policy.min_security_score:
             violations.append(

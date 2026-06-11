@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from mcts.reporting.models import Finding, Severity
 from mcts.scoring.context import scorable_findings_v2
-from mcts.scoring.engine_v2 import RiskScoringEngineV2, bracket, finding_risk
+from mcts.scoring.engine_v2 import RiskScoringEngineV2, finding_risk
 from mcts.scoring.factors import ScoringContext
 from mcts.scoring.models import RiskFactorVector
 from mcts.scoring.weights import load_weights

@@ -19,11 +19,9 @@ from mcts.scoring.models import (
 )
 from mcts.scoring.normalize import security_score_from_absolute
 from mcts.scoring.uncertainty import (
-    analyzer_disagreement_factor,
     compute_risk_range,
     confidence_score,
     effective_confidence,
-    evidence_quality_factor,
     factor_breakdown_dict,
 )
 
@@ -79,7 +77,7 @@ def build_top_contributors(
 
     rows: list[TopContributor] = []
     ranked = sorted(
-        zip(findings, per_finding_risks),
+        zip(findings, per_finding_risks, strict=True),
         key=lambda x: x[1],
         reverse=True,
     )

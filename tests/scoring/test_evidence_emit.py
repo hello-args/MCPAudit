@@ -3,7 +3,7 @@
 from mcts.reporting.models import Finding, Severity
 from mcts.scoring.evidence_emit import enrich_scoring_evidence
 from mcts.scoring.evidence_tags import has_v2_evidence
-from mcts.scoring.factors import ScoringContext, classify_exploitability
+from mcts.scoring.factors import classify_exploitability
 from mcts.scoring.weights import load_weights
 
 
@@ -33,7 +33,8 @@ def test_command_execution_exploitability_class() -> None:
     )
     enriched = enrich_scoring_evidence([finding])[0]
     weights = load_weights("manual_v1")
-    assert classify_exploitability(enriched, weights) == weights.classifiers["exploitability"]["command_execution"]
+    expected = weights.classifiers["exploitability"]["command_execution"]
+    assert classify_exploitability(enriched, weights) == expected
 
 
 def test_attack_chains_path_hop_count_from_graph() -> None:

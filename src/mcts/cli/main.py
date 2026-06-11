@@ -21,7 +21,6 @@ from mcts.output.analysis_dir import (
 )
 from mcts.output.artifacts import persist_scan_artifacts
 from mcts.report.data import (
-    category_gate_failures,
     parse_category_gates,
     parse_min_category_score_v2,
 )

@@ -14,7 +14,10 @@ def test_scoring_does_not_import_analyzers() -> None:
                 for alias in node.names:
                     if alias.name.startswith("mcts.analyzers"):
                         offenders.append(f"{path}:{alias.name}")
-            elif isinstance(node, ast.ImportFrom) and node.module:
-                if node.module.startswith("mcts.analyzers"):
-                    offenders.append(f"{path}:{node.module}")
+            elif (
+                isinstance(node, ast.ImportFrom)
+                and node.module
+                and node.module.startswith("mcts.analyzers")
+            ):
+                offenders.append(f"{path}:{node.module}")
     assert offenders == []

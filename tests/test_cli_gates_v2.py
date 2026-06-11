@@ -1,5 +1,6 @@
 """v2 CI gate tests."""
 
+import contextlib
 from pathlib import Path
 from unittest.mock import patch
 
@@ -34,11 +35,11 @@ def test_legacy_min_score_gate_unchanged() -> None:
         scoring_mode="legacy",
         min_score=100,
     )
-    with patch("mcts.cli.main.typer.Exit", side_effect=SystemExit(1)) as exit_mock:
-        try:
-            _check_gates(report, config)
-        except SystemExit:
-            pass
+    with (
+        patch("mcts.cli.main.typer.Exit", side_effect=SystemExit(1)) as exit_mock,
+        contextlib.suppress(SystemExit),
+    ):
+        _check_gates(report, config)
     exit_mock.assert_called_once_with(code=1)
 
 
@@ -51,9 +52,9 @@ def test_min_category_score_v2_gate_exits_on_vulnerable() -> None:
         scoring_mode="v2",
         min_category_score_v2={"injection": 80},
     )
-    with patch("mcts.cli.main.typer.Exit", side_effect=SystemExit(1)) as exit_mock:
-        try:
-            _check_gates(report, config)
-        except SystemExit:
-            pass
+    with (
+        patch("mcts.cli.main.typer.Exit", side_effect=SystemExit(1)) as exit_mock,
+        contextlib.suppress(SystemExit),
+    ):
+        _check_gates(report, config)
     exit_mock.assert_called_once_with(code=1)

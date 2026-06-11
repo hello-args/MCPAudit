@@ -11,19 +11,17 @@ PathRecord = dict[str, Any]
 
 
 def _has_edge(graph: dict[str, Any], src: str, dst: str) -> bool:
-    for edge in graph.get("edges", []):
-        if edge.get("from") == src and edge.get("to") == dst:
-            return True
-    return False
+    return any(
+        edge.get("from") == src and edge.get("to") == dst for edge in graph.get("edges", [])
+    )
 
 
 def _path_validated(graph: dict[str, Any], nodes: list[str]) -> bool:
     if len(nodes) < 2:
         return False
-    for a, b in zip(nodes, nodes[1:]):
-        if not _has_edge(graph, a, b):
-            return False
-    return True
+    return all(
+        _has_edge(graph, a, b) for a, b in zip(nodes, nodes[1:], strict=False)
+    )
 
 
 def bfs_path(graph: dict[str, Any], start: str, end: str) -> list[str] | None:

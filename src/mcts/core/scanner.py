@@ -210,10 +210,11 @@ class Scanner:
         findings.extend(self.compliance.check(findings, tools_discovered=len(server_info.tools)))
         analyzers_executed.append("compliance")
 
-        if "attack_chains" in analyzers_executed:
-            raw_graph = self.attack_chains.last_graph
-        else:
-            raw_graph = {}
+        raw_graph = (
+            self.attack_chains.last_graph
+            if "attack_chains" in analyzers_executed
+            else {}
+        )
         _trace_pipeline("graph")
 
         scan_scope = infer_scan_scope(self.config)

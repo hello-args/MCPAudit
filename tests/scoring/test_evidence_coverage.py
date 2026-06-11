@@ -29,7 +29,6 @@ def test_corpus_servers_meet_evidence_coverage_pilot() -> None:
 
 def test_corpus_expected_ordering_from_fixture() -> None:
     import json
-    from pathlib import Path
 
     from mcts.scoring.corpus_runner import CORPUS_DIR, scan_corpus_absolute_risks
 

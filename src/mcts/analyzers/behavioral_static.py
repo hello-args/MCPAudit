@@ -8,7 +8,6 @@ import re
 from mcts.analyzers.base import BaseAnalyzer
 from mcts.mcp.models import MCPServerInfo, MCPTool
 from mcts.reporting.models import Finding, Severity, SourceLocation
-from mcts.scoring.evidence_tags import tag_behavioral_static_finding
 from mcts.sast.go.sinks import detect_go_sinks
 from mcts.sast.go.taint import analyze_go_taint
 from mcts.sast.python.crossfile import expand_python_handler
@@ -19,6 +18,7 @@ from mcts.sast.rust.sinks import detect_rust_sinks
 from mcts.sast.rust.taint import analyze_rust_taint
 from mcts.sast.typescript.sinks import detect_typescript_sinks
 from mcts.sast.typescript.taint import analyze_typescript_taint
+from mcts.scoring.evidence_tags import tag_behavioral_static_finding
 
 _BENIGN_CLAIMS = (
     (
