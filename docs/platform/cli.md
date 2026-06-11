@@ -336,10 +336,13 @@ Pre-install vetting for PyPI, npm, and OCI package references before adding them
 
 ```bash
 mcts vet pypi:requests@2.31.0
+mcts vet pypi:fastapi==0.136.3
 mcts vet npm:@modelcontextprotocol/sdk
 mcts vet oci:ghcr.io/org/mcp-server:1.0.0
 mcts vet pypi:fastmcp --json -o vet-report.json
 ```
+
+PyPI specs accept npm-style `@` pins or standard PEP 508 `==` pins after the `pypi:` prefix.
 
 | Flag | Default | Description |
 |------|---------|-------------|

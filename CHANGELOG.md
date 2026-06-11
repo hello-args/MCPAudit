@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fail `mcts readiness` when zero MCP tools are discovered instead of reporting production-ready with `tools_checked: 0`.
 - Suppress misleading OWASP MCP Top 10 coverage-gap meta-findings when zero MCP tools were discovered.
 - Write distinct HTML and SARIF artifacts for `scan-prompts`, `scan-resources`, and `scan-instructions` instead of overwriting `scan-report.html`.
+- Document PEP 508 `pypi:package==version` syntax for `mcts vet` alongside existing `@` pin form.
 
 ### Changed
 
