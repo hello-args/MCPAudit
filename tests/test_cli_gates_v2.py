@@ -40,3 +40,20 @@ def test_legacy_min_score_gate_unchanged() -> None:
         except SystemExit:
             pass
     exit_mock.assert_called_once_with(code=1)
+
+
+def test_min_category_score_v2_gate_exits_on_vulnerable() -> None:
+    report = Scanner(
+        ScanConfig(target=Path("examples/vulnerable-mcp-server/server.py"), scoring_mode="v2")
+    ).run()
+    config = ScanConfig(
+        target=Path("examples/vulnerable-mcp-server/server.py"),
+        scoring_mode="v2",
+        min_category_score_v2={"injection": 80},
+    )
+    with patch("mcts.cli.main.typer.Exit", side_effect=SystemExit(1)) as exit_mock:
+        try:
+            _check_gates(report, config)
+        except SystemExit:
+            pass
+    exit_mock.assert_called_once_with(code=1)

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Scoring v2 (multi-factor risk)** — parallel `score_v2.absolute_risk` with factor classifiers, attack-chain multipliers, corpus-calibrated `security_score`, and explainable `top_contributors`; legacy `score.overall` unchanged (invariant I1)
+- **Default dual scoring** — `--scoring both` is the default in CLI, API, and GitHub Action; opt out with `--scoring legacy`
+- **v2 CI gates** — `--min-security-score`, `--max-absolute-risk`, `--max-risk-level`, `--min-category-score-v2`; API returns `gate_violations` and echoed `scoring_mode`
+- **Dashboard v2** — absolute risk header, factor-axis radar, OWASP `category_scores_v2` tiles, dual-score glossary when `both`
+- **SARIF `mcts/scoreV2`** — optional run properties; see [sarif-score-v2.md](docs/reporting/sarif-score-v2.md) for Code Scanning adoption
+- **Calibration** — 11-server corpus, Spearman gate (ρ ≥ 0.80), `scripts/calibrate_scoring_weights.py`, packaged `scoring_v2_corpus_stats.json`
+- **Docs** — [ADR-003](docs/analysis/adr-003-scoring-v2.md), [scoring-spec-v2](docs/reporting/scoring-spec-v2.md), [migration guide](docs/migration/scoring-v2.md)
+- **Pentest** — `verdict` follows `score_v2.risk_level` when v2 scoring is enabled
+- **CI** — `scoring-v2` workflow required on main CI (`ci.yml`) with Spearman ρ ≥ 0.80 gate
+
 ### Fixed
 
 - Reject invalid `--snapshot` JSON such as scan-report artifacts, empty tool lists, or tool rows without names before scan analysis starts.

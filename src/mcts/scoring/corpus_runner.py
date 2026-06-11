@@ -128,13 +128,14 @@ def _percentile_float(sorted_values: list[float], pct: float) -> float:
 
 
 def _dimension_p95_from_buckets(dimension_buckets: dict[str, list[float]]) -> dict[str, int]:
+    """P95 per axis using servers with non-zero raw sums (zeros excluded)."""
     p95: dict[str, int] = {}
     for dim, values in dimension_buckets.items():
-        if not values:
+        positive = sorted(max(0.0, value) for value in values if value > 0)
+        if not positive:
             p95[dim] = 1
             continue
-        sorted_vals = sorted(max(0.0, value) for value in values)
-        raw_p95 = _percentile_float(sorted_vals, 95)
+        raw_p95 = _percentile_float(positive, 95)
         p95[dim] = max(1, round(raw_p95))
     return p95
 

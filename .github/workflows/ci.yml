@@ -10,3 +10,6 @@ permissions:
 jobs:
   test:
     uses: ./.github/workflows/test-gate.yml
+
+  scoring-v2:
+    uses: ./.github/workflows/scoring-v2.yml

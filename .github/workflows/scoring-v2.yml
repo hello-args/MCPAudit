@@ -3,6 +3,7 @@ name: scoring-v2
 on:
   push:
   pull_request:
+  workflow_call:
 
 jobs:
   scoring:

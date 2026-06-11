@@ -136,7 +136,7 @@ mcts scan ./server.py \
 | `--max-absolute-risk` | v2 stable integer risk sum |
 | `--max-risk-level` | v2 band (`low` < `medium` < `high` < `critical`) |
 
-GitHub Action equivalents: `scoring`, `min-security-score`, `max-absolute-risk`, `max-risk-level` inputs. See [Scoring v2 migration](../migration/scoring-v2.md).
+GitHub Action equivalents: `scoring`, `min-security-score`, `max-absolute-risk`, `max-risk-level`, `min-category-score-v2` inputs. See [Scoring v2 migration](../migration/scoring-v2.md) and [SARIF scoreV2](../reporting/sarif-score-v2.md).
 
 ### SARIF for code scanning
 

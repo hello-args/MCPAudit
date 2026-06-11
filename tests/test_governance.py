@@ -48,6 +48,35 @@ def test_evaluate_policy_v2_gates() -> None:
     assert any("security score" in item for item in violations)
 
 
+def test_evaluate_policy_min_category_score_v2() -> None:
+    from mcts.governance.policy import GovernancePolicy
+    from mcts.reporting.models import Finding, Severity, SourceLocation
+
+    policy = GovernancePolicy(min_category_score_v2={"injection": 80})
+    findings = [
+        Finding(
+            id="inj-1",
+            analyzer="prompt_injection",
+            title="Injection",
+            description="d",
+            severity=Severity.CRITICAL,
+            recommendation="fix",
+            location=SourceLocation(file="x.py"),
+        )
+    ]
+    violations = evaluate_policy(
+        policy=policy,
+        score=90,
+        critical=1,
+        high=0,
+        servers=["demo"],
+        absolute_risk=500,
+        risk_level="critical",
+        findings=findings,
+    )
+    assert any("v2 category score" in item for item in violations)
+
+
 def test_evaluate_policy_max_risk_level() -> None:
     from mcts.governance.policy import GovernancePolicy
 

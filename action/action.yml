@@ -33,6 +33,12 @@ inputs:
     description: Fail if v2 risk level exceeds this band (low, medium, high, critical)
     required: false
     default: ""
+  min-category-score-v2:
+    description: >
+      Comma-separated v2 OWASP category minimums (category:min, 100=good).
+      Example injection:80,privilege:70
+    required: false
+    default: ""
   weights-profile:
     description: v2 weights profile (default manual_v1)
     required: false
@@ -107,6 +113,15 @@ runs:
         fi
         if [ -n "${{ inputs.max-risk-level }}" ]; then
           ARGS+=(--max-risk-level "${{ inputs.max-risk-level }}")
+        fi
+        if [ -n "${{ inputs.min-category-score-v2 }}" ]; then
+          IFS=',' read -ra V2_CAT_GATES <<< "${{ inputs.min-category-score-v2 }}"
+          for gate in "${V2_CAT_GATES[@]}"; do
+            trimmed="$(echo "$gate" | xargs)"
+            if [ -n "$trimmed" ]; then
+              ARGS+=(--min-category-score-v2 "$trimmed")
+            fi
+          done
         fi
         if [ -n "${{ inputs.weights-profile }}" ] && [ "${{ inputs.weights-profile }}" != "manual_v1" ]; then
           ARGS+=(--weights "${{ inputs.weights-profile }}")

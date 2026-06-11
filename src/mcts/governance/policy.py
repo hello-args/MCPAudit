@@ -14,6 +14,7 @@ class GovernancePolicy(BaseModel):
     min_security_score: int | None = Field(default=None, ge=0, le=100)
     max_absolute_risk: int | None = Field(default=None, ge=0)
     max_risk_level: str | None = Field(default=None)
+    min_category_score_v2: dict[str, int] = Field(default_factory=dict)
     max_critical: int | None = Field(default=None, ge=0)
     max_high: int | None = Field(default=None, ge=0)
     allowed_servers: list[str] = Field(default_factory=list)
@@ -46,7 +47,10 @@ def evaluate_policy(
     absolute_risk: int | None = None,
     security_score: int | None = None,
     risk_level: str | None = None,
+    findings: list | None = None,
 ) -> list[str]:
+    from mcts.report.data import category_scores_v2_gate_failures
+
     _LEVEL_ORDER = {"low": 0, "medium": 1, "high": 2, "critical": 3}
     violations: list[str] = []
     if policy.min_score is not None and score < policy.min_score:
@@ -77,6 +81,15 @@ def evaluate_policy(
         elif _LEVEL_ORDER.get(risk_level, 0) > _LEVEL_ORDER.get(policy.max_risk_level, 0):
             violations.append(
                 f"risk level {risk_level!r} exceeds maximum {policy.max_risk_level!r}"
+            )
+    if policy.min_category_score_v2:
+        if absolute_risk is None:
+            violations.append(
+                "min_category_score_v2 requires v2 scoring (use --scoring v2 or both)"
+            )
+        elif findings is not None:
+            violations.extend(
+                category_scores_v2_gate_failures(findings, policy.min_category_score_v2)
             )
     if policy.max_critical is not None and critical > policy.max_critical:
         violations.append(f"critical findings {critical} exceed max {policy.max_critical}")

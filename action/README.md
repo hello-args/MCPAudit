@@ -83,10 +83,11 @@ If the action lives in your repo under `action/`:
 | `target` | `./server.py` | Path to MCP server entrypoint or repo directory |
 | `fail-on-critical` | `true` | Fail workflow if any critical finding is detected |
 | `min-score` | — | Fail if legacy overall score is below this threshold (0–100) |
-| `scoring` | `legacy` | `legacy`, `v2`, or `both` — enable multi-factor scoring |
+| `scoring` | `both` | `legacy`, `v2`, or `both` — enable multi-factor scoring |
 | `min-security-score` | — | Fail if v2 benchmark security score is below threshold (requires `scoring: v2` or `both`) |
 | `max-absolute-risk` | — | Fail if v2 absolute risk exceeds threshold |
 | `max-risk-level` | — | Fail if v2 risk level exceeds band (`low` / `medium` / `high` / `critical`) |
+| `min-category-score-v2` | — | Comma-separated v2 OWASP minimums (`injection:80,privilege:70`; 100=good) |
 | `weights-profile` | `manual_v1` | v2 weights profile when `scoring` is `v2` or `both` |
 | `assets-path` | — | Optional `.mcts/assets.yaml` for v2 asset-value overrides |
 | `extras` | `mcp,sast` | Comma-separated optional extras (`all` installs every extra) |

@@ -1000,6 +1000,7 @@ def scan(
             absolute_risk=report.score_v2.absolute_risk if report.score_v2 else None,
             security_score=report.score_v2.security_score if report.score_v2 else None,
             risk_level=report.score_v2.risk_level if report.score_v2 else None,
+            findings=report.findings,
         )
         if violations:
             console.print("[red]Governance policy violations:[/red]")

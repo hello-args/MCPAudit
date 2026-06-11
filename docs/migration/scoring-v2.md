@@ -7,7 +7,7 @@ mcts scan <target> --scoring v2      # legacy + score_v2 in JSON
 mcts scan <target> --scoring both    # same; UI shows both when supported
 ```
 
-Default remains `--scoring legacy` until GA (see integration plan §15).
+Default is `--scoring both` (legacy `score.overall` plus `score_v2` in JSON and reports).
 
 ## Score differences (expected)
 
@@ -54,6 +54,9 @@ min_score: 70              # legacy overall only
 min_security_score: 50     # v2 benchmark score
 max_absolute_risk: 500     # v2 absolute risk ceiling
 max_risk_level: medium     # v2 band gate
+min_category_score_v2:     # v2 OWASP tiles (100=good; fail when below)
+  injection: 80
+  privilege: 70
 ```
 
 ## Asset overrides

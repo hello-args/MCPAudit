@@ -19,12 +19,12 @@
     2260
   ],
   "dimension_p95": {
-    "exploitability": 3,
-    "reachability": 3,
-    "exposure": 2,
+    "exploitability": 4,
+    "reachability": 4,
+    "exposure": 3,
     "blast_radius": 5,
     "business_impact": 4,
-    "asset_value": 2,
+    "asset_value": 3,
     "attack_preconditions": 3,
     "threat_maturity": 1
   },
