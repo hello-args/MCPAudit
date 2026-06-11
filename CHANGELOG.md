@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Print MCP Surface / Supply Chain / Dependency Hygiene breakdown when `--min-score` or `--ci` gate fails.
 - Validate resolvable live launch configuration before the consent gate on `mcts snapshot` and `mcts fuzz`.
 
 ## [0.1.2] - 2026-06-10

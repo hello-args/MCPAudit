@@ -163,11 +163,35 @@ def _print_discovery_hints(target: Path) -> None:
         console.print(f"  [dim]{line}[/dim]")
 
 
+def _print_min_score_gate_failure(report, min_score: int) -> None:
+    overall = report.score.overall
+    console.print(f"[red]CI gate failed:[/red] overall score {overall}/100 (minimum {min_score})")
+    breakdown = getattr(report, "score_breakdown", None)
+    if breakdown is None:
+        return
+    buckets = [
+        ("MCP Surface", breakdown.mcp_surface),
+        ("Supply Chain", breakdown.supply_chain),
+        ("Dependency Hygiene", breakdown.dependency_hygiene),
+    ]
+    lowest_label, lowest_score = min(buckets, key=lambda item: item[1])
+    console.print("[yellow]Score breakdown:[/yellow]")
+    for label, score in buckets:
+        suffix = " ← primary failure driver" if label == lowest_label else ""
+        console.print(f"  {label}: {score}/100{suffix}")
+    console.print(f"  Composite: {breakdown.composite}/100")
+    if lowest_score < min_score:
+        console.print(
+            f"[dim]Lowest bucket ({lowest_label}) is below the overall minimum; "
+            "review findings in that area before changing MCP tool code.[/dim]"
+        )
+
+
 def _check_gates(report, config: ScanConfig) -> None:
     if config.fail_on_critical and report.summary.critical > 0:
         raise typer.Exit(code=1)
     if config.min_score is not None and report.score.overall < config.min_score:
-        console.print(f"[red]Score {report.score.overall} is below minimum {config.min_score}[/red]")
+        _print_min_score_gate_failure(report, config.min_score)
         raise typer.Exit(code=1)
     if config.max_critical is not None and report.summary.critical > config.max_critical:
         console.print(
@@ -495,7 +519,10 @@ def scan(
     ] = None,
     ci: Annotated[
         bool,
-        typer.Option("--ci", help="Apply CI gate preset (fail-on-critical, min-score 70)"),
+        typer.Option(
+            "--ci",
+            help="Apply CI gate preset (fail-on-critical, min-score 70) and print score breakdown on failure",
+        ),
     ] = False,
     policy: Annotated[
         Path | None,
