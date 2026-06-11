@@ -5,8 +5,10 @@ from __future__ import annotations
 import pytest
 
 from mcts.analyzers.surface_context import scan_surfaces
+from mcts.core.config import ScanConfig
 from mcts.mcp.models import MCPResource, MCPServerInfo, MCPTool, SurfaceScanOptions
 from mcts.readiness.heuristics import check_tool_readiness, readiness_score
+from mcts.readiness.runner import run_readiness
 from mcts.sast.typescript.sinks import detect_typescript_sinks
 
 
@@ -26,6 +28,33 @@ def test_readiness_score_deductions():
     tool = MCPTool(name="x", description="short")
     findings = check_tool_readiness(tool)
     assert readiness_score(findings) < 100
+
+
+def test_readiness_warns_when_opa_requested_but_unavailable(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("mcts.readiness.runner.Scanner", _FakeScanner)
+    monkeypatch.setattr("mcts.readiness.runner.OpaProvider.is_available", lambda self: False)
+    report = run_readiness(ScanConfig(target=".", readiness_opa=True))
+    assert any(f.id == "readiness-opa-unavailable" for f in report.findings)
+
+
+def test_readiness_warns_when_llm_requested_but_unavailable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("MCTS_LLM_API_KEY", raising=False)
+    monkeypatch.setattr("mcts.readiness.runner.Scanner", _FakeScanner)
+    report = run_readiness(ScanConfig(target=".", readiness_llm=True))
+    assert any(f.id == "readiness-llm-unavailable" for f in report.findings)
+
+
+class _FakeScanner:
+    def __init__(self, *_args, **_kwargs) -> None:
+        self.client = self
+
+    def discover(self) -> MCPServerInfo:
+        return MCPServerInfo(
+            name="demo",
+            tools=[MCPTool(name="echo", description="Echo user input back to the caller safely.")],
+        )
 
 
 def test_resource_mime_allowlist_filters_surfaces():
