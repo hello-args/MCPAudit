@@ -82,9 +82,7 @@ def is_sql_database_tool(tool: MCPTool) -> bool:
 
     haystack = f"{tool.name} {tool.description}".lower()
     if any(marker in haystack for marker in SQL_TOOL_MARKERS):
-        if has_file_schema and not has_sql_schema:
-            return False
-        return True
+        return not (has_file_schema and not has_sql_schema)
 
     return False
 
@@ -108,7 +106,4 @@ def is_file_access_tool(tool: MCPTool) -> bool:
     if FILE_TOOL_TOKEN.search(haystack) and has_file_schema:
         return True
 
-    if re.search(r"\bfile\s+(?:path|system|access|read|write)\b", haystack, re.I):
-        return True
-
-    return False
+    return bool(re.search(r"\bfile\s+(?:path|system|access|read|write)\b", haystack, re.I))
