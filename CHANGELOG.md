@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Validate governance `--policy` files before scan execution so missing or invalid policy files fail before reports are written.
+- Return exit code 2 with a clear message when `mcts snapshot` cannot resolve a live launch configuration.
 
 ## [0.1.2] - 2026-06-10
 
