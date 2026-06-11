@@ -33,7 +33,13 @@ _OPTIONAL_CLI_CHECKS = (
 )
 
 
-def run_doctor(path: Path, *, deep: bool = False, json_output: bool = False) -> int:
+def run_doctor(
+    path: Path,
+    *,
+    deep: bool = False,
+    json_output: bool = False,
+    output: Path | None = None,
+) -> int:
     """Run read-only preflight checks. Returns exit code (0 ok, 1 failures, 2 user error)."""
     root = path.expanduser().resolve()
     if not root.exists():
@@ -81,31 +87,46 @@ def run_doctor(path: Path, *, deep: bool = False, json_output: bool = False) -> 
         checks.append(("warn", "Entrypoint candidate", "none found"))
         warnings += 1
 
-    if deep and configs:
-        for cfg in configs[:1]:
-            for server_name in sorted(load_servers_dict(cfg))[:2]:
-                _deep_import_check(cfg, server_name, checks)
+    if deep:
+        if not configs:
+            checks.append(("warn", "Deep checks", "skipped — no MCP config found"))
+            warnings += 1
+        else:
+            for cfg in configs[:1]:
+                try:
+                    server_names = sorted(load_servers_dict(cfg))[:2]
+                except ConfigDiscoveryError:
+                    server_names = []
+                if not server_names:
+                    checks.append(("warn", "Deep checks", "skipped — no servers in config"))
+                    warnings += 1
+                    continue
+                for server_name in server_names:
+                    _deep_import_check(cfg, server_name, checks)
 
     if deep:
         warnings += _check_optional_toolchain(checks)
 
-    if json_output:
+    payload = {
+        "path": str(root),
+        "checks": [{"status": s, "label": label, "detail": d} for s, label, d in checks],
+        "failures": failures,
+        "warnings": warnings,
+    }
+
+    if json_output or output is not None:
         import json
 
         from mcts.output.analysis_dir import resolve_output_path
 
-        payload = {
-            "path": str(root),
-            "checks": [{"status": s, "label": label, "detail": d} for s, label, d in checks],
-            "failures": failures,
-            "warnings": warnings,
-        }
+        output_path = resolve_output_path(output, "doctor-report.json")
         text = json.dumps(payload, indent=2)
-        output_path = resolve_output_path(None, "doctor-report.json")
         output_path.write_text(text, encoding="utf-8")
-        console.print_json(text)
+        if json_output:
+            console.print_json(text)
         console.print(f"[green]Saved[/green] {output_path}")
-    else:
+
+    if not json_output:
         console.print(f"[bold]mcts doctor[/bold] {path}\n")
         for status, label, detail in checks:
             icon = {"pass": "[green]✓[/green]", "warn": "[yellow]⚠[/yellow]", "fail": "[red]✗[/red]"}[status]
@@ -154,6 +175,13 @@ def _deep_import_check(config_path: Path, server_name: str, checks: list[tuple[s
             module = live.args[idx + 1].split(":")[0]
             break
     if not module:
+        checks.append(
+            (
+                "warn",
+                "Deep checks",
+                f"skipped for {server_name!r} — no -m module in launch args",
+            )
+        )
         return
     cwd = Path(live.cwd or ".")
     result = subprocess.run(
