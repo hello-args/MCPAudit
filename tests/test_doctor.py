@@ -86,3 +86,31 @@ def test_doctor_deep_exits_zero(tmp_path: Path) -> None:
     result = runner.invoke(app, ["doctor", "--deep", str(tmp_path)])
 
     assert result.exit_code == 0
+
+
+def test_doctor_deep_without_config_shows_skip_message(tmp_path: Path) -> None:
+    result = runner.invoke(app, ["doctor", "--deep", str(tmp_path)])
+
+    assert result.exit_code == 0
+    assert "Deep checks: skipped — no MCP config found" in result.stdout
+
+
+def test_doctor_deep_without_module_shows_skip_message(tmp_path: Path) -> None:
+    config = tmp_path / ".mcp.json"
+    config.write_text(json.dumps({"mcpServers": {"local": {"command": "python", "args": ["server.py"]}}}))
+
+    result = runner.invoke(app, ["doctor", "--deep", str(tmp_path)])
+
+    assert result.exit_code == 0
+    assert "Deep checks: skipped for 'local' — no -m module in launch args" in result.stdout
+
+
+def test_doctor_deep_json_includes_skip_status(tmp_path: Path) -> None:
+    result = runner.invoke(app, ["doctor", "--deep", "--json", str(tmp_path)])
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout.split("Saved")[0].strip())
+    deep_checks = [row for row in payload["checks"] if row["label"] == "Deep checks"]
+    assert deep_checks
+    assert deep_checks[0]["status"] == "warn"
+    assert "skipped" in deep_checks[0]["detail"]
