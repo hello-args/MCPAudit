@@ -1106,9 +1106,9 @@ def fuzz(
     target: Annotated[
         Path,
         typer.Argument(
-            help="Path to MCP server entrypoint (use . with --config)",
+            help="Path to MCP server entrypoint (use . with --config or --url)",
         ),
-    ],
+    ] = Path("."),
     fuzz_level: Annotated[
         str,
         typer.Option(
@@ -1133,6 +1133,22 @@ def fuzz(
         str | None,
         typer.Option("--server", help="Server name inside --config mcpServers"),
     ] = None,
+    url: Annotated[
+        str | None,
+        typer.Option("--url", help="Remote MCP server URL (SSE or streamable HTTP)"),
+    ] = None,
+    transport: Annotated[
+        str,
+        typer.Option("--transport", help="Remote transport: streamable-http or sse"),
+    ] = "streamable-http",
+    bearer_token: Annotated[
+        str | None,
+        typer.Option("--bearer-token", help="Bearer token for remote MCP server"),
+    ] = None,
+    header: Annotated[
+        list[str] | None,
+        typer.Option("--header", help="Custom HTTP header (Name: Value). Repeatable."),
+    ] = None,
     output: Annotated[
         Path | None,
         typer.Option("--output", "-o", help="Write fuzz findings JSON"),
@@ -1141,7 +1157,7 @@ def fuzz(
         bool,
         typer.Option(
             "--i-understand-live-risk",
-            help="Consent to start a live MCP server subprocess",
+            help="Consent to probe a live MCP server (subprocess or remote)",
         ),
     ] = False,
     understand_fuzz_risk: Annotated[
@@ -1156,7 +1172,7 @@ def fuzz(
         typer.Option("--theme", help="Terminal theme: cyber, minimal, github"),
     ] = ThemeName.CYBER.value,
 ) -> None:
-    """Run safe read-only MCP protocol fuzz probes against a stdio server."""
+    """Run safe read-only MCP protocol fuzz probes against a stdio or remote server."""
     import json
 
     from mcts.analyzers.runtime_events import events_from_fuzz_findings
@@ -1166,14 +1182,30 @@ def fuzz(
     from mcts.probe.startup_errors import MCPStartupError
     from mcts.taxonomy.mapper import enrich_findings
 
-    if target == Path(".") and config is None:
+    is_remote = bool(url)
+
+    if url and command:
+        console.print("[red]Error:[/red] --url and --command are mutually exclusive.")
+        raise typer.Exit(code=2)
+
+    if url and config:
+        console.print("[red]Error:[/red] --url and --config are mutually exclusive.")
+        raise typer.Exit(code=2)
+
+    if not is_remote and target == Path(".") and config is None:
         _print_discovery_hints(target)
 
     if not live_consent_granted(flag=understand_live_risk):
-        console.print(
-            "[red]Fuzzing requires live server consent.[/red] Pass --i-understand-live-risk "
-            "or set MCTS_LIVE_OK=1 in CI."
-        )
+        if is_remote:
+            console.print(
+                "[red]Remote fuzzing sends test probes to a live MCP endpoint.[/red] "
+                "Pass --i-understand-live-risk or set MCTS_LIVE_OK=1 in CI."
+            )
+        else:
+            console.print(
+                "[red]Fuzzing requires live server consent.[/red] Pass --i-understand-live-risk "
+                "or set MCTS_LIVE_OK=1 in CI."
+            )
         raise typer.Exit(code=2)
 
     if config and not server:
@@ -1194,6 +1226,7 @@ def fuzz(
 
     scan_target = config if (config and target == Path(".")) else target
     live_args = [part.strip() for part in args.split(",") if part.strip()] if args else []
+    remote_headers = _parse_headers(header)
 
     try:
         resolved_theme = get_theme(theme)
@@ -1211,6 +1244,10 @@ def fuzz(
         fuzz_level=level,
         fuzz_consent=understand_fuzz_risk,
         theme=resolved_theme.name.value,
+        remote_url=url,
+        remote_transport=transport,
+        bearer_token=bearer_token,
+        remote_headers=remote_headers,
     )
 
     try:
@@ -1227,6 +1264,7 @@ def fuzz(
 
     findings = enrich_findings(result.findings)
     runtime_event_rows = events_from_fuzz_findings(findings)
+    target_label = url or str(scan_target)
     console.print(f"[bold]MCTS fuzz[/bold] — level={result.level.value}, probes={result.probes_run}")
     if not findings:
         console.print("[green]No fuzz findings — server handled probes cleanly.[/green]")
@@ -1235,7 +1273,7 @@ def fuzz(
             console.print(f"  [{finding.severity.value}] {finding.title}")
 
     payload = {
-        "target": str(scan_target),
+        "target": target_label,
         "fuzz_level": result.level.value,
         "probes_run": result.probes_run,
         "runtime_events": runtime_event_rows,
