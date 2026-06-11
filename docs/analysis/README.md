@@ -13,7 +13,7 @@ How MCTS **examines** discovered MCP surfaces and **produces findings**.
 | What does this finding mean? | [Security checks reference](security-checks.md) |
 | How does the pipeline work? | [Architecture](architecture.md) |
 | How do I add an analyzer? | [Architecture — Extension points](architecture.md#extension-points) or [CONTRIBUTING.md](../../CONTRIBUTING.md) |
-| Why did my scan score this way? | [Scoring spec](../reporting/scoring-spec.md) |
+| Why did my scan score this way? | **[Scoring developer guide](../reporting/scoring-guide.md)** |
 
 ---
 

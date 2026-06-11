@@ -16,7 +16,7 @@ MCTS aims to become the **default security tool for MCP servers** — the same w
 
 Today, MCTS identifies security issues across permissions, injection, tool abuse, data leakage, and attack chains. The next evolution adds deeper SAST, skills scanning, AI-BOM export, and runtime proxy capabilities.
 
-**Operational docs (shipped features):** [Architecture](../analysis/architecture.md) · [CLI](../platform/cli.md) · [Scoring](../reporting/scoring-spec.md) · [CI](../platform/ci-integration.md)
+**Operational docs (shipped features):** [Architecture](../analysis/architecture.md) · [CLI](../platform/cli.md) · [Scoring v2](../reporting/scoring-spec-v2.md) · [Migration](../migration/scoring-v2.md) · [CI](../platform/ci-integration.md)
 
 Status labels used throughout this document:
 
@@ -40,6 +40,8 @@ Status labels used throughout this document:
 | Multi-step attack chain detection | Shipped (capability-graph BFS) |
 | Compliance checks (OWASP LLM Top 10) | Shipped |
 | Exponential risk scoring (score + risk index) | Shipped |
+| Multi-factor scoring v2 (`absolute_risk`, factor radar, corpus calibration) | Shipped (default `both`) |
+| v2 CI gates + governance policy fields | Shipped |
 | Terminal UI (Rich, themes, progress animation) | Shipped |
 | JSON reports | Shipped |
 | HTML security dashboard (`mcts report`) | Shipped |

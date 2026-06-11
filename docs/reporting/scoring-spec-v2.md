@@ -1,5 +1,8 @@
 # MCTS Risk Score v2 — Specification
 
+> **Read first:** [Scoring developer guide](scoring-guide.md) — mental model, CI flags, JSON fields.  
+> This page is the **technical v2 reference** (formulas and implementation map).
+
 **Status:** GA (default `--scoring both`)  
 **ADR:** [adr-003-scoring-v2.md](../analysis/adr-003-scoring-v2.md)  
 **Legacy spec:** [scoring-spec.md](scoring-spec.md)  
@@ -7,7 +10,7 @@
 
 ## Overview
 
-v2 adds `score_v2` with a stable **absolute risk** integer (higher = worse) alongside frozen legacy `score.overall`. Default is `--scoring both`.
+v2 adds `score_v2` with **absolute risk** (integer, higher = worse) next to legacy `score.overall` (0–100, higher = better).
 
 ## Scorable set
 

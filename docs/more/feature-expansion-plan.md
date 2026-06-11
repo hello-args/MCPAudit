@@ -32,7 +32,7 @@ This is the **detailed implementation guide** for evolving MCTS from an alpha sc
 | **Discovery** | `discovery/*`, `mcp/client.py` | Multi-file Python + TypeScript static discovery; live stdio + HTTP/SSE merge |
 | **Analyzers** | `analyzers/*.py` | Metadata, SAST, 20+ runtime sub-detectors, Sigma, OAuth, supply chain |
 | **Attack chains** | `attack_chains.py` | Capability-graph BFS on per-tool profiles |
-| **Scoring** | `scoring/engine.py` | Exponential decay + auditable `ScoreBasis` + `--fail-on-category` |
+| **Scoring** | `scoring/engine.py`, `engine_v2.py`, `graph.py`, `chains.py` | Legacy exponential + v2 multi-factor (`absolute_risk`), corpus calibration, dual default `both` |
 | **Compliance** | `compliance/checks.py` | OWASP LLM meta-findings |
 | **CLI** | `cli/main.py` | `scan`, `report`, `inventory`, `fuzz`, `readiness`, `serve`, `vet`, `pentest`, `doctor`, `snapshot`, `scan-mcp`; `mcts-mcp` server mode |
 | **Terminal UI** | `ui/*` | Rich themes, progress, report renderer, `--terminal-format` |

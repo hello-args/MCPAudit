@@ -18,7 +18,7 @@ Key properties:
 - **Runs locally** — no cloud account required for standard scans
 - **Works in CI** — SARIF output, score gates, published GitHub Action
 - **MCP-specific** — checks tool permissions, description poisoning, attack chains, and protocol behavior that general SAST tools miss
-- **Transparent scoring** — auditable 0–100 score with clear pass/fail gates
+- **Transparent scoring** — legacy 0–100 index plus v2 multi-factor `absolute_risk`, factor breakdown, and corpus-calibrated benchmark score
 
 ```bash
 mcts scan ./repo/
@@ -48,8 +48,8 @@ MCTS focuses on the **MCP boundary** — tool metadata, JSON schemas, handler so
 
 | Area | What MCTS provides |
 |------|-------------------|
-| **CI adoption** | SARIF 2.1.0, `--min-score`, `--max-critical`, `--fail-on-category`, published GitHub Action `@v1` |
-| **Risk intelligence** | Exponential security score, risk index, auditable `ScoreBasis`, seven category dimensions |
+| **CI adoption** | SARIF 2.1.0 (incl. `mcts/scoreV2`), legacy + v2 gates, published GitHub Action `@v1` |
+| **Risk intelligence** | Dual legacy + v2 scoring, factor-axis radar, `top_contributors`, attack-chain multiplier, auditable `ScoreBasis` |
 | **Threat model** | Capability-graph attack chains (read→exfil, read→exec), not keyword-only heuristics |
 | **Reporting** | Rich terminal UI (3 themes), executive HTML dashboard, OWASP LLM + MCP mapping, MCTS-T technique grid, capability matrix, attack graph, scan history trend |
 | **Taxonomy** | First-party `MCTS-T-*` techniques and `MCTS-M-*` mitigations on every finding |
@@ -68,10 +68,14 @@ MCTS focuses on the **MCP boundary** — tool metadata, JSON schemas, handler so
 Fail PRs when critical findings exist or score drops below team threshold:
 
 ```bash
+# Legacy gates
 mcts scan ./server.py --fail-on-critical --min-score 70 --max-critical 0
+
+# v2 gates (scoring both is default)
+mcts scan ./server.py --max-absolute-risk 500 --max-risk-level high
 ```
 
-Integrate via [CI Integration](../platform/ci-integration.md) or GitHub Action.
+Integrate via [CI Integration](../platform/ci-integration.md) or GitHub Action. See [Scoring v2 migration](../migration/scoring-v2.md).
 
 ### 2. MCP server author review
 
@@ -151,7 +155,8 @@ Run MCTS **in addition to** existing AppSec tooling on MCP server repositories.
 | Capability | Status |
 |------------|--------|
 | Capability-graph attack chains (BFS) | Shipped |
-| Auditable exponential score + category gates | Shipped |
+| Dual legacy + v2 scoring (`absolute_risk`, factor radar, corpus calibration) | Shipped |
+| Auditable exponential score + legacy/v2 CI gates | Shipped |
 | MCTS-T taxonomy + bundled Sigma metadata rules | Shipped |
 | Executive HTML dashboard (local, no server) | Shipped |
 | MCTS-T full technique grid + capability matrix in HTML | Shipped |

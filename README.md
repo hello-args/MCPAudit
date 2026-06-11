@@ -33,21 +33,20 @@ uv run mcts scan examples/vulnerable-mcp-server/server.py
 
 ```
 $ mcts scan examples/vulnerable-mcp-server/server.py
-[✓] Discovering tools...
-[✓] Mapping permissions...
-[✓] Detecting attack chains...
-[✓] Generating report...
-
 ==================== MCTS Security Report ====================
-Overall Score:   5/100 (CRITICAL)
+Overall Score:   1/100 (CRITICAL)        ← legacy (--min-score)
 Risk Index:      100/100
-Scoring basis:   3 Critical, 7 High, 2 Medium (12 scorable findings)
+Scoring basis:   5 Critical, 11 High, 1 Medium (17 scorable findings)
+Absolute Risk:   2260 (critical)         ← v2 (--max-absolute-risk)
+Security Score:  9/100                   ← v2 benchmark
 
 Severity Summary          Top Findings
-● Critical    4           [1] CRITICAL Destructive tool: delete_all_users
-● High        7           [2] CRITICAL Read → exfiltration attack chain possible
-● Medium      2           ...
+● Critical    5           [1] CRITICAL Destructive tool: delete_all_users
+● High       11           [2] CRITICAL Read → exfiltration attack chain possible
+● Medium      1           ...
 ```
+
+Two scores on one scan is normal — see the [scoring developer guide](docs/reporting/scoring-guide.md).
 
 </details>
 
@@ -113,13 +112,12 @@ MCTS is **alpha** software with a local-first MCP security pipeline — no cloud
 
 | Capability | How |
 |------------|-----|
-| Risk scoring | Legacy 0–100 index (default) + opt-in v2 multi-factor `absolute_risk` (`--scoring v2\|both`) |
+| Risk scoring | Legacy + v2 by default — [developer guide](docs/reporting/scoring-guide.md) |
 | Compliance mapping | OWASP LLM Top 10 + OWASP MCP Top 10 (non-scoring meta-findings) |
 | Terminal UI | Rich dashboard — themes, progress, `--terminal-format` views |
-| Export formats | JSON, SARIF (`--format sarif`), raw envelope, HTML (`mcts report`) |
-| CI gates | `--fail-on-critical`, `--min-score`, `--max-critical`, `--fail-on-category` |
-| CI preset | `--ci` unified gate bundle |
-| Governance policies | `--policy` YAML allowlist and min-score gates |
+| Export formats | JSON, SARIF, HTML (`mcts report`) |
+| CI gates | Legacy (`--min-score`) and/or v2 (`--max-absolute-risk`) — [guide](docs/reporting/scoring-guide.md#ci-gates--pick-one-strategy) |
+| Governance policies | `--policy` YAML (legacy + optional v2 fields) |
 | GitHub Action | JSON + SARIF + HTML artifacts ([`@v1`](action/README.md)) |
 | Preflight | `mcts doctor` — deps, extras, and config hints |
 
@@ -214,12 +212,16 @@ The HTML report includes a dark-themed overview (score gauge, letter grade, seve
 ### CI gate (fail on critical or score)
 
 ```bash
+# Legacy (unchanged)
 mcts scan ./server.py --fail-on-critical --min-score 70
-mcts scan . --fail-on-critical --min-score 70
+
+# v2 (default scoring includes score_v2)
+mcts scan ./server.py --fail-on-critical --max-absolute-risk 500 --max-risk-level high
+
 mcts scan . -o report.sarif --format sarif
 ```
 
-See [docs/platform/ci-integration.md](docs/platform/ci-integration.md) and [action/README.md](action/README.md).
+Gate cheat sheet: [scoring guide](docs/reporting/scoring-guide.md#ci-gates--pick-one-strategy) · [CI integration](docs/platform/ci-integration.md) · [GitHub Action](action/README.md)
 
 ### Themes
 
@@ -241,7 +243,7 @@ uv run mcts scan ./server.py --theme minimal --no-progress
      (core checks always on; 20+ per scan; opt-in via flags)
               │
               ▼
-        Risk scoring engine
+   Legacy score (overall) + v2 score (absolute_risk)
               │
     ┌─────────┼─────────┐
     ▼         ▼         ▼
@@ -255,6 +257,7 @@ uv run mcts scan ./server.py --theme minimal --no-progress
 
 | I want to… | Guide |
 |------------|-------|
+| Understand scores | **[Scoring developer guide](docs/reporting/scoring-guide.md)** |
 | Choose a scan mode | [Scanning overview](docs/scanning/README.md) |
 | Set up CI | [CI integration](docs/platform/ci-integration.md) |
 | Look up commands | [CLI reference](docs/platform/cli.md) |
@@ -275,14 +278,14 @@ MCTS/
 │   ├── vet/             # Pre-install package vetting (pypi/npm/oci)
 │   ├── pentest/         # Structured pentest runner
 │   ├── mcp_server/      # `mcts-mcp` stdio tools for IDE agents
-│   ├── governance/      # YAML policy allowlist + min-score gates
+│   ├── governance/      # YAML policy + scan_gates (legacy + v2)
 │   ├── readiness/       # Production readiness heuristics
 │   ├── api/             # FastAPI REST server
 │   ├── inventory/       # Client config + skills discovery
 │   ├── fuzz/            # Protocol fuzz runner
 │   ├── sast/            # Tree-sitter taint + Semgrep rule pack
 │   ├── taxonomy/        # MCTS-T techniques, Sigma rules
-│   ├── scoring/         # Risk scoring engine
+│   ├── scoring/         # Risk scoring v1 + v2 engines, corpus stats, attack-graph paths
 │   ├── compliance/      # OWASP & MCP compliance checks
 │   ├── reporting/       # ScanReport models, SARIF, HTML entry
 │   ├── report/          # HTML dashboard (templates, CSS, JS)
@@ -323,7 +326,7 @@ MCTS is **MCP-boundary security** — tool metadata, schemas, handler source, cl
 | Trust registries | Cloud scan + reputation | MCTS is local-first; no account required for CI |
 | Runtime gateways | Runtime policy & governance | Different layer — MCTS scans before deploy; they enforce at runtime |
 
-**Where MCTS leads today:** auditable exponential scoring, capability-graph attack chains, first-party MCTS-T taxonomy with bundled Sigma rules, executive HTML dashboard, readiness + OPA, YARA on metadata, line-jumping detection, Semgrep SAST adapter, LLM metadata triage, package vetting, MCP server mode (`mcts-mcp`), skills scanning, toxic-flow analysis, local-first default.
+**Where MCTS leads today:** dual legacy + v2 multi-factor scoring (`absolute_risk`, factor radar, corpus-calibrated `security_score`), capability-graph attack chains, first-party MCTS-T taxonomy with bundled Sigma rules, executive HTML dashboard, readiness + OPA, YARA on metadata, line-jumping detection, Semgrep SAST adapter, LLM metadata triage, package vetting, MCP server mode (`mcts-mcp`), skills scanning, toxic-flow analysis, local-first default.
 
 **Highest-priority gaps:** deep multi-language CFG/taint, prompt firewall, CycloneDX AI-BOM export, runtime stdio proxy, remote protocol fuzz (`mcts fuzz --url`), scan history/trends, hallucinated package detection, full Agno multi-agent pentest.
 

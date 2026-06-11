@@ -2,9 +2,9 @@
 
 > [Documentation](../index.md) → **Reporting**
 
-How MCTS **presents** results — scores, exports, and shareable reports.
+How MCTS **presents** scan results — scores, exports, and shareable reports.
 
-> **Just ran your first scan?** The terminal already showed a summary. To share with others, generate [HTML](html-report.md).
+> **Confused by two scores?** Read **[Scoring — developer guide](scoring-guide.md)** first (5 min). Everything else links from there.
 
 ---
 
@@ -13,31 +13,29 @@ How MCTS **presents** results — scores, exports, and shareable reports.
 | Format | Command | Best for |
 |--------|---------|----------|
 | **Terminal** | `mcts scan ./server.py` | Quick feedback while coding |
-| **JSON** | `mcts scan … -o report.json` | Automation, input for HTML report |
+| **JSON** | `mcts scan … -o report.json` | Automation, HTML input, CI |
 | **SARIF** | `mcts scan … -f sarif -o report.sarif` | GitHub / GitLab Code Scanning |
 | **HTML** | `mcts report report.json -o report.html` | Leadership and security reviews |
 
 ---
 
-## Score at a glance
+## Scoring docs (read in this order)
 
-| Score | Grade | Meaning |
-|-------|-------|---------|
-| 76–100 | A–B | Good posture |
-| 51–75 | C | Review before production |
-| 26–50 | D | Significant issues |
-| 0–25 | F | Do not deploy |
-
-Details: [Scoring specification](scoring-spec.md)
+| Order | Doc | Who it's for |
+|-------|-----|--------------|
+| **1** | **[Scoring developer guide](scoring-guide.md)** | Everyone — mental model, CI cheat sheet, JSON fields |
+| 2 | [Scoring spec (legacy)](scoring-spec.md) | Legacy formula and `--min-score` gates |
+| 3 | [Scoring spec v2](scoring-spec-v2.md) | v2 factors, chains, calibration |
+| 4 | [Migration & policy](migration/scoring-v2.md) | YAML policy, assets, history |
+| 5 | [SARIF scoreV2](sarif-score-v2.md) | Code Scanning integration |
 
 ---
 
-## Guides
+## Other guides
 
 | Page | When to read |
 |------|--------------|
-| [Scoring specification](scoring-spec.md) | CI gates and score formula |
-| [HTML dashboard](html-report.md) | Executive report layout |
+| [HTML dashboard](html-report.md) | Layout of the executive report |
 | [Threat taxonomy](taxonomy.md) | MCTS-T technique IDs on findings |
 
 ---
@@ -46,4 +44,4 @@ Details: [Scoring specification](scoring-spec.md)
 
 - [Getting started](../get-started/getting-started.md)
 - [CI integration](../platform/ci-integration.md)
-- [Documentation index](../index.md)
+- [Glossary](../glossary.md)

@@ -10,10 +10,19 @@
 
 **New to MCTS?** Read one guide, run one command, done.
 
-1. **[Install and first scan](get-started/getting-started.md)** — install, scan the example server, read the score, export HTML
-2. Stuck on a term? **[Glossary](glossary.md)**
+1. **[Install and first scan](get-started/getting-started.md)** — install, scan the example server, read the output, export HTML
+2. **Two scores on the same scan?** **[Scoring developer guide](reporting/scoring-guide.md)** — 5 min, answers 90% of score questions
+3. Stuck on a term? **[Glossary](glossary.md)**
 
 You do **not** need to read the CLI reference, architecture doc, or planning docs to get value from MCTS.
+
+### Typical developer path
+
+```
+Install → first scan → scoring guide (if confused) → CI integration → done
+```
+
+Contributors add: [Architecture](analysis/architecture.md) → [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ---
 
@@ -30,7 +39,8 @@ Pick the task that matches what you are doing right now:
 | Scan a **hosted** URL | [Remote scanning](scanning/remote-scanning.md) — `--url` + auth |
 | Scan with **no network** (exported JSON) | [Static snapshot](scanning/static-snapshot.md) — `--snapshot` |
 | **Choose a scan mode** (decision tree) | [Which scan mode should I use?](scanning/README.md#which-scan-mode-should-i-use) |
-| Fail CI on bad scores | [CI integration](platform/ci-integration.md) — `--fail-on-critical --min-score 70` |
+| Understand scan scores | **[Scoring developer guide](reporting/scoring-guide.md)** — start here |
+| Fail CI on bad scores | [CI integration](platform/ci-integration.md) — see scoring guide for gate cheat sheet |
 | Share results with leadership | [HTML report](reporting/html-report.md) — `mcts report report.json -o report.html` |
 | See what's installed on my machine | [Config inventory](scanning/inventory.md) — `mcts inventory --scan` |
 | Scan all local MCP configs | `mcts scan --machine-wide` — [CLI reference](platform/cli.md) |
@@ -73,6 +83,7 @@ Three tiers — read top to bottom only as needed.
 | Which scan mode to use | [Scanning overview](scanning/README.md) |
 | Live / remote / snapshot / fuzz / inventory | [Scanning guides](scanning/README.md#guides) |
 | CI and GitHub Action | [CI integration](platform/ci-integration.md) |
+| Understand scores | **[Scoring developer guide](reporting/scoring-guide.md)** |
 | HTML and SARIF reports | [Reporting overview](reporting/README.md) |
 
 ### Tier 2 — Reference (when you need details)
@@ -81,7 +92,7 @@ Three tiers — read top to bottom only as needed.
 |-------|-------|
 | Every command and flag | [CLI reference](platform/cli.md) |
 | Every security check | [Security checks](analysis/security-checks.md) |
-| How the score is calculated | [Scoring spec](reporting/scoring-spec.md) |
+| Scoring (legacy + v2) | **[Scoring developer guide](reporting/scoring-guide.md)** → [legacy spec](reporting/scoring-spec.md) · [v2 spec](reporting/scoring-spec-v2.md) |
 | Technique IDs (MCTS-T-*) | [Threat taxonomy](reporting/taxonomy.md) |
 | REST API | [REST API](platform/rest-api.md) |
 | Term definitions | [Glossary](glossary.md) |
@@ -104,7 +115,7 @@ Three tiers — read top to bottom only as needed.
 |------|------|
 | Developer (first time) | [Getting started](get-started/getting-started.md) → [Scanning overview](scanning/README.md) |
 | MCP server author | [Getting started](get-started/getting-started.md) → [Security checks](analysis/security-checks.md) |
-| DevOps / CI | [CI integration](platform/ci-integration.md) → [Scoring spec](reporting/scoring-spec.md) |
+| DevOps / CI | [Scoring developer guide](reporting/scoring-guide.md) → [CI integration](platform/ci-integration.md) |
 | Security engineer | [Architecture](analysis/architecture.md) → [Security checks](analysis/security-checks.md) |
 | Agent / platform team | [Inventory](scanning/inventory.md) → [CLI reference](platform/cli.md) |
 | Contributor | [CONTRIBUTING.md](../CONTRIBUTING.md) → [Quick start](../CONTRIBUTING.md#quick-start-for-first-time-contributors) | [Architecture](analysis/architecture.md) |

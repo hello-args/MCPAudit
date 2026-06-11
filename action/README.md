@@ -46,9 +46,23 @@ jobs:
 2. Runs `mcts scan` once on your target (JSON, SARIF, and HTML are derived from the same scan)
 3. Writes `mcts-report.json`, `mcts-report.sarif`, and `mcts-report.html` to the workflow workspace
 4. Uploads JSON, HTML, and SARIF as workflow artifacts
-5. Fails the workflow if `fail-on-critical` or `min-score` thresholds are not met
+5. Fails the workflow on gate violations — legacy (`fail-on-critical`, `min-score`) and/or v2 (`max-absolute-risk`, `max-risk-level`, `min-security-score`, `min-category-score-v2`)
 
 Upload SARIF to GitHub Code Scanning separately (see quick start) to show findings in the Security tab.
+
+### v2 gate example
+
+```yaml
+- uses: MCP-Audit/MCTS@v1
+  with:
+    target: ./server.py
+    fail-on-critical: true
+    max-absolute-risk: "500"
+    max-risk-level: high
+    min-security-score: "40"
+```
+
+Scoring defaults to `both` — JSON and SARIF include `score_v2` without extra inputs. See [Scoring developer guide](../docs/reporting/scoring-guide.md#ci-gates--pick-one-strategy).
 
 ### Installed capabilities (default extras)
 
@@ -108,5 +122,6 @@ If the action lives in your repo under `action/`:
 
 - [CI Integration](../docs/platform/ci-integration.md) — full CI patterns and gate examples
 - [CLI Reference](../docs/platform/cli.md) — all scan flags available locally
-- [Scoring Specification](../docs/reporting/scoring-spec.md) — how scores are calculated
+- [Scoring developer guide](../docs/reporting/scoring-guide.md) — start here (CI flags, two scores)
+- [Scoring spec v2](../docs/reporting/scoring-spec-v2.md) — technical reference
 - [Documentation index](../docs/index.md)

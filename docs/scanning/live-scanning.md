@@ -198,7 +198,7 @@ If source **is** present, static TS discovery still runs in parallel. See [TypeS
 | `--runtime-events` | Merged with live-generated events |
 | `--sigma-rules-path` | Applies to merged `MCPServerInfo` |
 | `--semantic-secrets` | Static source analysis; independent of live |
-| `--fail-on-*` gates | Apply to final report regardless of discovery mode |
+| `--fail-on-*` / v2 gates | Apply to final report regardless of discovery mode (`score_v2` included when `--scoring v2\|both`, default `both`) |
 
 ---
 
@@ -261,6 +261,11 @@ mcts scan examples/live-mcp-server/server.py \
   --live --no-progress \
   -o report.json \
   --min-score 70
+
+# Or v2 gates (scoring both is default)
+mcts scan examples/live-mcp-server/server.py \
+  --live --no-progress \
+  --max-absolute-risk 500 -o report.json
 ```
 
 ---

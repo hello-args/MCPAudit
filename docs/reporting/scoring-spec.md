@@ -2,24 +2,23 @@
 
 > [Documentation](../index.md) → [Reporting](README.md)
 
-This document explains how MCTS calculates the **security score** (0–100) and **risk index** from findings. Use it to set CI gate thresholds, explain scores to stakeholders, or verify that scoring is working correctly.
+This document is the **legacy** scoring reference (`score.overall`, 0–100). For the full picture (legacy + v2), read the **[Scoring developer guide](scoring-guide.md)** first.
 
-> **Just want to set a CI gate?** Use `--min-score 70 --fail-on-critical`. See [CI Integration](../platform/ci-integration.md).
-> **Multi-factor scoring (v2)?** See [Scoring v2 specification](scoring-spec-v2.md) and [migration guide](../migration/scoring-v2.md).
-> **Unfamiliar with terms?** See the [Glossary](../glossary.md).
+> **CI gate on legacy score:** `--min-score 70 --fail-on-critical` · [CI Integration](../platform/ci-integration.md)  
+> **v2 scoring:** [Scoring spec v2](scoring-spec-v2.md)
 
 ---
 
 ## In plain English
 
-After MCTS finds security issues, it converts them into a single number:
+The **legacy overall score** is 0–100 where **higher is better**. It uses severity weights and exponential decay — see formulas below.
 
-- **Security score (0–100):** Higher is better. 100 means no issues. Below 50 is serious.
-- **Risk index (0–100):** Higher is worse. A linear measure of total risk burden.
+- **Risk index (0–100):** Higher is worse. Linear measure of total risk burden.
+- **Default scans** also compute v2 (`score_v2`) — this doc does **not** cover v2. See [scoring guide](scoring-guide.md).
 
-The score is calculated from finding severities using a transparent formula — nothing is hardcoded per target. Every report includes a `score.basis` field showing exactly which findings contributed, so you can verify the math.
+Every report includes `score.basis` showing which severities contributed. The scanner verifies the math on every run.
 
-**Example:** A server with 3 Critical + 7 High + 2 Medium findings scores approximately **5/100**.
+**Example:** `examples/vulnerable-mcp-server/server.py` scores approximately **1/100** legacy overall (v2 is separate — see [scoring guide](scoring-guide.md)).
 
 Compliance findings (OWASP mapping) appear in reports but do **not** affect the score.
 
@@ -48,7 +47,7 @@ Reports may include `score_breakdown` with decomposed scores:
 
 1. **Deterministic** — same findings always produce the same score
 2. **Auditable** — `score.basis` documents exact severity counts used
-3. **CI-friendly** — gates on overall score, critical count, and category thresholds
+3. **CI-friendly** — legacy gates on overall score, critical count, and category thresholds; v2 gates documented in [scoring-spec-v2](scoring-spec-v2.md)
 4. **Separated compliance** — OWASP meta-findings do not inflate risk score
 
 The scanner calls `RiskScoringEngine.verify()` after scoring; mismatch raises `RuntimeError` (regression guard).
@@ -202,7 +201,7 @@ Benchmarks are illustrative overlays — not pass/fail thresholds.
 
 ---
 
-## CI gate semantics
+## CI gate semantics (legacy)
 
 Exit code **1** when a gate fails; **2** for usage/consent errors.
 
@@ -211,9 +210,22 @@ Exit code **1** when a gate fails; **2** for usage/consent errors.
 | `--fail-on-critical` | `summary.critical > 0` (scorable findings) |
 | `--min-score N` | `score.overall < N` |
 | `--max-critical N` | `summary.critical > N` |
-| `--fail-on-category KEY:LIMIT` | Category score ≥ LIMIT |
+| `--fail-on-category KEY:LIMIT` | Legacy category score ≥ LIMIT |
 
 Category gates are **inclusive** at the limit: `--fail-on-category permissions:10` fails when permissions category score is **10 or higher**.
+
+### v2 gates (shipped)
+
+Requires `--scoring v2` or `both` (default). Canonical reference: [Scoring spec v2](scoring-spec-v2.md) · [Migration guide](../migration/scoring-v2.md).
+
+| Flag | Fails when |
+|------|------------|
+| `--min-security-score N` | `score_v2.security_score < N` (needs corpus stats) |
+| `--max-absolute-risk N` | `score_v2.absolute_risk > N` |
+| `--max-risk-level LEVEL` | `score_v2.risk_level` exceeds band |
+| `--min-category-score-v2 KEY:MIN` | v2 OWASP tile &lt; MIN (100=good) |
+
+REST API returns `gate_violations` but does not change HTTP status — use CLI for CI exit codes.
 
 ### Recommended starter policy
 
@@ -242,10 +254,12 @@ Tune limits per team risk appetite. Start strict on `max-critical` and relax `mi
 
 Grades are derived from `score.overall` in `report/data.py`.
 
-### Planned scoring modes (gap audit)
+### Scoring modes
 
-| Mode | Status | GAP |
-|------|--------|-----|
+| Mode | Status | Notes |
+|------|--------|-------|
+| Legacy exponential (`--scoring legacy`) | Shipped | This document — `score.overall` |
+| Multi-factor v2 (`--scoring v2\|both`) | Shipped (default `both`) | [Scoring spec v2](scoring-spec-v2.md) |
 | AIVSS v2 (`--scoring aivss`) | Missing | GAP-060 |
 | CVSS v4 vector per finding | Missing | GAP-061 |
 | Runtime trust score (live/proxy) | Planned | L10-01 |

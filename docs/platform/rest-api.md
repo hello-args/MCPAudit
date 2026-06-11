@@ -4,7 +4,8 @@
 
 MCTS can run as a **REST API server** for programmatic scans — useful when you want other tools or services to trigger scans without using the CLI directly.
 
-> **Most users should use the CLI.** The REST API is for automation and integration scenarios.
+> **Most users should use the CLI.** The REST API is for automation and integration scenarios.  
+> **Scores & gates:** [Scoring developer guide](../reporting/scoring-guide.md) — `scoring_mode`, `gate_violations`, v2 fields.
 
 ---
 
@@ -129,6 +130,7 @@ All scan endpoints accept these fields (plus endpoint-specific fields where note
 | `min_security_score` | int | — | Gate: fail when v2 security score below threshold (not enforced server-side by default) |
 | `max_absolute_risk` | int | — | Gate: fail when v2 absolute risk above threshold |
 | `max_risk_level` | string | — | Gate: fail when v2 risk level exceeds band |
+| `min_category_score_v2` | object | — | Map of OWASP category key → minimum tile score (100=good) |
 | `assets_path` | string | — | Optional `.mcts/assets.yaml` path for v2 asset-value overrides |
 
 Batch endpoints (`/scan-all-tools`, `/scan-all-prompts`, `/scan-all-resources`) run one full analyzer pass per item. Use `fanout_offset` and `fanout_limit` to paginate; responses include `truncated` and `truncation_warning` when more items remain.

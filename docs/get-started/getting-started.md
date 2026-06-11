@@ -35,9 +35,11 @@ By the end of this guide you will:
 
 MCTS reads your server code (or connects to a running server), runs automated security checks, and produces:
 
-- A **security score** from 0 to 100 (100 = no issues found)
 - A list of **findings** ranked by severity (Critical → Low)
+- **Two scores by default** — legacy `score.overall` (0–100, higher = better) and v2 `score_v2.absolute_risk` (integer, higher = worse)
 - Exportable reports in JSON, SARIF, and HTML formats
+
+**Scores confusing?** Read the **[Scoring developer guide](../reporting/scoring-guide.md)** (5 min) before diving into formulas.
 
 For the full pipeline design, see [Architecture](../analysis/architecture.md).
 
@@ -155,7 +157,7 @@ The repo includes demo servers you can scan immediately:
 
 | Path | What it demonstrates | Expected score |
 |------|---------------------|----------------|
-| `examples/vulnerable-mcp-server/server.py` | Destructive tools, injection, attack chains | ~5/100 (CRITICAL) |
+| `examples/vulnerable-mcp-server/server.py` | Destructive tools, injection, attack chains | Legacy ~1/100; v2 absolute risk ~2260 |
 | `examples/baseline-mcp-server/server.py` | Minimal, safe tool surface | ~100/100 |
 | `examples/medium-risk-mcp-server/server.py` | Moderate findings | ~67/100 |
 | `examples/live-mcp-server/server.py` | Live probe + fuzz tests | Varies |
@@ -177,36 +179,33 @@ uv run mcts scan examples/vulnerable-mcp-server/server.py
 
 1. **Discovery** — MCTS parses the Python file and finds all `@tool` handlers, their descriptions, input schemas, and handler source code
 2. **Analysis** — 25+ security analyzers check for permissions, injection, secrets, command execution, attack chains, and more
-3. **Scoring** — Findings are weighted by severity and converted to a 0–100 score
+3. **Scoring** — Two engines run by default: legacy `score.overall` + v2 `score_v2` ([guide](../reporting/scoring-guide.md))
 4. **Report** — Results appear in your terminal
 
 ### Reading the output
 
 ```text
-[✓] Discovering tools...
-[✓] Mapping permissions...
-[✓] Detecting attack chains...
-[✓] Generating report...
-
 ==================== MCTS Security Report ====================
-Overall Score:   5/100 (CRITICAL)
+Overall Score:   1/100 (CRITICAL)
 Risk Index:      100/100
-Scoring basis:   3 Critical, 7 High, 2 Medium, 0 Low (12 scorable findings)
+Scoring basis:   5 Critical, 11 High, 1 Medium, 0 Low (17 scorable findings)
+Absolute Risk:   2260 (critical)
+Security Score:  9/100
+Legacy Index:    1/100 (deprecated)
 
-● Critical    4
-● High        7
-● Medium      2
-● Low         0
+● Critical    5
+● High       11
+● Medium      1
 ```
 
 | Field | Meaning |
 |-------|---------|
-| **Overall Score** | 0–100, higher is better. Below 50 is serious. |
-| **Risk Index** | 0–100, higher is worse. Linear measure of total risk. |
-| **Scoring basis** | How many findings at each severity level contributed to the score |
-| **Severity counts** | Total findings including non-scoring compliance items |
+| **Overall Score** | Legacy 0–100 (higher = better). Existing CI `--min-score` uses this. |
+| **Absolute Risk** | v2 integer (higher = worse). Primary posture metric for new policies. |
+| **Security Score** | v2 benchmark vs corpus (higher = better). **Not** the same as Overall Score. |
+| **Severity counts** | Findings by level (compliance rows appear in reports but are excluded from score math) |
 
-Scores are never hardcoded — the scanner verifies its math on every run. Details: [Scoring Specification](../reporting/scoring-spec.md).
+**Two scores?** That is expected — legacy **1/100** and v2 **2260** measure different things. See the **[Scoring developer guide](../reporting/scoring-guide.md)** for which metric to use in CI.
 
 ### Scan a whole repository
 
@@ -253,7 +252,7 @@ By default, every scan writes artifacts to **`mcts_analysis/`** in your project 
 | `scan-report.json` | Full machine-readable report |
 | `scan-report.html` | Executive HTML dashboard (open directly) |
 | `scan-report.sarif` | GitHub Code Scanning upload |
-| `history.json` | Score trend across runs |
+| `history.json` | Score trend across runs (`scoring_version`, `absolute_risk` when v2) |
 
 Relative `-o` paths use the **basename only** under `mcts_analysis/` — e.g. `-o report.json` → `mcts_analysis/report.json`, not `./report.json`.
 
@@ -356,7 +355,9 @@ Most users start with a **static scan** (`mcts scan ./server.py`). When you need
 
 ## CI gate
 
-Fail your build when security thresholds aren't met:
+Fail your build when security thresholds aren't met.
+
+**Existing pipelines (legacy — no change required):**
 
 ```bash
 uv run mcts scan ./server.py \
@@ -365,7 +366,17 @@ uv run mcts scan ./server.py \
   -o report.json
 ```
 
-GitHub Action: [CI Integration](../platform/ci-integration.md) · [action/README.md](../../action/README.md)
+**New policies (v2 gates — scoring is `both` by default):**
+
+```bash
+uv run mcts scan ./server.py \
+  --fail-on-critical \
+  --max-absolute-risk 500 \
+  --max-risk-level high \
+  -o report.json
+```
+
+Gate cheat sheet: [Scoring developer guide](../reporting/scoring-guide.md#ci-gates--pick-one-strategy) · GitHub Action: [CI Integration](../platform/ci-integration.md) · [action/README.md](../../action/README.md)
 
 ---
 
@@ -392,7 +403,7 @@ mcts scan . --auto --auto-server my-server -o report.json --html report.html
 | Exit code 2, "Live probing requires consent" | Missing consent flag | Add `--i-understand-live-risk` or `MCTS_LIVE_OK=1` |
 | Exit code 2, "Unknown format" | Invalid `--format` | Use `json` or `sarif` |
 | No tools discovered | Wrong target or empty repo | Point at server entrypoint; check `--languages` |
-| Score seems wrong | Compliance findings in report | Only scorable analyzers affect score; check `score.basis` |
+| Score seems wrong / two different numbers | Dual engines on default scans | Expected — see [Scoring guide](../reporting/scoring-guide.md); check `score.basis` and `score_v2.basis` |
 | `mcp` import error | Missing extra | `uv sync --extra mcp` or `uvx --from 'mcp-mcts[mcp]' mcts …` |
 | Remote scan fails | Missing consent or auth | `--i-understand-live-risk` + `--bearer-token` |
 | TS tools missing | Language filter | Use `--languages typescript` |
@@ -403,6 +414,7 @@ mcts scan . --auto --auto-server my-server -o report.json --html report.html
 
 | I want to… | Guide |
 |------------|-------|
+| Understand scores & CI gates | **[Scoring developer guide](../reporting/scoring-guide.md)** |
 | Pick live vs remote vs snapshot | [Which scan mode?](../scanning/README.md#which-scan-mode-should-i-use) |
 | See every CLI flag | [CLI reference](../platform/cli.md) |
 | Understand a finding | [Security checks](../analysis/security-checks.md) |

@@ -37,8 +37,11 @@ Everything else (`vet`, `pentest`, `fuzz`, `mcts-mcp`, `serve`) is optional — 
 # Daily development
 mcts scan ./server.py
 
-# CI gate
+# CI gate (legacy)
 mcts scan ./server.py --fail-on-critical --min-score 70 -o report.sarif --format sarif
+
+# CI gate (v2 — scoring is both by default)
+mcts scan ./server.py --max-absolute-risk 500 --max-risk-level high -o report.sarif --format sarif
 
 # Share with stakeholders
 mcts scan ./server.py -o report.json && mcts report report.json -o report.html

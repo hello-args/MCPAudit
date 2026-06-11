@@ -49,7 +49,9 @@ flowchart TB
   INFO["MCPServerInfo\nmcp/models.py"]
   ANA["Analyzers\nanalyzers/*.py"]
   COMP["Compliance\ncompliance/checks.py"]
-  SCORE["Scoring\nscoring/engine.py"]
+  GRAPH["Attack graph\nscoring/graph.py"]
+  V1["Legacy score\nengine.py"]
+  V2["v2 score\nengine_v2.py"]
   OUT["ScanReport\nreporting/models.py"]
   TERM["Terminal / JSON / SARIF / HTML"]
 
@@ -58,12 +60,14 @@ flowchart TB
   DISC --> INFO
   INFO --> ANA
   ANA --> COMP
-  COMP --> SCORE
-  SCORE --> OUT
+  COMP --> GRAPH
+  GRAPH --> V1
+  V1 --> V2
+  V2 --> OUT
   OUT --> TERM
 ```
 
-**Orchestrator:** `Scanner` in `src/mcts/core/scanner.py` wires discovery, the analyzer list, deduplication, compliance, and scoring.
+**Orchestrator:** `Scanner` in `src/mcts/core/scanner.py` wires discovery, analyzers, compliance, attack graph, legacy scoring, and optional v2 scoring (`scoring_mode` default `both`).
 
 | Layer | Directory | Typical contribution |
 |-------|-----------|----------------------|
@@ -71,7 +75,7 @@ flowchart TB
 | Discovery | `discovery/`, `mcp/client.py`, `probe/` | New languages, live/remote transport, inventory |
 | Analyzers | `analyzers/` | New security checks (subclass `BaseAnalyzer`) |
 | SAST / rules | `sast/`, `taxonomy/sigma/` | Tree-sitter taint, Semgrep rules, Sigma metadata |
-| Scoring & reports | `scoring/`, `reporting/`, `report/` | Score formula, SARIF, HTML dashboard |
+| Scoring & reports | `scoring/`, `governance/`, `reporting/`, `report/` | v1/v2 engines, corpus stats, gates, SARIF, HTML dashboard |
 | Tests | `tests/`, `tests/fixtures/regression/` | Unit tests, technique regression fixtures |
 
 **Adding an analyzer (common task):**
@@ -81,7 +85,7 @@ flowchart TB
 3. Add tests and, when applicable, a fixture under `tests/fixtures/regression/MCTS-T-*/`.
 4. Document in [Security Checks](docs/analysis/security-checks.md) and assign a `technique_id`.
 
-Full pipeline detail: [Architecture](docs/analysis/architecture.md) · [Extension points](docs/analysis/architecture.md#extension-points)
+Full pipeline detail: [Architecture](docs/analysis/architecture.md) · [Scoring guide](docs/reporting/scoring-guide.md) · [Extension points](docs/analysis/architecture.md#extension-points)
 
 ---
 

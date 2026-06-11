@@ -28,9 +28,11 @@ Some checks are separate from the main scan:
 ## How checks run
 
 ```
-Discovery → MCPServerInfo → analyzers → enrich (MCTS-T) → score → report
-                                    ↘ compliance (non-scoring)
+Discovery → MCPServerInfo → analyzers → enrich (MCTS-T) → compliance (non-scoring)
+         → attack graph + scan scope → legacy score → score_v2 (when v2/both) → report
 ```
+
+Under `--scoring v2|both`, `attack_chains` meta-findings appear in the report and HTML but are **excluded** from the v2 sum; chain signal applies via `chain_factor` on tool-attributed findings. Legacy `score.overall` still includes chain meta-rows in its scorable set.
 
 | Layer | What is inspected |
 |-------|-------------------|
@@ -807,7 +809,7 @@ uv run mcts scan ./server.py -o report.json
 uv run mcts report report.json -o security-report.html
 ```
 
-**Demo server:** `examples/vulnerable-mcp-server/server.py` exercises permissions, injection, command execution, data leakage, and attack chains — expect score ~5/100 (CRITICAL).
+**Demo server:** `examples/vulnerable-mcp-server/server.py` exercises permissions, injection, command execution, data leakage, and attack chains — expect legacy overall ~1/100 and v2 absolute risk ~2260 (see [scoring guide](../reporting/scoring-guide.md)).
 
 ---
 

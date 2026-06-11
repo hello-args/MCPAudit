@@ -20,7 +20,7 @@ Legacy scoring (`score.overall`) uses severity-only exponential decay. Clients n
 | Analyzer when v2 on | Always run `AttackChainAnalyzer`; bypass `--analyzers` / `--surfaces` |
 | `chain_factor` gating | `enable_attack_chains` / `--no-attack-chains` sets `chain_factor_mode: disabled` |
 | `weights_hash` | `ScoreV2Basis.weights_hash` only — not on `RiskScoreV2` |
-| API score gates | CLI-only in v2.0; API returns JSON without HTTP gate exit |
+| API score gates | CLI enforces exit codes; API returns `gate_violations` array without HTTP gate exit (v2.0) |
 | Canonical graph | `scoring/graph.py` owns paths; `report/data.build_attack_graph()` delegates |
 | Fake path rejection | BFS returns `None` when disconnected — never `[start, end]` |
 | Model location | v2 types in `scoring/models.py`; `ScanReport` imports `RiskScoreV2` |

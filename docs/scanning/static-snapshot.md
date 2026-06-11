@@ -98,9 +98,13 @@ Use individual paths via CLI when exporting prompts/resources separately (future
 # Export tools from a trusted environment, then scan offline
 mcts scan . --snapshot ./artifacts/tools-list.json -o report.json
 
-# With CI gates
+# With CI gates (legacy or v2 — default scoring is both)
 mcts scan . --snapshot tools.json \
   --fail-on-critical --min-score 70 \
+  -o report.json
+
+mcts scan . --snapshot tools.json \
+  --max-absolute-risk 500 --max-risk-level high \
   -o report.json
 ```
 

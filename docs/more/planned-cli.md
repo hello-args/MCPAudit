@@ -43,6 +43,7 @@ From the [Feature Expansion Plan — CLI appendix](feature-expansion-plan.md#sca
 | `--skills` / SKILL.md scanning | GAP-029 | Shipped |
 | `--full-toxic-flows` TF codes | GAP-032 | Shipped |
 | `--ci` gate bundle | GAP-024 | Shipped |
+| `--scoring v2\|both` + v2 gates | — | Shipped (default `both`) |
 | `--policy` governance YAML | GAP-222 | Shipped |
 | `--scan-all-users` multi-home | GAP-021 | P1 |
 | `--diff-base` git-scoped scan | GAP-010 | P1 |

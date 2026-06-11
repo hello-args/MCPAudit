@@ -4,8 +4,20 @@
 
 This guide shows how to run MCTS in your CI/CD pipeline — fail builds on security thresholds, upload SARIF to GitHub Code Scanning, and share HTML reports with your team.
 
-> **Just want a quick gate?** Run `mcts scan ./server.py --fail-on-critical --min-score 70`
-> **Want the GitHub Action?** See [GitHub Actions](#github-actions-published-action) below.
+> **Which CI flags should I use?** [Scoring developer guide](../reporting/scoring-guide.md#ci-gates--pick-one-strategy) — legacy vs v2 cheat sheet  
+> **Quick legacy gate:** `mcts scan ./server.py --fail-on-critical --min-score 70`  
+> **Quick v2 gate:** `mcts scan ./server.py --fail-on-critical --max-absolute-risk 500 --max-risk-level high`  
+> **GitHub Action:** [below](#github-actions-published-action)
+
+### Pick a CI strategy
+
+| Strategy | When | Example |
+|----------|------|---------|
+| **A — Legacy only** | Existing pipelines; no policy change | `--fail-on-critical --min-score 70` |
+| **B — v2 only** | New risk policies | `--max-absolute-risk 500 --max-risk-level high` |
+| **C — Dual gates** | Transition period | `--min-score 70 --max-absolute-risk 500` |
+
+Default `--scoring both` means v2 fields are always in JSON/SARIF/HTML even when you only gate on legacy metrics.
 
 ---
 
@@ -71,7 +83,7 @@ jobs:
 3. Writes `mcts-report.json` and `mcts-report.sarif`
 4. Runs `mcts report` → `mcts-report.html`
 5. Uploads JSON/HTML as workflow artifacts
-6. Respects `fail-on-critical` and `min-score` inputs
+6. Respects legacy gates (`fail-on-critical`, `min-score`) and optional v2 gates (`scoring`, `min-security-score`, `max-absolute-risk`, `max-risk-level`, `min-category-score-v2`)
 
 Monorepo: `uses: ./action`
 Full reference: [action/README.md](../../action/README.md)
@@ -82,7 +94,12 @@ Full reference: [action/README.md](../../action/README.md)
 |-------|---------|-------------|
 | `target` | `./server.py` | Scan target path |
 | `fail-on-critical` | `true` | Fail workflow on critical findings |
-| `min-score` | — | Fail if score below threshold |
+| `min-score` | — | Fail if legacy overall score below threshold |
+| `scoring` | `both` | `legacy`, `v2`, or `both` |
+| `min-security-score` | — | v2 benchmark gate |
+| `max-absolute-risk` | — | v2 absolute risk ceiling |
+| `max-risk-level` | — | v2 band gate (`low` … `critical`) |
+| `min-category-score-v2` | — | Comma-separated `category:min` for v2 OWASP tiles |
 | `extras` | `mcp,sast` | Optional extras to install (`all` for full set) |
 
 ---
@@ -115,9 +132,9 @@ mcts scan ./repo/ \
 
 Category semantics: [Scoring Specification](../reporting/scoring-spec.md). Category gates apply to **legacy** v1 tiles only.
 
-### Scoring v2 gates (opt-in)
+### Scoring v2 gates
 
-Enable multi-factor scoring, then gate on v2 fields:
+Scans include `score_v2` by default (`scoring: both`). **Gates** on v2 fields are opt-in:
 
 ```bash
 mcts scan ./server.py \
@@ -135,8 +152,22 @@ mcts scan ./server.py \
 | `--min-security-score` | v2 benchmark percentile score |
 | `--max-absolute-risk` | v2 stable integer risk sum |
 | `--max-risk-level` | v2 band (`low` < `medium` < `high` < `critical`) |
+| `--min-category-score-v2` | v2 OWASP tile minimum (100=good) |
 
-GitHub Action equivalents: `scoring`, `min-security-score`, `max-absolute-risk`, `max-risk-level`, `min-category-score-v2` inputs. See [Scoring v2 migration](../migration/scoring-v2.md) and [SARIF scoreV2](../reporting/sarif-score-v2.md).
+GitHub Action equivalents: `scoring`, `min-security-score`, `max-absolute-risk`, `max-risk-level`, `min-category-score-v2` inputs.
+
+**v2 Action example:**
+
+```yaml
+- uses: MCP-Audit/MCTS@v1
+  with:
+    target: ./server.py
+    fail-on-critical: true
+    max-absolute-risk: "500"
+    max-risk-level: high
+```
+
+See [Scoring developer guide](../reporting/scoring-guide.md), [migration](../migration/scoring-v2.md), and [SARIF scoreV2](../reporting/sarif-score-v2.md).
 
 ### SARIF for code scanning
 
@@ -318,7 +349,8 @@ See [Planned CLI flags](../more/planned-cli.md) and [Roadmap Phase 2](../more/ro
 
 ## Related
 
+- **[Scoring developer guide](../reporting/scoring-guide.md)** — gate cheat sheet (read first)
 - [CLI Reference](cli.md)
-- [Scoring Spec](../reporting/scoring-spec.md)
+- [GitHub Action](../../action/README.md)
 - [Live Scanning](../scanning/live-scanning.md)
 - [Roadmap — GitHub Action](../more/roadmap.md#2-github-action)

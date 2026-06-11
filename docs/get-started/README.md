@@ -19,6 +19,7 @@ That is all you need to begin. The [documentation index](../index.md) links to e
 | Next step | Guide |
 |-----------|-------|
 | Pick live vs remote vs snapshot | [Which scan mode?](../scanning/README.md#which-scan-mode-should-i-use) |
+| Understand scores | [Scoring developer guide](../reporting/scoring-guide.md) |
 | Add MCTS to CI | [CI integration](../platform/ci-integration.md) |
 | Understand a finding | [Security checks](../analysis/security-checks.md) |
 | Share an HTML report | [HTML dashboard](../reporting/html-report.md) |

@@ -14,6 +14,8 @@ Answer these questions:
 - **Yes** → `mcts scan ./server.py` or `mcts scan ./repo/` ([getting started](../get-started/getting-started.md))
 - **Not sure which file** → `mcts scan . --auto`
 
+**Confused by Overall Score vs Absolute Risk?** → [Scoring developer guide](../reporting/scoring-guide.md)
+
 **Do you need what the server advertises at runtime?**
 - Add `--live --i-understand-live-risk` → [Live scanning](live-scanning.md)
 
@@ -42,7 +44,7 @@ Answer these questions:
 | **Inventory** | Config only | No | No | `mcts inventory --scan` |
 | **Fuzz** | No | Yes | No | `mcts fuzz …` |
 
-After discovery, all modes feed the same analyzers and produce the same report format.
+After discovery, all modes feed the same analyzers and produce the same report format (legacy `score` + v2 `score_v2` when `--scoring v2|both`, default `both`).
 
 ---
 

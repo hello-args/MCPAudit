@@ -46,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Documentation** — added [Scoring developer guide](docs/reporting/scoring-guide.md) as single entry point; simplified glossary, getting started, and migration doc; synced architecture and CI docs
 - Print MCP Surface / Supply Chain / Dependency Hygiene breakdown when `--min-score` or `--ci` gate fails.
 - Validate resolvable live launch configuration before the consent gate on `mcts snapshot` and `mcts fuzz`.
 - **Doctor + MCP server startup hints** — `mcts doctor` now reports whether the optional `[mcp]` extra is installed, and `mcts-mcp` prints a direct install hint instead of a bare import failure when the extra is missing (#219).

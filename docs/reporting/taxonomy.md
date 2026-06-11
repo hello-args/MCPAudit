@@ -61,7 +61,7 @@ Extend `src/mcts/taxonomy/crosswalk.json` when mapping new techniques to externa
 | MCTS-T-1002 | Path Traversal / Missing Validation | `path_validation`, `tool_abuse` | High |
 | MCTS-T-1003 | Command Execution via Tool Handler | `command_execution` | Critical |
 | MCTS-T-1004 | Sensitive Data Exposure | `data_leakage` | High |
-| MCTS-T-1005 | Multi-Step Attack Chain | `attack_chains` | Critical |
+| MCTS-T-1005 | Multi-Step Attack Chain | `attack_chains` | Critical (meta-rows displayed; excluded from v2 `absolute_risk` sum — chain signal is `chain_factor` on tool findings) |
 | MCTS-T-1006 | Excessive Tool Permissions | `permission_analyzer` | Critical |
 | MCTS-T-1007 | Tool Output Prompt Injection | `jailbreak`, `runtime_events` | High |
 | MCTS-T-1008 | Cross-Server Tool Shadowing | `cross_server` | High |
