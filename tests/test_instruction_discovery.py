@@ -144,6 +144,41 @@ def test_explicit_instruction_file(tmp_path: Path) -> None:
     assert info.prompts[0].source_file == str(prompt.resolve())
 
 
+def test_docs_prompts_excluded_from_default_discovery(tmp_path: Path) -> None:
+    design = tmp_path / "docs" / "prompts"
+    design.mkdir(parents=True)
+    design_file = design / "narrow-confidence-dimensions-prompt.md"
+    design_file.write_text(
+        "# SDD: Narrow Confidence Dimensions\n"
+        "System prompt draft for classifier. You must always call the tool...\n"
+    )
+    runtime = tmp_path / "prompts"
+    runtime.mkdir(parents=True)
+    (runtime / "greeting_prompt.md").write_text("Hello user.\n")
+
+    config = ScanConfig(target=tmp_path, discover_instructions=True)
+    info = discover_instruction_surfaces(config)
+
+    discovered = {p.source_file for p in info.prompts}
+    assert str(design_file.resolve()) not in discovered
+    assert any(str((runtime / "greeting_prompt.md").resolve()) == path for path in discovered)
+
+
+def test_explicit_instruction_file_in_docs_prompts_still_included(tmp_path: Path) -> None:
+    design = tmp_path / "docs" / "prompts" / "review-prompt.md"
+    design.parent.mkdir(parents=True)
+    design.write_text("Explicit design prompt for audit.\n")
+
+    config = ScanConfig(
+        target=tmp_path,
+        discover_instructions=False,
+        instruction_files=[design],
+    )
+    info = discover_instruction_surfaces(config)
+    assert len(info.prompts) == 1
+    assert info.prompts[0].source_file == str(design.resolve())
+
+
 def test_discover_skills_from_repo_path(tmp_path: Path, monkeypatch) -> None:
     skill = tmp_path / "skills" / "deploy"
     skill.mkdir(parents=True)
