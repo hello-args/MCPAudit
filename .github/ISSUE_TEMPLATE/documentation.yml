@@ -1,0 +1,79 @@
+name: Documentation
+description: Report incorrect, missing, or unclear documentation
+title: "[DOCS]: "
+labels: ["type:docs", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Docs live under [`docs/`](https://github.com/MCP-Audit/MCTS/tree/main/docs). Entry points: [Getting Started](https://github.com/MCP-Audit/MCTS/blob/main/docs/get-started/getting-started.md), [Glossary](https://github.com/MCP-Audit/MCTS/blob/main/docs/glossary.md), [Documentation index](https://github.com/MCP-Audit/MCTS/blob/main/docs/index.md).
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and did not find a duplicate
+          required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What doc is wrong or missing?
+    validations:
+      required: true
+
+  - type: input
+    id: doc_path
+    attributes:
+      label: Doc path or URL
+      description: File path in the repo or section heading.
+      placeholder: "docs/platform/cli.md — mcts scan flags"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_kind
+    attributes:
+      label: Issue type
+      options:
+        - Incorrect — contradicts current behavior
+        - Missing — behavior exists but is undocumented
+        - Unclear — confusing wording or structure
+        - Outdated — references old commands, versions, or branding
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's wrong today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should it say?
+      description: Suggested wording, outline, or link target.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority (suggested)
+      options:
+        - "priority:P1 — misleads users on security-critical behavior"
+        - "priority:P2 — causes confusion but workaround is obvious"
+        - "priority:P3 — typo / polish / nice-to-have"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to open a PR with a doc fix

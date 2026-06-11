@@ -17,6 +17,8 @@ This guide explains how to open, label, and track issues in [MCP-Audit/MCTS](htt
 
 - [Bug report](https://github.com/MCP-Audit/MCTS/issues/new?template=bug_report.yml)
 - [Feature request](https://github.com/MCP-Audit/MCTS/issues/new?template=feature_request.yml)
+- [Security finding](https://github.com/MCP-Audit/MCTS/issues/new?template=security_finding.yml) — false positives/negatives and scoring accuracy in scan results
+- [Documentation](https://github.com/MCP-Audit/MCTS/issues/new?template=documentation.yml)
 
 For security vulnerabilities in **MCTS itself**, follow [SECURITY.md](../../SECURITY.md) — do not file public issues for undisclosed vulns.
 

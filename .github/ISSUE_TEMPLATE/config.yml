@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security disclosure (MCTS vulnerabilities)
+    url: https://github.com/MCP-Audit/MCTS/blob/main/SECURITY.md
+    about: Do not file public issues for undisclosed security vulnerabilities in MCTS itself.
+  - name: Issue labeling guide
+    url: https://github.com/MCP-Audit/MCTS/blob/main/docs/contributing/issue-labeling.md
+    about: How maintainers label type, priority, component, and status.
+  - name: Contributing guide
+    url: https://github.com/MCP-Audit/MCTS/blob/main/CONTRIBUTING.md
+    about: Development setup, branch workflow, and PR expectations.

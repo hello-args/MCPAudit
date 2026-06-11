@@ -1,35 +1,136 @@
 name: Bug Report
-description: Report a bug in MCTS
-title: "[Bug]: "
-labels: ["bug", "triage"]
+description: Something in MCTS is broken or behaves unexpectedly
+title: "[BUG]: "
+labels: ["type:bug", "status:triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        For MCTS tool bugs, see [Getting Started](https://github.com/MCP-Audit/MCTS/blob/main/docs/get-started/getting-started.md) and [CLI Reference](https://github.com/MCP-Audit/MCTS/blob/main/docs/platform/cli.md). For vulnerabilities in **MCTS itself**, see [SECURITY.md](https://github.com/MCP-Audit/MCTS/blob/main/SECURITY.md).
-  - type: textarea
-    id: description
+        **Before you submit:** search [open issues](https://github.com/MCP-Audit/MCTS/issues) for duplicates and reproduce on latest `main` or `develop`.
+
+        - [Getting Started](https://github.com/MCP-Audit/MCTS/blob/main/docs/get-started/getting-started.md)
+        - [CLI Reference](https://github.com/MCP-Audit/MCTS/blob/main/docs/platform/cli.md)
+        - Vulnerabilities in **MCTS itself** → [SECURITY.md](https://github.com/MCP-Audit/MCTS/blob/main/SECURITY.md) (not this template)
+
+  - type: checkboxes
+    id: checklist
     attributes:
-      label: What happened?
-      description: Describe the bug and what you expected.
+      label: Checklist
+      options:
+        - label: I searched existing issues and did not find a duplicate
+          required: true
+        - label: I reproduced this on the latest `main` or `develop` branch
+          required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One or two sentences describing the bug.
+      placeholder: "`mcts scan` crashes when scanning with `--snapshot` and an empty tools array."
     validations:
       required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should have happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened? Include error messages, exit codes, or unexpected output.
+    validations:
+      required: true
+
   - type: textarea
     id: reproduce
     attributes:
       label: Steps to reproduce
+      description: Exact commands and inputs so a maintainer can replay the issue.
       placeholder: |
-        1. Run `mcts scan ...`
-        2. See error
+        1. `uv sync --all-extras`
+        2. `uv run mcts scan examples/vulnerable-mcp-server/server.py --scoring both`
+        3. See error …
+      render: shell
     validations:
       required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Logs, stack traces, config snippets, or file paths. Redact secrets.
+      render: shell
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component (suggested)
+      description: Primary area affected. Maintainers may adjust after triage.
+      options:
+        - component:cli
+        - component:api
+        - component:reporting
+        - component:ui
+        - component:sast
+        - component:live-probe
+        - component:fuzz
+        - component:inventory
+        - component:github-action
+        - component:ci
+        - component:scripts
+        - component:release
+        - component:auth
+        - component:docs
+        - component:other (comment in body)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority (suggested)
+      description: Your best estimate — maintainers confirm during triage.
+      options:
+        - "priority:P0 — blocks production / data loss / security bypass"
+        - "priority:P1 — major broken workflow or incorrect security result"
+        - "priority:P2 — medium impact; workaround exists"
+        - "priority:P3 — minor / cosmetic / docs polish"
+    validations:
+      required: true
+
   - type: input
     id: version
     attributes:
       label: MCTS version
-      placeholder: 0.1.0
+      description: Output of `mcts --version` or PyPI/git tag.
+      placeholder: "0.1.2 or git commit abc1234"
+
   - type: input
     id: python
     attributes:
       label: Python version
-      placeholder: 3.12
+      placeholder: "3.12"
+
+  - type: input
+    id: platform
+    attributes:
+      label: OS / environment
+      placeholder: "macOS 15, Ubuntu 24.04, GitHub Actions, etc."
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Who is affected and how severely (CLI users, CI, API deployments, etc.)?
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Related issues, PRs, or doc links (optional).

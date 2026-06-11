@@ -1,23 +1,141 @@
 name: Security Finding
-description: Report a false positive or missed vulnerability pattern
-title: "[Security]: "
-labels: ["security", "triage"]
+description: Report a false positive, false negative, or scoring issue in MCTS results
+title: "[SECURITY]: "
+labels: ["type:security", "status:triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        Technique IDs and taxonomy: [Threat Taxonomy](https://github.com/MCP-Audit/MCTS/blob/main/docs/reporting/taxonomy.md). Scoring behavior: [Scoring Specification](https://github.com/MCP-Audit/MCTS/blob/main/docs/reporting/scoring-spec.md).
+        Use this template when MCTS **scan results** look wrong — missed risks, noisy findings, or unexpected scores.
+
+        **Not for vulnerabilities in MCTS itself** → follow [SECURITY.md](https://github.com/MCP-Audit/MCTS/blob/main/SECURITY.md) for responsible disclosure.
+
+        - [Threat Taxonomy](https://github.com/MCP-Audit/MCTS/blob/main/docs/reporting/taxonomy.md) — `MCTS-T-*` technique IDs
+        - [Scoring spec (legacy)](https://github.com/MCP-Audit/MCTS/blob/main/docs/reporting/scoring-spec.md)
+        - [Scoring spec (v2)](https://github.com/MCP-Audit/MCTS/blob/main/docs/reporting/scoring-spec-v2.md)
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and did not find a duplicate
+          required: true
+        - label: I am reporting scan-result accuracy, not a vulnerability in the MCTS tool itself
+          required: true
+
+  - type: dropdown
+    id: finding_kind
+    attributes:
+      label: Finding type
+      options:
+        - finding:false-positive — MCTS flagged risk that should not fire
+        - finding:false-negative — real risk that MCTS missed
+        - Scoring / severity mismatch — score, risk level, or category seems wrong
+        - Attack chain / graph issue
+        - Other (describe in body)
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One or two sentences on what MCTS got wrong.
+    validations:
+      required: true
+
   - type: textarea
     id: finding
     attributes:
       label: Finding details
-      description: Describe the false positive or missed pattern.
+      description: Title, severity, analyzer name, technique ID, and why the result is incorrect.
+      placeholder: |
+        - Finding title: …
+        - Severity: critical / high / …
+        - Analyzer: PathValidationAnalyzer
+        - Technique: MCTS-T-1029
+        - Why wrong: …
     validations:
       required: true
+
   - type: textarea
     id: mcp-server
     attributes:
       label: MCP server context
-      description: Minimal repro server or tool definition (redact secrets).
+      description: Minimal repro — tool definition, handler snippet, or example server path. Redact secrets.
+      render: shell
     validations:
       required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction command
+      description: Exact `mcts scan` (or subcommand) invocation and flags.
+      placeholder: "uv run mcts scan examples/vulnerable-mcp-server/server.py --scoring both"
+      render: shell
+    validations:
+      required: true
+
+  - type: input
+    id: technique_id
+    attributes:
+      label: Technique ID (if known)
+      placeholder: "MCTS-T-1029"
+
+  - type: dropdown
+    id: scoring_mode
+    attributes:
+      label: Scoring mode
+      options:
+        - legacy (`score.overall`)
+        - v2 (`score_v2.absolute_risk`)
+        - both (default)
+        - unknown / not applicable
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component (suggested)
+      options:
+        - component:sast
+        - component:reporting
+        - component:live-probe
+        - component:cli
+        - component:api
+        - component:other (comment in body)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority (suggested)
+      options:
+        - "priority:P0 — critical false negative or score bypass"
+        - "priority:P1 — high-severity misclassification affecting triage"
+        - "priority:P2 — medium noise or coverage gap"
+        - "priority:P3 — edge case / low-severity tuning"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should MCTS report instead (finding, severity, score, or silence)?
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: How would this misclassification affect a security review or CI gate?
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: OWASP MCP mapping, CWE, related issues, or benchmark servers.

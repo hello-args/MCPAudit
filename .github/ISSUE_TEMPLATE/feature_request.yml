@@ -1,33 +1,105 @@
 name: Feature Request
-description: Suggest a new feature or analyzer
-title: "[Feature]: "
-labels: ["enhancement", "triage"]
+description: Propose new functionality, analyzer, or workflow improvement
+title: "[FEATURE]: "
+labels: ["type:feature", "status:triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        Check the [Product Roadmap](https://github.com/MCP-Audit/MCTS/blob/main/docs/more/roadmap.md) and [Feature Expansion Plan](https://github.com/MCP-Audit/MCTS/blob/main/docs/more/feature-expansion-plan.md) before proposing large features.
+        **Before you submit:** check the [Product Roadmap](https://github.com/MCP-Audit/MCTS/blob/main/docs/more/roadmap.md) and [Feature Expansion Plan](https://github.com/MCP-Audit/MCTS/blob/main/docs/more/feature-expansion-plan.md) for overlapping work.
+
+        Large features should start as an issue before opening a PR. See [CONTRIBUTING.md](https://github.com/MCP-Audit/MCTS/blob/main/CONTRIBUTING.md).
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and did not find a duplicate
+          required: true
+        - label: This is not a bug report (use the Bug Report template for broken behavior)
+          required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One or two sentences on what you want and why.
+    validations:
+      required: true
+
   - type: textarea
     id: problem
     attributes:
       label: Problem
-      description: What security gap or workflow pain does this solve?
+      description: What security gap, false-negative class, or workflow pain does this solve today?
     validations:
       required: true
+
   - type: textarea
     id: solution
     attributes:
       label: Proposed solution
+      description: How should MCTS behave? CLI flags, analyzer logic, report output, etc.
     validations:
       required: true
-  - type: dropdown
-    id: area
+
+  - type: textarea
+    id: alternatives
     attributes:
-      label: Area
+      label: Alternatives considered
+      description: Other approaches you considered and why you prefer this one.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component (suggested)
       options:
-        - Analyzer
-        - CLI
-        - Reporting
-        - CI/CD Action
-        - Documentation
-        - Other
+        - component:cli
+        - component:api
+        - component:reporting
+        - component:ui
+        - component:sast
+        - component:live-probe
+        - component:fuzz
+        - component:inventory
+        - component:github-action
+        - component:ci
+        - component:scripts
+        - component:release
+        - component:auth
+        - component:docs
+        - component:other (comment in body)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority (suggested)
+      options:
+        - "priority:P0 — blocks production readiness"
+        - "priority:P1 — high value; should land soon"
+        - "priority:P2 — medium value; planned backlog"
+        - "priority:P3 — nice-to-have / future consideration"
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Checklist of done conditions for maintainers and contributors.
+      placeholder: |
+        - [ ] New analyzer emits MCTS-T-* finding with evidence
+        - [ ] Regression fixture added under tests/fixtures/regression/
+        - [ ] CLI flag documented in docs/platform/cli.md
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to open a PR for this (comment on the issue to claim it)
