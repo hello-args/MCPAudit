@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Write distinct HTML and SARIF artifacts for `scan-prompts`, `scan-resources`, and `scan-instructions` instead of overwriting `scan-report.html`.
 - Add `-o` / `--output` to `mcts doctor` and surface scan subcommands for CI artifact paths (#156, #157).
 - Accept `--no-progress` on `readiness`, `fuzz`, `scan-mcp`, and surface scan subcommands for shared CI scripts (#158).
+- Explain when `mcts doctor --deep` import checks are skipped (no MCP config or no `-m` module in launch args).
 
 ### Changed
 

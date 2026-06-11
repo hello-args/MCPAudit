@@ -87,10 +87,22 @@ def run_doctor(
         checks.append(("warn", "Entrypoint candidate", "none found"))
         warnings += 1
 
-    if deep and configs:
-        for cfg in configs[:1]:
-            for server_name in sorted(load_servers_dict(cfg))[:2]:
-                _deep_import_check(cfg, server_name, checks)
+    if deep:
+        if not configs:
+            checks.append(("warn", "Deep checks", "skipped — no MCP config found"))
+            warnings += 1
+        else:
+            for cfg in configs[:1]:
+                try:
+                    server_names = sorted(load_servers_dict(cfg))[:2]
+                except ConfigDiscoveryError:
+                    server_names = []
+                if not server_names:
+                    checks.append(("warn", "Deep checks", "skipped — no servers in config"))
+                    warnings += 1
+                    continue
+                for server_name in server_names:
+                    _deep_import_check(cfg, server_name, checks)
 
     if deep:
         warnings += _check_optional_toolchain(checks)
@@ -163,6 +175,13 @@ def _deep_import_check(config_path: Path, server_name: str, checks: list[tuple[s
             module = live.args[idx + 1].split(":")[0]
             break
     if not module:
+        checks.append(
+            (
+                "warn",
+                "Deep checks",
+                f"skipped for {server_name!r} — no -m module in launch args",
+            )
+        )
         return
     cwd = Path(live.cwd or ".")
     result = subprocess.run(

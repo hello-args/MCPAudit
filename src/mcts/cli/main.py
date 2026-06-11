@@ -1572,7 +1572,10 @@ def doctor(
     ] = Path("."),
     deep: Annotated[
         bool,
-        typer.Option("--deep", help="Run optional import dry-run checks for config servers"),
+        typer.Option(
+            "--deep",
+            help="Run import validation for MCP server modules (requires .mcp.json or other MCP config)",
+        ),
     ] = False,
     output: Annotated[
         Path | None,
