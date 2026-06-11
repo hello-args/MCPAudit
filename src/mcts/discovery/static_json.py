@@ -57,9 +57,7 @@ def _load_combined_snapshot(path: Path) -> MCPServerInfo:
     if not isinstance(payload, dict):
         raise StaticJsonError(f"Snapshot must be object or array: {path}")
     if _looks_like_scan_report(payload):
-        raise StaticJsonError(
-            "Invalid snapshot: file looks like a scan report, not a tools/list snapshot"
-        )
+        raise StaticJsonError("Invalid snapshot: file looks like a scan report, not a tools/list snapshot")
 
     tools = _extract_snapshot_tools(payload)
     prompts = _extract_list(payload, ("prompts",))
