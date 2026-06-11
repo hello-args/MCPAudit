@@ -40,6 +40,24 @@ SECRET_ENV_VARS = (
 
 HIDDEN_CHAR_PATTERN = re.compile(r"[\u200b-\u200f\ufeff\u202a-\u202e]")
 
+LOGGING_CALL_PATTERN = re.compile(
+    r"""
+    ^\s*
+    (?:
+        print
+        |console\.(?:log|info|warn|warning|error|debug)
+        |(?:logger|logging|log)\.(?:log|info|warn|warning|error|debug|exception|critical)
+        |(?:self\.)?logger\.(?:log|info|warn|warning|error|debug|exception|critical)
+    )
+    \s*\(
+    """,
+    re.VERBOSE,
+)
+
+
+def _is_logging_statement(line: str) -> bool:
+    return bool(LOGGING_CALL_PATTERN.search(line))
+
 
 class DataLeakageAnalyzer(BaseAnalyzer):
     """Scans tool metadata and source files for exposed secrets."""
@@ -100,6 +118,8 @@ class DataLeakageAnalyzer(BaseAnalyzer):
             for line_no, line in enumerate(content.splitlines(), start=1):
                 for label, pattern, severity in SECRET_PATTERNS:
                     if not pattern.search(line):
+                        continue
+                    if label == "Internal URL" and _is_logging_statement(line):
                         continue
                     finding_id = f"leak-src-{file_path}-{line_no}-{label.lower().replace(' ', '-')}"
                     if finding_id in seen:
