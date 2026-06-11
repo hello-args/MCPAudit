@@ -87,3 +87,13 @@ def test_scan_dot_allowed_without_config(tmp_path: Path) -> None:
     server.write_text("print('not mcp')\n")
     result = runner.invoke(app, ["scan", str(tmp_path), "--no-progress", "--no-save"])
     assert result.exit_code in (0, 1)
+
+
+def test_scan_url_without_target_does_not_require_positional() -> None:
+    result = runner.invoke(
+        app,
+        ["scan", "--url", "https://example.com/mcp", "--no-progress", "--no-save"],
+    )
+    assert "TARGET is required" not in result.stdout
+    assert result.exit_code == 2
+    assert "consent" in result.stdout.lower()
