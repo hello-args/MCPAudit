@@ -28,6 +28,29 @@ def run_readiness(config: ScanConfig) -> ReadinessReport:
     llm = ReadinessLlmJudge(model=config.readiness_llm_model) if config.readiness_llm else None
     findings: list[Finding] = []
 
+    if config.readiness_opa and (opa is None or not opa.is_available()):
+        findings.append(
+            _optional_check_unavailable(
+                check_id="readiness-opa-unavailable",
+                title="OPA readiness checks skipped",
+                description=_opa_unavailable_reason(opa),
+                recommendation=(
+                    "Install the opa CLI on PATH or omit --opa when policy checks are not required."
+                ),
+            )
+        )
+    if config.readiness_llm and (llm is None or not llm.is_available()):
+        findings.append(
+            _optional_check_unavailable(
+                check_id="readiness-llm-unavailable",
+                title="LLM readiness judge skipped",
+                description=_llm_unavailable_reason(),
+                recommendation=(
+                    "Set MCTS_LLM_API_KEY and install litellm (`uv sync --extra llm`), or omit --llm-judge."
+                ),
+            )
+        )
+
     for tool in server.tools:
         tool_def = _tool_def(tool)
         findings.extend(check_tool_readiness(tool))
@@ -96,3 +119,45 @@ def _tool_def(tool: MCPTool) -> dict:
         "description": tool.description,
         "inputSchema": tool.input_schema,
     }
+
+
+def _optional_check_unavailable(
+    *,
+    check_id: str,
+    title: str,
+    description: str,
+    recommendation: str,
+) -> Finding:
+    return Finding(
+        id=check_id,
+        analyzer="readiness",
+        title=title,
+        description=description,
+        severity=Severity.MEDIUM,
+        recommendation=recommendation,
+        technique_id=None,
+        confidence=1.0,
+        evidence={"skipped": True, "optional_check": True},
+    )
+
+
+def _opa_unavailable_reason(opa: OpaProvider | None) -> str:
+    if opa is None:
+        return "OPA readiness checks were requested but the provider was not initialized."
+    if opa._opa_path is None:
+        return "OPA readiness checks were requested but the opa CLI was not found on PATH."
+    if not opa.policies_dir.exists():
+        return f"OPA readiness checks were requested but policies were not found at {opa.policies_dir}."
+    return "OPA readiness checks were requested but OPA is not available."
+
+
+def _llm_unavailable_reason() -> str:
+    import os
+
+    if not os.environ.get("MCTS_LLM_API_KEY"):
+        return "LLM readiness review was requested but MCTS_LLM_API_KEY is not set."
+    try:
+        import litellm  # noqa: F401
+    except ImportError:
+        return "LLM readiness review was requested but litellm is not installed."
+    return "LLM readiness review was requested but the judge is not available."
