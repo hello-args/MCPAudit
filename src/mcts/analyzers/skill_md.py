@@ -57,7 +57,7 @@ def analyze_skill(entry: SkillEntry) -> list[Finding]:
                     )
                 )
             continue
-        if pattern.search(text):
+        if _rule_matches(text, code, pattern):
             findings.append(_finding(entry, code, label, title))
 
     remote_urls = _REMOTE_FETCH.findall(text)
@@ -73,6 +73,59 @@ def analyze_skill(entry: SkillEntry) -> list[Finding]:
         )
 
     return findings
+
+
+def _rule_matches(text: str, code: str, pattern: re.Pattern[str]) -> bool:
+    matches = list(pattern.finditer(text))
+    if not matches:
+        return False
+    if code in {"W008", "W010"}:
+        return any(not _is_defensive_instruction_context(text, match) for match in matches)
+    return True
+
+
+def _is_defensive_instruction_context(text: str, match: re.Match[str]) -> bool:
+    """Return True when a risky phrase appears inside a protective instruction.
+
+    SKILL.md files are instruction payloads, so benign templates often say things
+    like "never reveal tokens" or "do not ignore system instructions". Those
+    should not be reported as credential-harvest or instruction-override findings
+    unless the same local sentence asks the agent to expose, send, override, or
+    bypass boundaries.
+    """
+    start = max(0, match.start() - 120)
+    end = min(len(text), match.end() + 120)
+    window = text[start:end].lower()
+
+    defensive_markers = (
+        "do not",
+        "don't",
+        "never",
+        "must not",
+        "should not",
+        "refuse",
+        "reject",
+        "avoid",
+        "without revealing",
+        "without exposing",
+    )
+    if not any(marker in window for marker in defensive_markers):
+        return False
+
+    offensive_markers = (
+        "send the",
+        "share the",
+        "upload",
+        "exfil",
+        "paste",
+        "webhook",
+        "requestbin",
+        "ngrok",
+        "override policy",
+        "ignore all previous",
+        "disregard all previous",
+    )
+    return not any(marker in window for marker in offensive_markers)
 
 
 def analyze_skills(entries: list[SkillEntry]) -> list[Finding]:
