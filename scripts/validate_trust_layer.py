@@ -90,8 +90,7 @@ def main() -> int:
         evaluate_scan_gate_violations(report, cat_cfg) == [],
     )
     breakdown_ok = (
-        report.score_breakdown is not None
-        and report.score_breakdown.mcp_surface == report.score.overall
+        report.score_breakdown is not None and report.score_breakdown.mcp_surface == report.score.overall
     )
     check("score_breakdown mcp_surface matches enforce overall", breakdown_ok)
 
@@ -166,9 +165,7 @@ def main() -> int:
     print("\n[SARIF] Export")
     sarif = build_sarif(report)
     results = sarif["runs"][0]["results"]
-    chain_results = [
-        r for r in results if r.get("properties", {}).get("analyzer") == "attack_chains"
-    ]
+    chain_results = [r for r in results if r.get("properties", {}).get("analyzer") == "attack_chains"]
     if chain_results:
         props = chain_results[0].get("properties", {})
         rule_id = chain_results[0].get("ruleId")
@@ -213,9 +210,7 @@ def main() -> int:
     )[0]
     check("missing finding_ids key does not prove", out_missing.evidence_type == "capability_overlap")
 
-    path_only = overlap.model_copy(
-        update={"evidence": {**(overlap.evidence or {}), "path": ["a", "b", "c"]}}
-    )
+    path_only = overlap.model_copy(update={"evidence": {**(overlap.evidence or {}), "path": ["a", "b", "c"]}})
     out_path = validate_findings(
         [path_only],
         ValidationContext(scan_scope="repository", tools=[], attack_graph={}, mode="enforce"),
