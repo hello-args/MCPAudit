@@ -5,7 +5,6 @@ from __future__ import annotations
 import re
 
 from mcts.analyzers.base import BaseAnalyzer
-from mcts.analyzers.finding_facts import build_analyzer_finding
 from mcts.mcp.models import MCPServerInfo
 from mcts.reporting.models import Finding, Severity, SourceLocation
 
@@ -129,8 +128,8 @@ class ToolShadowingAnalyzer(BaseAnalyzer):
             ):
                 continue
             findings.append(
-                build_analyzer_finding(
-                    finding_id=f"shadow-{tool.name}",
+                Finding(
+                    id=f"shadow-{tool.name}",
                     analyzer=self.name,
                     title=f"Tool shadowing pattern on {tool.name}",
                     description=(
@@ -138,18 +137,15 @@ class ToolShadowingAnalyzer(BaseAnalyzer):
                         "other tools — consistent with MCTS-T-1020."
                     ),
                     severity=Severity.HIGH,
+                    tool=tool.name,
                     recommendation=(
                         "Remove cross-tool override instructions; validate tool metadata "
                         "against a signed baseline."
                     ),
-                    rule_id="RULE_TOOL_SHADOWING",
-                    match=tool.name,
-                    field="tool_metadata",
-                    tool=tool.name,
-                    location=SourceLocation(file=tool.source_file or "", line=tool.source_line),
                     technique_id="MCTS-T-1020",
                     confidence=0.85,
-                    extra_evidence={"type": "tool_shadowing"},
+                    location=SourceLocation(file=tool.source_file or "", line=tool.source_line),
+                    evidence={"type": "tool_shadowing"},
                 )
             )
         return findings

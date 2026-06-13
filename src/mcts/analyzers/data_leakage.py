@@ -5,7 +5,6 @@ from __future__ import annotations
 import re
 
 from mcts.analyzers.base import BaseAnalyzer
-from mcts.analyzers.finding_facts import build_analyzer_finding
 from mcts.mcp.models import MCPServerInfo
 from mcts.reporting.models import Finding, Severity, SourceLocation
 from mcts.scoring.evidence_tags import tag_data_leakage_finding
@@ -79,40 +78,35 @@ class DataLeakageAnalyzer(BaseAnalyzer):
             for label, pattern, severity in SECRET_PATTERNS:
                 if pattern.search(corpus):
                     findings.append(
-                        build_analyzer_finding(
-                            finding_id=f"leak-meta-{tool.name}-{label.lower().replace(' ', '-')}",
+                        Finding(
+                            id=f"leak-meta-{tool.name}-{label.lower().replace(' ', '-')}",
                             analyzer=self.name,
                             title=f"Potential {label} exposure in {tool.name}",
                             description=f"Pattern matching {label} found in tool metadata.",
                             severity=severity,
-                            recommendation="Remove secrets from tool definitions; use secure secret stores.",
-                            rule_id="RULE_LEAK_PATTERN",
-                            match=label,
-                            field="tool_metadata",
                             tool=tool.name,
-                            location=SourceLocation(file=tool.source_file or "", line=tool.source_line),
+                            recommendation="Remove secrets from tool definitions; use secure secret stores.",
                             technique_id="MCTS-T-1004",
                             confidence=0.8,
-                            extra_evidence={"pattern": pattern.pattern},
+                            location=SourceLocation(file=tool.source_file or "", line=tool.source_line),
+                            evidence={"pattern": pattern.pattern},
                         )
                     )
             for env_var in SECRET_ENV_VARS:
                 if env_var in corpus:
                     findings.append(
-                        build_analyzer_finding(
-                            finding_id=f"leak-env-{tool.name}-{env_var.lower()}",
+                        Finding(
+                            id=f"leak-env-{tool.name}-{env_var.lower()}",
                             analyzer=self.name,
                             title=f"Referenced sensitive env var: {env_var}",
                             description="Tool metadata references environment variables that may leak.",
                             severity=Severity.MEDIUM,
-                            recommendation=f"Avoid exposing {env_var} through tool responses.",
-                            rule_id="RULE_LEAK_ENV_REF",
-                            match=env_var,
-                            field="tool_metadata",
                             tool=tool.name,
-                            location=SourceLocation(file=tool.source_file or "", line=tool.source_line),
+                            recommendation=f"Avoid exposing {env_var} through tool responses.",
                             technique_id="MCTS-T-1004",
                             confidence=0.7,
+                            location=SourceLocation(file=tool.source_file or "", line=tool.source_line),
+                            evidence={"env_var": env_var},
                         )
                     )
         return findings
@@ -133,21 +127,17 @@ class DataLeakageAnalyzer(BaseAnalyzer):
                         continue
                     seen.add(finding_id)
                     findings.append(
-                        build_analyzer_finding(
-                            finding_id=finding_id,
+                        Finding(
+                            id=finding_id,
                             analyzer=self.name,
                             title=f"Potential {label} in source",
                             description=f"Pattern matching {label} found at {file_path}:{line_no}.",
                             severity=severity,
                             recommendation="Remove hardcoded secrets; use environment or secret managers.",
-                            rule_id="RULE_LEAK_SOURCE",
-                            match=label,
-                            field="source_line",
-                            location=SourceLocation(file=file_path, line=line_no),
                             technique_id="MCTS-T-1004",
                             confidence=0.7,
-                            snippet=line.strip()[:120],
-                            extra_evidence={"pattern": pattern.pattern},
+                            location=SourceLocation(file=file_path, line=line_no),
+                            evidence={"pattern": pattern.pattern, "line": line.strip()[:120]},
                         )
                     )
         return findings

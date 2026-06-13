@@ -131,20 +131,16 @@ def _build_graph_from_chain_findings(findings: list[Finding]) -> dict[str, Any]:
         exec_tools = evidence.get("exec_tools", [])
         for src in read_tools:
             for dst in exfil_tools:
-                if src != dst:
-                    edges.append({"from": src, "to": dst, "label": "exfil"})
+                edges.append({"from": src, "to": dst, "label": "exfil"})
         for src in cred_tools:
             for dst in exfil_tools:
-                if src != dst:
-                    edges.append({"from": src, "to": dst, "label": "credential → exfil"})
+                edges.append({"from": src, "to": dst, "label": "credential → exfil"})
         for src in read_tools:
             for dst in cred_tools:
-                if src != dst:
-                    edges.append({"from": src, "to": dst, "label": "read → cred"})
+                edges.append({"from": src, "to": dst, "label": "read → cred"})
         for src in read_tools:
             for dst in exec_tools:
-                if src != dst:
-                    edges.append({"from": src, "to": dst, "label": "read → exec"})
+                edges.append({"from": src, "to": dst, "label": "read → exec"})
     return {"nodes": list(nodes.values()), "edges": edges}
 
 

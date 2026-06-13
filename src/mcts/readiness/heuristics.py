@@ -41,9 +41,7 @@ def check_tool_readiness(tool: MCPTool) -> list[Finding]:
     return findings
 
 
-def readiness_score(findings: list[Finding], *, use_display: bool = False) -> int:
-    from mcts.reporting.display import effective_severity
-
+def readiness_score(findings: list[Finding]) -> int:
     deductions = {
         Severity.CRITICAL: 25,
         Severity.HIGH: 15,
@@ -52,8 +50,7 @@ def readiness_score(findings: list[Finding], *, use_display: bool = False) -> in
     }
     score = 100
     for finding in findings:
-        severity = effective_severity(finding) if use_display else finding.severity
-        score -= deductions.get(severity, 0)
+        score -= deductions.get(finding.severity, 0)
     return max(0, score)
 
 

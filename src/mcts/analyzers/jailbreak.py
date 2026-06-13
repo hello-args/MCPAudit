@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 from mcts.analyzers.base import BaseAnalyzer
-from mcts.analyzers.finding_facts import build_analyzer_finding
 from mcts.mcp.models import MCPServerInfo, MCPTool
 from mcts.probe.jailbreak import summarize_jailbreak_events
 from mcts.reporting.models import Finding, Severity
@@ -31,8 +30,8 @@ class JailbreakAnalyzer(BaseAnalyzer):
             return [tag_jailbreak_finding(f) for f in findings]
 
         findings.append(
-            build_analyzer_finding(
-                finding_id="jailbreak-manipulation-surface",
+            Finding(
+                id="jailbreak-manipulation-surface",
                 analyzer=self.name,
                 title="Elevated agent manipulation surface",
                 description=(
@@ -41,12 +40,9 @@ class JailbreakAnalyzer(BaseAnalyzer):
                 ),
                 severity=severity,
                 recommendation="Reduce tool count, add schemas, and restrict execution capabilities.",
-                rule_id="RULE_JAILBREAK_SURFACE",
-                match=str(score),
-                field="tool_metadata",
                 technique_id="MCTS-T-1007",
                 confidence=0.7,
-                extra_evidence={
+                evidence={
                     "manipulation_score": score,
                     "tool_count": len(server.tools),
                     "executes_commands": sum(
@@ -61,8 +57,8 @@ class JailbreakAnalyzer(BaseAnalyzer):
     def _live_finding(self, summary: dict[str, Any]) -> Finding:
         accepted = int(summary["accepted_count"])
         severity = Severity.CRITICAL if accepted >= 2 else Severity.HIGH
-        return build_analyzer_finding(
-            finding_id="jailbreak-live-payload-accepted",
+        return Finding(
+            id="jailbreak-live-payload-accepted",
             analyzer=self.name,
             title="Live jailbreak probe accepted override instructions",
             description=(
@@ -74,12 +70,9 @@ class JailbreakAnalyzer(BaseAnalyzer):
                 "Harden system instructions, validate tool inputs, and block override phrases "
                 "before executing privileged tools."
             ),
-            rule_id="RULE_JAILBREAK_LIVE",
-            match=str(accepted),
-            field="runtime_events",
             technique_id="MCTS-T-1007",
             confidence=0.85,
-            extra_evidence={
+            evidence={
                 **summary,
                 "analysis_mode": "live_probe",
             },

@@ -7,7 +7,6 @@ import os
 import re
 
 from mcts.analyzers.base import BaseAnalyzer
-from mcts.analyzers.finding_facts import build_analyzer_finding, build_skip_finding
 from mcts.analyzers.surface_context import scan_surfaces
 from mcts.mcp.models import MCPServerInfo
 from mcts.reporting.models import Finding, Severity
@@ -39,27 +38,11 @@ class LlmMetadataTriageAnalyzer(BaseAnalyzer):
     def analyze(self, server: MCPServerInfo) -> list[Finding]:
         api_key = os.environ.get("MCTS_LLM_API_KEY")
         if not api_key:
-            return [
-                build_skip_finding(
-                    finding_id="llm-triage-skipped",
-                    analyzer=self.name,
-                    title="LLM metadata triage skipped",
-                    description="MCTS_LLM_API_KEY is not set",
-                    recommendation="Export MCTS_LLM_API_KEY or disable --enable-llm-triage.",
-                )
-            ]
+            return []
         try:
             import litellm  # type: ignore[import-untyped]
         except ImportError:
-            return [
-                build_skip_finding(
-                    finding_id="llm-triage-skipped",
-                    analyzer=self.name,
-                    title="LLM metadata triage skipped",
-                    description="litellm is not installed",
-                    recommendation="Install the llm extra (`uv sync --extra llm`).",
-                )
-            ]
+            return []
 
         findings: list[Finding] = []
         for surface in scan_surfaces(server):
@@ -74,21 +57,17 @@ class LlmMetadataTriageAnalyzer(BaseAnalyzer):
                 continue
             confidence = _clamp_confidence(payload.get("confidence"))
             findings.append(
-                build_analyzer_finding(
-                    finding_id=f"llm-triage-{verdict}-{surface.label}",
+                Finding(
+                    id=f"llm-triage-{verdict}-{surface.label}",
                     analyzer=self.name,
                     title=f"LLM triage ({verdict}): {surface.label}",
                     description=str(payload.get("rationale") or f"Metadata classified as {verdict}"),
                     severity=_VERDICT_SEVERITY[verdict],
-                    recommendation=_recommendation_for(verdict),
-                    rule_id=f"RULE_LLM_TRIAGE_{verdict.upper()}",
-                    match=verdict,
-                    field="mcp_surface",
                     tool=surface.name if surface.kind.value == "tool" else None,
+                    recommendation=_recommendation_for(verdict),
                     technique_id="MCTS-T-1001",
                     confidence=confidence,
-                    snippet=str(payload.get("rationale") or verdict)[:200],
-                    extra_evidence={
+                    evidence={
                         "surface": surface.kind.value,
                         "verdict": verdict,
                         "model": self.model,

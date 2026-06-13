@@ -5,7 +5,6 @@ from __future__ import annotations
 import re
 
 from mcts.analyzers.base import BaseAnalyzer
-from mcts.analyzers.finding_facts import build_analyzer_finding
 from mcts.analyzers.surface_context import is_intentional_context_surface, scan_surfaces
 from mcts.analyzers.surfaces import ScanSurfaceKind
 from mcts.mcp.models import MCPServerInfo
@@ -48,8 +47,8 @@ class PromptDefenseAnalyzer(BaseAnalyzer):
             ]
             if len(missing) >= 3:
                 findings.append(
-                    build_analyzer_finding(
-                        finding_id=f"prompt-defense-{surface.label}",
+                    Finding(
+                        id=f"prompt-defense-{surface.label}",
                         analyzer=self.name,
                         title=f"Missing defensive language on {surface.label}",
                         description=(
@@ -61,13 +60,9 @@ class PromptDefenseAnalyzer(BaseAnalyzer):
                             "Add explicit defensive instructions for untrusted input, "
                             "data leakage, and role boundaries."
                         ),
-                        rule_id="RULE_PROMPT_DEFENSE_GAP",
-                        match=missing[0],
-                        field=surface.kind.value,
-                        tool=surface.name if surface.kind == ScanSurfaceKind.TOOL else None,
                         technique_id="MCTS-T-1001",
                         confidence=0.55,
-                        extra_evidence={"surface": surface.kind.value, "missing_vectors": missing},
+                        evidence={"surface": surface.kind.value, "missing_vectors": missing},
                     )
                 )
         return findings

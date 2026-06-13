@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from mcts.reporting.display import effective_impact, effective_severity
 from mcts.reporting.models import Finding, ScanReport, Severity
 from mcts.taxonomy.mapper import load_taxonomy
 
@@ -123,13 +122,6 @@ def _taxonomy_reference(taxon_id: str) -> dict[str, Any]:
     }
 
 
-def _sarif_security_severity(finding: Finding) -> str:
-    """Align GitHub security-severity with display when trust adjusted severity is set."""
-    if finding.display_severity is not None:
-        return SARIF_SECURITY_SEVERITY[effective_severity(finding)]
-    return SARIF_SECURITY_SEVERITY[effective_impact(finding)]
-
-
 def _build_rules(findings: list[Finding]) -> dict[str, dict[str, Any]]:
     rules: dict[str, dict[str, Any]] = {}
     for finding in findings:
@@ -145,7 +137,7 @@ def _build_rules(findings: list[Finding]) -> dict[str, dict[str, Any]]:
             "properties": {
                 "analyzer": finding.analyzer,
                 "technique_id": finding.technique_id,
-                "security-severity": _sarif_security_severity(finding),
+                "security-severity": SARIF_SECURITY_SEVERITY[finding.severity],
             },
         }
     return rules
@@ -154,29 +146,16 @@ def _build_rules(findings: list[Finding]) -> dict[str, dict[str, Any]]:
 def _finding_to_result(finding: Finding, rules: dict[str, dict[str, Any]], target: str) -> dict[str, Any]:
     result: dict[str, Any] = {
         "ruleId": finding.id,
-        "level": SARIF_SEVERITY[effective_severity(finding)],
+        "level": SARIF_SEVERITY[finding.severity],
         "message": {"text": finding.description},
         "locations": [_result_location(finding, target)],
         "properties": {
             "severity": finding.severity.value,
-            "display_severity": effective_severity(finding).value,
             "analyzer": finding.analyzer,
             "recommendation": finding.recommendation,
             "confidence": finding.confidence,
         },
     }
-    if finding.evidence_type:
-        result["properties"]["evidence_type"] = finding.evidence_type
-    evidence = finding.evidence or {}
-    facts = evidence.get("facts")
-    if isinstance(facts, list) and facts:
-        result["properties"]["mcts/factCount"] = len(facts)
-        result["properties"]["mcts/facts"] = facts[:5]
-    factors = evidence.get("confidence_factors")
-    if isinstance(factors, list) and factors:
-        result["properties"]["mcts/confidenceFactors"] = factors
-    if finding.rule_stability:
-        result["properties"]["mcts/ruleStability"] = finding.rule_stability
     taxa = _result_taxa(finding)
     if taxa:
         result["taxa"] = taxa
@@ -196,7 +175,7 @@ def _finding_to_result(finding: Finding, rules: dict[str, dict[str, Any]], targe
             "shortDescription": {"text": finding.title},
             "fullDescription": {"text": finding.description},
             "properties": {
-                "security-severity": _sarif_security_severity(finding),
+                "security-severity": SARIF_SECURITY_SEVERITY[finding.severity],
             },
         }
     return result

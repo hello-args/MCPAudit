@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Any
 
 from mcts.analyzers.base import BaseAnalyzer
-from mcts.analyzers.finding_facts import build_analyzer_finding
 from mcts.mcp.models import MCPServerInfo, MCPTool
 from mcts.reporting.models import Finding, Severity, SourceLocation
 
@@ -45,8 +44,8 @@ class MetadataDiffAnalyzer(BaseAnalyzer):
                 continue
 
             findings.append(
-                build_analyzer_finding(
-                    finding_id=f"meta-diff-{name}",
+                Finding(
+                    id=f"meta-diff-{name}",
                     analyzer=self.name,
                     title=f"Tool metadata changed since baseline: {name}",
                     description=(
@@ -54,21 +53,18 @@ class MetadataDiffAnalyzer(BaseAnalyzer):
                         "Possible rug pull or persistent tool redefinition."
                     ),
                     severity=Severity.CRITICAL,
+                    tool=name,
                     recommendation=(
                         "Pin tool manifests cryptographically (MCTS-M-002); reject metadata "
                         "changes without explicit operator approval."
                     ),
-                    rule_id="RULE_METADATA_DIFF",
-                    match=name,
-                    field="tool_metadata",
-                    tool=name,
+                    technique_id="MCTS-T-1013",
+                    confidence=0.9,
                     location=SourceLocation(
                         file=snap.get("source_file") or "",
                         line=snap.get("source_line"),
                     ),
-                    technique_id="MCTS-T-1013",
-                    confidence=0.9,
-                    extra_evidence={
+                    evidence={
                         "changed_fields": changed_fields,
                         "baseline_hash": previous.get("hash"),
                         "current_hash": snap["hash"],
@@ -80,21 +76,17 @@ class MetadataDiffAnalyzer(BaseAnalyzer):
         for name in baseline_tools:
             if name not in current:
                 findings.append(
-                    build_analyzer_finding(
-                        finding_id=f"meta-removed-{name}",
+                    Finding(
+                        id=f"meta-removed-{name}",
                         analyzer=self.name,
                         title=f"Baseline tool removed: {name}",
                         description=f"Tool '{name}' existed in baseline but is missing from current scan.",
                         severity=Severity.MEDIUM,
+                        tool=name,
                         recommendation=(
                             "Verify tool removal was intentional; monitor for shadow replacements."
                         ),
-                        rule_id="RULE_METADATA_REMOVED",
-                        match=name,
-                        field="tool_metadata",
-                        tool=name,
                         technique_id="MCTS-T-1040",
-                        confidence=0.9,
                     )
                 )
 

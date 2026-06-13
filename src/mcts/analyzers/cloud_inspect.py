@@ -7,7 +7,6 @@ import os
 import httpx
 
 from mcts.analyzers.base import BaseAnalyzer
-from mcts.analyzers.finding_facts import build_analyzer_finding, build_skip_finding
 from mcts.analyzers.surface_context import scan_surfaces
 from mcts.mcp.models import MCPServerInfo
 from mcts.reporting.models import Finding, Severity
@@ -26,15 +25,7 @@ class CloudInspectAnalyzer(BaseAnalyzer):
     def analyze(self, server: MCPServerInfo) -> list[Finding]:
         api_key = os.environ.get("MCTS_CLOUD_API_KEY")
         if not api_key:
-            return [
-                build_skip_finding(
-                    finding_id="cloud-inspect-skipped",
-                    analyzer=self.name,
-                    title="Cloud inspect skipped",
-                    description="MCTS_CLOUD_API_KEY is not set",
-                    recommendation="Export MCTS_CLOUD_API_KEY or disable --enable-cloud-inspect.",
-                )
-            ]
+            return []
         findings: list[Finding] = []
         headers = {
             "Content-Type": "application/json",
@@ -56,20 +47,17 @@ class CloudInspectAnalyzer(BaseAnalyzer):
                 continue
             for rule in _triggered_rules(data):
                 findings.append(
-                    build_analyzer_finding(
-                        finding_id=f"cloud-{rule['id']}-{surface.label}",
+                    Finding(
+                        id=f"cloud-{rule['id']}-{surface.label}",
                         analyzer=self.name,
                         title=f"Cloud inspect: {rule['name']} on {surface.label}",
                         description=rule.get("description", rule["name"]),
                         severity=_map_severity(rule.get("severity", "medium")),
-                        recommendation="Review cloud-flagged MCP content.",
-                        rule_id=f"RULE_CLOUD_{rule['id']}",
-                        match=rule["name"],
-                        field="mcp_surface",
                         tool=surface.name if surface.kind.value == "tool" else None,
+                        recommendation="Review cloud-flagged MCP content.",
                         technique_id="MCTS-T-1001",
                         confidence=0.75,
-                        extra_evidence={"surface": surface.kind.value, "rule": rule["name"]},
+                        evidence={"surface": surface.kind.value, "rule": rule["name"]},
                     )
                 )
         return findings
