@@ -51,6 +51,7 @@ class ScanRequest(BaseModel):
     semantic_secrets: bool = False
     runtime_events: list[dict[str, Any]] = Field(default_factory=list)
     fail_on_critical: bool = False
+    findings_trust_mode: Literal["off", "warn", "enforce"] = "off"
     min_score: int | None = Field(default=None, ge=0, le=100)
     scoring_mode: Literal["legacy", "v2", "both"] = "both"
     weights_profile: str = "manual_v1"
@@ -137,6 +138,7 @@ def _build_config(req: ScanRequest, *, request: Request | None = None) -> ScanCo
         semantic_secrets=req.semantic_secrets,
         runtime_events=req.runtime_events,
         fail_on_critical=req.fail_on_critical,
+        findings_trust_mode=req.findings_trust_mode,
         min_score=req.min_score,
         scoring_mode=req.scoring_mode,
         weights_profile=req.weights_profile,

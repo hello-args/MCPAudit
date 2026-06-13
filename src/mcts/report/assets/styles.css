@@ -2507,6 +2507,33 @@ body.modal-open {
   color: #86efac;
 }
 
+.evidence-maturity-chip {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--muted, #94a3b8);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.evidence-maturity-graph_path {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.evidence-maturity-capability_overlap {
+  background: rgba(168, 85, 247, 0.12);
+  color: #d8b4fe;
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
 /* OWASP */
 .owasp-grid {
   display: grid;

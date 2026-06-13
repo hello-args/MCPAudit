@@ -199,8 +199,7 @@ def enrich_graph_dependent_evidence(
                     evidence.setdefault("hop_count", path.get("hop_count", 0))
                     break
             if "path" not in evidence and evidence.get("read_tools"):
-                evidence.setdefault("hop_count", 1)
-                evidence.setdefault("path", evidence.get("read_tools"))
+                evidence["path_status"] = "unproven"
             finding = finding.model_copy(update={"evidence": evidence})
         elif finding.analyzer in {"prompt_injection", "schema_surface"}:
             evidence = dict(finding.evidence or {})

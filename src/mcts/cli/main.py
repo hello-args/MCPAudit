@@ -311,6 +311,18 @@ def scan(
         int | None,
         typer.Option("--max-critical", help="Exit 1 if critical finding count exceeds this"),
     ] = None,
+    findings_trust_mode: Annotated[
+        str,
+        typer.Option(
+            "--findings-trust-mode",
+            help=(
+                "Findings trust layer: off (default), warn (populate display fields only), "
+                "or enforce (honest gates, score basis, and CLI on display severity). "
+                "warn does not relax CI — use enforce or --ci-trust."
+            ),
+            case_sensitive=False,
+        ),
+    ] = "off",
     fail_on_category: Annotated[
         list[str] | None,
         typer.Option(
@@ -556,6 +568,16 @@ def scan(
             help="Apply CI gate preset (fail-on-critical, min-score 70) and print score breakdown on failure",
         ),
     ] = False,
+    ci_trust: Annotated[
+        bool,
+        typer.Option(
+            "--ci-trust",
+            help=(
+                "CI preset with findings-trust-mode enforce "
+                "(fail-on-critical, min-score 70, display-aligned severity)"
+            ),
+        ),
+    ] = False,
     policy: Annotated[
         Path | None,
         typer.Option("--policy", help="Governance policy YAML (default: .mcts/policy.yaml)"),
@@ -738,7 +760,12 @@ def scan(
             if allowed and not analyzer_list:
                 analyzer_list.extend(allowed)
 
-    if ci:
+    if ci_trust:
+        findings_trust_mode = "enforce"
+        fail_on_critical = True
+        if min_score is None:
+            min_score = 70
+    elif ci:
         fail_on_critical = True
         if min_score is None:
             min_score = 70
@@ -796,6 +823,7 @@ def scan(
         fail_on_critical=fail_on_critical,
         min_score=min_score,
         max_critical=max_critical,
+        findings_trust_mode=findings_trust_mode.lower(),
         fail_on_category=category_gates,
         theme=resolved_theme.name.value,
         no_progress=no_progress,
@@ -983,11 +1011,14 @@ def scan(
     _check_strict_discovery(report, config_obj)
     _check_gates(report, config_obj)
     if gov is not None:
+        from mcts.reporting.display import summary_for_gates
+
+        gate_summary = summary_for_gates(report, config_obj)
         violations = evaluate_policy(
             policy=gov,
             score=report.score.overall,
-            critical=report.summary.critical,
-            high=report.summary.high,
+            critical=gate_summary.critical,
+            high=gate_summary.high,
             servers=[str(display_target)],
             absolute_risk=report.score_v2.absolute_risk if report.score_v2 else None,
             security_score=report.score_v2.security_score if report.score_v2 else None,

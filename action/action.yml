@@ -54,6 +54,18 @@ inputs:
       tree-sitter SAST.
     required: false
     default: "mcp,sast"
+  findings-trust-mode:
+    description: >
+      Findings trust layer — off (default), warn, or enforce.
+      enforce caps overlap-chain display severity and aligns gates with display counts.
+      Prefer enforce for CI; warn does not relax fail-on-critical.
+    required: false
+    default: "off"
+  ci-trust:
+    description: >
+      Shorthand for findings-trust-mode enforce with fail-on-critical (same as mcts --ci-trust).
+    required: false
+    default: "false"
 
 runs:
   using: composite
@@ -128,6 +140,11 @@ runs:
         fi
         if [ -n "${{ inputs.assets-path }}" ]; then
           ARGS+=(--assets-path "${{ inputs.assets-path }}")
+        fi
+        if [ "${{ inputs.ci-trust }}" = "true" ]; then
+          ARGS+=(--ci-trust)
+        elif [ -n "${{ inputs.findings-trust-mode }}" ] && [ "${{ inputs.findings-trust-mode }}" != "off" ]; then
+          ARGS+=(--findings-trust-mode "${{ inputs.findings-trust-mode }}")
         fi
 
         uv run mcts "${ARGS[@]}"

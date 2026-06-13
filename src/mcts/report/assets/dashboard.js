@@ -75,6 +75,29 @@
     low: "Lower priority — minor risk",
   };
 
+  function findingSeverity(f) {
+    return f.display_severity || f.severity;
+  }
+
+  const EVIDENCE_MATURITY_LABELS = {
+    graph_path: "Proven path",
+    capability_overlap: "Overlap",
+  };
+
+  function evidenceMaturityChip(f) {
+    if (!f.evidence_type) return "";
+    const label = EVIDENCE_MATURITY_LABELS[f.evidence_type] || f.evidence_type.replace(/_/g, " ");
+    return `<span class="evidence-maturity-chip evidence-maturity-${escapeHtml(f.evidence_type)}" title="Evidence maturity">${escapeHtml(label)}</span>`;
+  }
+
+  function trustEnforced() {
+    return (DATA.meta && DATA.meta.findings_trust_mode === "enforce") || false;
+  }
+
+  function activeSummary() {
+    return DATA.display_summary || DATA.summary || {};
+  }
+
   function scorePtsHtml(value) {
     return `<span class="score-pts-value">${value}</span><span class="score-pts-suffix"> / 100 pts</span>`;
   }
@@ -157,7 +180,7 @@
     const eyebrow = document.getElementById("hero-eyebrow");
     if (!statsEl) return;
 
-    const s = DATA.summary || {};
+    const s = activeSummary();
     const cs = DATA.checks_summary || {};
     const tools = DATA.meta?.tools_discovered || 0;
     const v2 = DATA.score_v2;
@@ -445,9 +468,11 @@
     const detailEl = document.getElementById("score-detail");
     const basis = DATA.score?.basis;
     if (detailEl && basis) {
+      const counts = trustEnforced() ? basis : DATA.display_summary ? activeSummary() : basis;
+      const countLabel = trustEnforced() ? "severity" : DATA.display_summary ? "display severity" : "severity";
       detailEl.textContent =
-        `Calculated from ${basis.scorable_total} finding(s) by severity — ` +
-        `${basis.critical} critical, ${basis.high} high, ${basis.medium} medium, ${basis.low} low. ` +
+        `Calculated from ${basis.scorable_total} finding(s) by ${countLabel} — ` +
+        `${counts.critical ?? 0} critical, ${counts.high ?? 0} high, ${counts.medium ?? 0} medium, ${counts.low ?? 0} low. ` +
         `This is a security rating, not a pass rate.`;
     }
   }
@@ -465,7 +490,7 @@
   function fillMetricsHeadline() {
     const el = document.getElementById("metrics-headline");
     if (!el) return;
-    const s = DATA.summary || {};
+    const s = activeSummary();
     const score = DATA.score?.overall ?? 0;
     const tools = DATA.meta?.tools_discovered || 0;
     const cs = DATA.checks_summary || {};
@@ -511,7 +536,7 @@
   }
 
   function fillIssuesSummary() {
-    const s = DATA.summary || {};
+    const s = activeSummary();
     const totalEl = document.getElementById("issues-total");
     const totalFoot = document.getElementById("issues-table-total");
     const tbody = document.getElementById("issues-table-body");
@@ -827,7 +852,7 @@
     const quick = document.getElementById("quick-jump");
     if (!lead || !steps || !quick) return;
 
-    const s = DATA.summary || {};
+    const s = activeSummary();
     const cs = DATA.checks_summary || {};
     const score = DATA.score?.overall ?? 0;
     const total = s.total || 0;
@@ -891,7 +916,7 @@
   }
 
   function fillNavBadges() {
-    const s = DATA.summary || {};
+    const s = activeSummary();
     const cs = DATA.checks_summary || {};
     const findingsBadge = document.getElementById("nav-badge-findings");
     const analyzersBadge = document.getElementById("nav-badge-analyzers");
@@ -918,7 +943,7 @@
 
     const severityRank = { critical: 0, high: 1, medium: 2, low: 3 };
     const topFindings = [...(DATA.findings || [])]
-      .sort((a, b) => (severityRank[a.severity] ?? 9) - (severityRank[b.severity] ?? 9))
+      .sort((a, b) => (severityRank[findingSeverity(a)] ?? 9) - (severityRank[findingSeverity(b)] ?? 9))
       .slice(0, 6);
     const passed = (DATA.analyzers || []).filter((a) => a.status === "passed").slice(0, 6);
 
@@ -933,7 +958,7 @@
           .map(
             (f) => `
         <li class="card-interactive" data-card-action="filter-search" data-card-value="${escapeHtml(f.title)}" tabindex="0" role="button" aria-label="View finding: ${escapeHtml(f.title)}">
-          <span class="sev-badge ${f.severity}">${f.severity}</span>
+          <span class="sev-badge ${findingSeverity(f)}">${findingSeverity(f)}</span>${evidenceMaturityChip(f)}
           <span class="overview-list-text">${escapeHtml(f.title)} <span class="row-cta">→</span></span>
         </li>`
           )
@@ -1466,14 +1491,14 @@
       );
     }
     if (filter !== "all") {
-      rows = rows.filter((f) => f.severity === filter);
+      rows = rows.filter((f) => findingSeverity(f) === filter);
     }
 
     tbody.innerHTML = rows
       .map(
         (f) => `
       <tr class="finding-row${f.has_evidence ? " finding-row--expandable" : ""}" data-finding-id="${escapeHtml(f.id)}"${f.has_evidence ? ' tabindex="0" role="button" aria-expanded="false"' : ""}>
-        <td><span class="sev-badge ${f.severity}">${f.severity}</span></td>
+        <td><span class="sev-badge ${findingSeverity(f)}">${findingSeverity(f)}</span>${evidenceMaturityChip(f)}</td>
         <td><strong>${escapeHtml(f.title)}</strong><br><span style="color:var(--muted);font-size:12px">${escapeHtml(f.description)}</span>${
           f.has_evidence
             ? `<div class="finding-expand-hint">${escapeHtml(f.evidence_summary || "View evidence")} <span class="row-cta">Details ↓</span></div>`
@@ -1558,7 +1583,7 @@
     }
     DATA.findings.sort((a, b) => {
       let cmp = 0;
-      if (key === "severity") cmp = (order[a.severity] ?? 9) - (order[b.severity] ?? 9);
+      if (key === "severity") cmp = (order[findingSeverity(a)] ?? 9) - (order[findingSeverity(b)] ?? 9);
       else cmp = String(a[key] || "").localeCompare(String(b[key] || ""));
       return sortAsc ? cmp : -cmp;
     });

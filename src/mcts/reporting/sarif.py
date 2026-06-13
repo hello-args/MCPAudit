@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from mcts.reporting.display import effective_impact, effective_severity
 from mcts.reporting.models import Finding, ScanReport, Severity
 from mcts.taxonomy.mapper import load_taxonomy
 
@@ -137,7 +138,7 @@ def _build_rules(findings: list[Finding]) -> dict[str, dict[str, Any]]:
             "properties": {
                 "analyzer": finding.analyzer,
                 "technique_id": finding.technique_id,
-                "security-severity": SARIF_SECURITY_SEVERITY[finding.severity],
+                "security-severity": SARIF_SECURITY_SEVERITY[effective_impact(finding)],
             },
         }
     return rules
@@ -146,16 +147,19 @@ def _build_rules(findings: list[Finding]) -> dict[str, dict[str, Any]]:
 def _finding_to_result(finding: Finding, rules: dict[str, dict[str, Any]], target: str) -> dict[str, Any]:
     result: dict[str, Any] = {
         "ruleId": finding.id,
-        "level": SARIF_SEVERITY[finding.severity],
+        "level": SARIF_SEVERITY[effective_severity(finding)],
         "message": {"text": finding.description},
         "locations": [_result_location(finding, target)],
         "properties": {
             "severity": finding.severity.value,
+            "display_severity": effective_severity(finding).value,
             "analyzer": finding.analyzer,
             "recommendation": finding.recommendation,
             "confidence": finding.confidence,
         },
     }
+    if finding.evidence_type:
+        result["properties"]["evidence_type"] = finding.evidence_type
     taxa = _result_taxa(finding)
     if taxa:
         result["taxa"] = taxa
@@ -175,7 +179,7 @@ def _finding_to_result(finding: Finding, rules: dict[str, dict[str, Any]], targe
             "shortDescription": {"text": finding.title},
             "fullDescription": {"text": finding.description},
             "properties": {
-                "security-severity": SARIF_SECURITY_SEVERITY[finding.severity],
+                "security-severity": SARIF_SECURITY_SEVERITY[effective_impact(finding)],
             },
         }
     return result

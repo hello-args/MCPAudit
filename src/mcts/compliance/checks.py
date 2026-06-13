@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from mcts.reporting.display import effective_severity
 from mcts.reporting.models import Finding, Severity
 
 OWASP_LLM_ANALYZER_MAP: dict[str, str] = {
@@ -103,7 +104,7 @@ class ComplianceChecker:
                 )
             )
 
-        critical_count = sum(1 for f in scorable if f.severity == Severity.CRITICAL)
+        critical_count = sum(1 for f in scorable if effective_severity(f) == Severity.CRITICAL)
         if critical_count >= 3:
             compliance_findings.append(
                 Finding(

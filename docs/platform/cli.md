@@ -84,6 +84,8 @@ When `-o` is set, format determines serialization. SARIF uses `reporting/sarif.p
 
 | Flag | Default | Description |
 |------|---------|-------------|
+| `--findings-trust-mode` | `off` | Findings trust layer: `off`, `warn`, or `enforce`. **Enforce** caps overlap chain display severity and aligns gates, score basis, history, and CLI with display severity. **`warn` does not relax CI** — use `enforce` or `--ci-trust`. See [Findings trust Phase 0](../reporting/findings-trust-phase0.md). |
+| `--ci-trust` | off | CI preset: `findings-trust-mode enforce`, `--fail-on-critical`, `--min-score 70`. |
 | `--fail-on-critical` | false | Exit **1** if any critical finding |
 | `--min-score` | — | Exit **1** if legacy `score.overall` < N (0–100) |
 | `--max-critical` | — | Exit **1** if critical count > N |

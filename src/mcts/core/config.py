@@ -131,6 +131,17 @@ class ScanConfig(BaseModel):
     max_absolute_risk: int | None = Field(default=None, ge=0)
     max_risk_level: str | None = None
     min_category_score_v2: dict[str, int] = Field(default_factory=dict)
+    findings_trust_mode: str = "off"
+    fail_on_priority_min: int | None = Field(default=None, ge=0, le=100)
+    min_evidence_strength: str | None = None
+
+    @field_validator("findings_trust_mode")
+    @classmethod
+    def _validate_findings_trust_mode(cls, value: str) -> str:
+        normalized = value.lower()
+        if normalized not in {"off", "warn", "enforce"}:
+            raise ValueError("findings_trust_mode must be off, warn, or enforce")
+        return normalized
 
     @field_validator("scoring_mode")
     @classmethod

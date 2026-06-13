@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import replace
+from typing import Any
 
 from mcts.reporting.models import Finding
 from mcts.scoring.context import scorable_findings_v2
@@ -97,7 +98,7 @@ def build_top_contributors(
         key=lambda p: p.get("hop_count", 0),
         reverse=True,
     )
-    if paths and len(rows) < limit:
+    if paths and len(rows) < limit and _paths_are_proven(paths):
         path = paths[0]
         rows.append(
             TopContributor(
@@ -110,6 +111,18 @@ def build_top_contributors(
             )
         )
     return rows[:limit]
+
+
+def _paths_are_proven(paths: list[dict[str, Any]]) -> bool:
+    """Suppress overlap-only paths (hop_count < 2) from top contributors."""
+    for path in paths:
+        hop_count = path.get("hop_count")
+        if isinstance(hop_count, int) and hop_count >= 2:
+            return True
+        nodes = path.get("nodes") or path.get("tools_on_path") or []
+        if isinstance(nodes, list) and len(nodes) >= 3:
+            return True
+    return False
 
 
 class RiskScoringEngineV2:
