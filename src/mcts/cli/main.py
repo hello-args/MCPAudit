@@ -210,19 +210,36 @@ def _level_exceeds(actual: str, maximum: str) -> bool:
 
 
 def _check_gates(report, config: ScanConfig) -> None:
-    from mcts.governance.scan_gates import evaluate_scan_gate_violations
+    from mcts.governance.gate_violations import collect_gate_violations
 
-    if config.min_score is not None and report.score.overall < config.min_score:
-        _print_min_score_gate_failure(report, config.min_score)
+    _exit_on_gate_violations(collect_gate_violations(report, config), report, config)
 
-    violations = evaluate_scan_gate_violations(report, config)
+
+def _exit_on_gate_violations(violations: list[str], report, config: ScanConfig) -> None:
     if not violations:
         return
 
-    category_failures = [item for item in violations if "risk score" in item]
-    other_failures = [
-        item for item in violations if item not in category_failures and not item.startswith("legacy overall")
+    min_score_failures = [item for item in violations if item.startswith("legacy overall score")]
+    if min_score_failures and config.min_score is not None:
+        _print_min_score_gate_failure(report, config.min_score)
+        violations = [item for item in violations if not item.startswith("legacy overall score")]
+
+    policy_failures = [
+        item for item in violations if "allowlist" in item or item.startswith("blocked server")
     ]
+    category_failures = [
+        item
+        for item in violations
+        if item not in policy_failures and ("risk score" in item or "v2 category score" in item)
+    ]
+    other_failures = [
+        item for item in violations if item not in category_failures and item not in policy_failures
+    ]
+
+    if policy_failures:
+        console.print("[red]Governance policy violations:[/red]")
+        for failure in policy_failures:
+            console.print(f"  • {failure}")
     if category_failures:
         console.print("[red]Category risk thresholds exceeded:[/red]")
         for failure in category_failures:
@@ -232,6 +249,54 @@ def _check_gates(report, config: ScanConfig) -> None:
         for failure in other_failures:
             console.print(f"[red]{failure}[/red]")
     raise typer.Exit(code=1)
+
+
+def _check_finding_policy_gates(
+    findings: list,
+    config: ScanConfig,
+    *,
+    target: str | None = None,
+    scan_scope: str = "repository",
+) -> None:
+    """YAML/CLI policy gates for auxiliary finding lists (no severity heuristic)."""
+    from mcts.governance.gate_violations import build_gate_scan_report, collect_findings_gate_violations
+
+    violations = collect_findings_gate_violations(
+        findings,
+        config,
+        target=target,
+        scan_scope=scan_scope,
+    )
+    if violations:
+        gate_report = build_gate_scan_report(
+            findings,
+            config,
+            target=target,
+            scan_scope=scan_scope,
+        )
+        _exit_on_gate_violations(violations, gate_report, config)
+
+
+def _check_auxiliary_finding_gates(
+    findings: list,
+    config: ScanConfig,
+    *,
+    target: str | None = None,
+    scan_scope: str = "repository",
+) -> None:
+    """Policy gates plus legacy critical/high heuristic for security-oriented CLIs."""
+    from mcts.reporting.trust_apply import finding_severity_label
+
+    _check_finding_policy_gates(
+        findings,
+        config,
+        target=target,
+        scan_scope=scan_scope,
+    )
+    if findings and any(
+        finding_severity_label(finding, config) in ("critical", "high") for finding in findings
+    ):
+        raise typer.Exit(code=1)
 
 
 @app.callback()
@@ -310,6 +375,61 @@ def scan(
     max_critical: Annotated[
         int | None,
         typer.Option("--max-critical", help="Exit 1 if critical finding count exceeds this"),
+    ] = None,
+    max_high: Annotated[
+        int | None,
+        typer.Option(
+            "--max-high",
+            help="Exit 1 if high finding count exceeds this (enforce: display counts)",
+        ),
+    ] = None,
+    findings_trust_mode: Annotated[
+        str | None,
+        typer.Option(
+            "--findings-trust-mode",
+            help=(
+                "Findings trust layer: off (default), warn (populate display fields only), "
+                "or enforce (honest gates, score basis, and CLI on display severity). "
+                "warn does not relax CI — use enforce or --ci-trust."
+            ),
+            case_sensitive=False,
+        ),
+    ] = None,
+    fail_on_priority_min: Annotated[
+        int | None,
+        typer.Option(
+            "--fail-on-priority-min",
+            help=(
+                "Exit 1 when any security finding has priority_score at or above this (0-100). "
+                "Use with --min-evidence-strength for Option B CI (e.g. 80 + strong)."
+            ),
+        ),
+    ] = None,
+    min_evidence_strength: Annotated[
+        str | None,
+        typer.Option(
+            "--min-evidence-strength",
+            help="With --fail-on-priority-min, only count findings at or above this strength "
+            "(weak, moderate, strong, verified)",
+            case_sensitive=False,
+        ),
+    ] = None,
+    enforce_bronze_facts: Annotated[
+        bool | None,
+        typer.Option(
+            "--enforce-bronze-facts",
+            help="Fail when experimental analyzers emit security findings without evidence.facts",
+        ),
+    ] = None,
+    collapse_template_severity: Annotated[
+        bool | None,
+        typer.Option(
+            "--collapse-template-severity",
+            help=(
+                "Phase B3 opt-in: under enforce, copy display_severity into finding.severity "
+                "(breaking for legacy JSON consumers)"
+            ),
+        ),
     ] = None,
     fail_on_category: Annotated[
         list[str] | None,
@@ -556,10 +676,27 @@ def scan(
             help="Apply CI gate preset (fail-on-critical, min-score 70) and print score breakdown on failure",
         ),
     ] = False,
+    ci_trust: Annotated[
+        bool,
+        typer.Option(
+            "--ci-trust",
+            help=(
+                "CI preset with findings-trust-mode enforce "
+                "(fail-on-critical, min-score 70, display-aligned severity)"
+            ),
+        ),
+    ] = False,
     policy: Annotated[
         Path | None,
         typer.Option("--policy", help="Governance policy YAML (default: .mcts/policy.yaml)"),
     ] = None,
+    ignore_policy: Annotated[
+        bool,
+        typer.Option(
+            "--ignore-policy",
+            help="Skip merging .mcts/policy.yaml into this scan (use CLI flags only)",
+        ),
+    ] = False,
     discover_instructions: Annotated[
         bool,
         typer.Option(
@@ -660,7 +797,7 @@ def scan(
 
     from mcts.cli.auto import AutoScanError, resolve_auto_scan
     from mcts.cli.machine_wide import run_machine_wide_cli
-    from mcts.governance import evaluate_policy, load_policy
+    from mcts.governance import load_policy, merge_scan_config_with_policy
     from mcts.probe.consent import LiveProbeConsentError, live_consent_granted
     from mcts.probe.session import MCPProbeError
     from mcts.probe.startup_errors import MCPStartupError
@@ -738,10 +875,20 @@ def scan(
             if allowed and not analyzer_list:
                 analyzer_list.extend(allowed)
 
-    if ci:
+    if ci_trust:
+        findings_trust_mode = "enforce"
+        findings_trust_explicit = True
         fail_on_critical = True
         if min_score is None:
             min_score = 70
+    elif ci:
+        fail_on_critical = True
+        if min_score is None:
+            min_score = 70
+
+    if not ci_trust:
+        findings_trust_explicit = findings_trust_mode is not None
+        findings_trust_mode = (findings_trust_mode or "off").lower()
 
     try:
         resolved_theme = get_theme(theme)
@@ -796,6 +943,14 @@ def scan(
         fail_on_critical=fail_on_critical,
         min_score=min_score,
         max_critical=max_critical,
+        max_high=max_high,
+        findings_trust_mode=findings_trust_mode,
+        findings_trust_mode_explicit=findings_trust_explicit,
+        ignore_policy=ignore_policy,
+        fail_on_priority_min=fail_on_priority_min,
+        min_evidence_strength=min_evidence_strength.lower() if min_evidence_strength else None,
+        enforce_bronze_facts=enforce_bronze_facts,
+        collapse_template_severity=collapse_template_severity,
         fail_on_category=category_gates,
         theme=resolved_theme.name.value,
         no_progress=no_progress,
@@ -866,6 +1021,8 @@ def scan(
     except (FileNotFoundError, ValueError) as exc:
         console.print(f"[red]Error:[/red] {exc}")
         raise typer.Exit(code=2) from exc
+
+    config_obj = merge_scan_config_with_policy(config_obj, gov)
 
     if machine_wide:
         try:
@@ -982,23 +1139,6 @@ def scan(
     _check_strict_live(report, config_obj)
     _check_strict_discovery(report, config_obj)
     _check_gates(report, config_obj)
-    if gov is not None:
-        violations = evaluate_policy(
-            policy=gov,
-            score=report.score.overall,
-            critical=report.summary.critical,
-            high=report.summary.high,
-            servers=[str(display_target)],
-            absolute_risk=report.score_v2.absolute_risk if report.score_v2 else None,
-            security_score=report.score_v2.security_score if report.score_v2 else None,
-            risk_level=report.score_v2.risk_level if report.score_v2 else None,
-            findings=report.findings,
-        )
-        if violations:
-            console.print("[red]Governance policy violations:[/red]")
-            for item in violations:
-                console.print(f"  • {item}")
-            raise typer.Exit(code=1)
 
 
 @app.command()
@@ -1031,18 +1171,37 @@ def inventory(
         str,
         typer.Option("--theme", help="Terminal theme: cyber, minimal, github"),
     ] = ThemeName.CYBER.value,
+    findings_trust_mode: Annotated[
+        str | None,
+        typer.Option(
+            "--findings-trust-mode",
+            help="Apply findings trust validator to inventory findings (off, warn, enforce)",
+            case_sensitive=False,
+        ),
+    ] = None,
+    ignore_policy: Annotated[
+        bool,
+        typer.Option(
+            "--ignore-policy",
+            help="Skip merging .mcts/policy.yaml into inventory scans",
+        ),
+    ] = False,
 ) -> None:
     """Discover MCP servers configured across 12+ agent clients."""
     from mcts.analyzers.cross_server import CrossServerAnalyzer
     from mcts.analyzers.skill_md import analyze_skills
     from mcts.analyzers.toxic_flows import analyze_inventory as analyze_toxic_flows
     from mcts.core.config import ScanConfig
+    from mcts.governance import load_policy, merge_scan_config_with_policy
     from mcts.inventory.runner import enrich_with_tool_names, run_inventory
     from mcts.inventory.scan_all import (
+        collect_scan_all_gate_violations,
         default_output_path,
         run_inventory_scan_all,
+        scan_all_has_high_severity,
         write_inventory_scan_all,
     )
+    from mcts.reporting.trust_apply import apply_config_trust_layer
     from mcts.taxonomy.mapper import enrich_findings
 
     try:
@@ -1051,8 +1210,18 @@ def inventory(
         console.print(f"[red]Error:[/red] {exc}")
         raise typer.Exit(code=2) from exc
 
+    inv_config = merge_scan_config_with_policy(
+        ScanConfig(
+            target=Path("."),
+            findings_trust_mode=(findings_trust_mode or "off").lower(),
+            findings_trust_mode_explicit=findings_trust_mode is not None,
+            ignore_policy=ignore_policy,
+        ),
+        load_policy(None),
+    )
+
     if scan_all:
-        inventory_report, scan_rows = run_inventory_scan_all(ScanConfig(target=Path(".")))
+        inventory_report, scan_rows = run_inventory_scan_all(inv_config)
         console.print(
             f"[bold]Inventory scan-all[/bold] — {len(scan_rows)} server(s), "
             f"{inventory_report.config_files_found} config file(s)"
@@ -1066,7 +1235,13 @@ def inventory(
         output_path = default_output_path(output)
         write_inventory_scan_all(output_path, inventory_report, scan_rows)
         ReportRenderer(resolved_theme, console=console).render_saved_notice(str(output_path))
-        if any((row.get("findings") or 0) > 0 for row in scan_rows):
+        violations = collect_scan_all_gate_violations(inv_config, scan_rows)
+        if violations:
+            console.print("[red]Inventory scan-all gate failures:[/red]")
+            for item in violations:
+                console.print(f"  • {item}")
+            raise typer.Exit(code=1)
+        if scan_all_has_high_severity(inv_config, scan_rows):
             raise typer.Exit(code=1)
         return
 
@@ -1078,6 +1253,10 @@ def inventory(
     toxic_findings: list = []
     if full_toxic_flows or len(entries) >= 2:
         toxic_findings = enrich_findings(analyze_toxic_flows(entries))
+
+    shadow_findings = apply_config_trust_layer(shadow_findings, inv_config, scan_scope="inventory")
+    skill_findings = apply_config_trust_layer(skill_findings, inv_config, scan_scope="inventory")
+    toxic_findings = apply_config_trust_layer(toxic_findings, inv_config, scan_scope="inventory")
 
     console.print(f"[bold]MCP inventory[/bold] — {report.config_files_found} config file(s)")
     for client in report.clients_scanned:
@@ -1123,8 +1302,12 @@ def inventory(
     ReportRenderer(resolved_theme, console=console).render_saved_notice(str(output_path))
 
     combined = shadow_findings + skill_findings + toxic_findings
-    if combined and any(f.severity.value in ("critical", "high") for f in combined):
-        raise typer.Exit(code=1)
+    _check_auxiliary_finding_gates(
+        combined,
+        inv_config,
+        target=str(inv_config.target),
+        scan_scope="inventory",
+    )
 
 
 @app.command()
@@ -1141,11 +1324,28 @@ def vet(
         bool,
         typer.Option("--json", help="Emit machine-readable JSON to stdout"),
     ] = False,
+    findings_trust_mode: Annotated[
+        str | None,
+        typer.Option(
+            "--findings-trust-mode",
+            help="Apply findings trust validator to vet findings (off, warn, enforce)",
+            case_sensitive=False,
+        ),
+    ] = None,
+    ignore_policy: Annotated[
+        bool,
+        typer.Option(
+            "--ignore-policy",
+            help="Skip merging .mcts/policy.yaml into vet policy defaults",
+        ),
+    ] = False,
 ) -> None:
     """Pre-install vetting for PyPI, npm, and OCI package references."""
     import json
 
-    from mcts.reporting.models import Severity
+    from mcts.core.config import ScanConfig
+    from mcts.reporting.trust_apply import merge_scan_config_defaults
+    from mcts.reporting.vet_trust import apply_trust_to_vet_report, vet_finding_to_finding, vet_severity_label
     from mcts.vet import run_vet
 
     try:
@@ -1157,15 +1357,25 @@ def vet(
         console.print(f"[red]Error:[/red] {exc}")
         raise typer.Exit(code=2) from exc
 
+    config = merge_scan_config_defaults(
+        ScanConfig(target=Path("."), ignore_policy=ignore_policy),
+        findings_trust_mode=findings_trust_mode,
+    )
+    report = apply_trust_to_vet_report(report, config)
+    use_display = config.findings_trust_mode != "off"
+
     payload = report.model_dump(mode="json")
     if json_output:
         console.print(json.dumps(payload, indent=2))
     else:
         console.print(f"[bold]mcts vet[/bold] {package}")
-        console.print(f"Verdict: [bold]{report.verdict}[/bold]  Risk: {report.risk_score}/100")
+        console.print(
+            f"Verdict: [bold]{report.verdict}[/bold]  "
+            f"Risk: {report.compute_risk_score(use_display=use_display)}/100"
+        )
         if report.findings:
             for finding in report.findings:
-                console.print(f"  [{finding.severity.value}] {finding.title}")
+                console.print(f"  [{vet_severity_label(finding, config)}] {finding.title}")
         else:
             console.print("  No issues flagged by heuristics.")
 
@@ -1174,8 +1384,13 @@ def vet(
     if not json_output:
         console.print(f"[green]Saved[/green] {output_path}")
 
-    if any(f.severity in {Severity.CRITICAL, Severity.HIGH} for f in report.findings):
-        raise typer.Exit(code=1)
+    gate_findings = [vet_finding_to_finding(finding) for finding in report.findings]
+    _check_auxiliary_finding_gates(
+        gate_findings,
+        config,
+        target=package,
+        scan_scope="vet",
+    )
 
 
 @app.command()
@@ -1337,6 +1552,21 @@ def fuzz(
         str,
         typer.Option("--theme", help="Terminal theme: cyber, minimal, github"),
     ] = ThemeName.CYBER.value,
+    findings_trust_mode: Annotated[
+        str | None,
+        typer.Option(
+            "--findings-trust-mode",
+            help="Apply findings trust validator to fuzz findings (off, warn, enforce)",
+            case_sensitive=False,
+        ),
+    ] = None,
+    ignore_policy: Annotated[
+        bool,
+        typer.Option(
+            "--ignore-policy",
+            help="Skip merging .mcts/policy.yaml into fuzz scan config",
+        ),
+    ] = False,
 ) -> None:
     """Run safe read-only MCP protocol fuzz probes against a stdio or remote server."""
     import json
@@ -1344,8 +1574,10 @@ def fuzz(
     from mcts.analyzers.runtime_events import events_from_fuzz_findings
     from mcts.fuzz.payloads import FuzzLevel
     from mcts.fuzz.runner import FuzzRunner
+    from mcts.governance import load_policy, merge_scan_config_with_policy
     from mcts.probe.consent import live_consent_granted
     from mcts.probe.startup_errors import MCPStartupError
+    from mcts.reporting.trust_apply import apply_config_trust_layer, finding_severity_label
     from mcts.taxonomy.mapper import enrich_findings
 
     is_remote = bool(url)
@@ -1385,21 +1617,27 @@ def fuzz(
         console.print(f"[red]Error:[/red] {exc}")
         raise typer.Exit(code=2) from exc
 
-    fuzz_config = ScanConfig(
-        target=scan_target,
-        live_command=command,
-        live_args=live_args,
-        config_path=config,
-        config_server=server,
-        live_consent=understand_live_risk,
-        fuzz_level=level,
-        fuzz_consent=understand_fuzz_risk,
-        theme=resolved_theme.name.value,
-        remote_url=url,
-        remote_transport=transport,
-        bearer_token=bearer_token,
-        remote_headers=remote_headers,
-        no_progress=no_progress,
+    fuzz_config = merge_scan_config_with_policy(
+        ScanConfig(
+            target=scan_target,
+            live_command=command,
+            live_args=live_args,
+            config_path=config,
+            config_server=server,
+            live_consent=understand_live_risk,
+            fuzz_level=level,
+            fuzz_consent=understand_fuzz_risk,
+            theme=resolved_theme.name.value,
+            remote_url=url,
+            remote_transport=transport,
+            bearer_token=bearer_token,
+            remote_headers=remote_headers,
+            no_progress=no_progress,
+            findings_trust_mode=(findings_trust_mode or "off").lower(),
+            findings_trust_mode_explicit=findings_trust_mode is not None,
+            ignore_policy=ignore_policy,
+        ),
+        load_policy(None),
     )
     _validate_live_launch(fuzz_config)
 
@@ -1429,6 +1667,11 @@ def fuzz(
         raise typer.Exit(code=2) from exc
 
     findings = enrich_findings(result.findings)
+    findings = apply_config_trust_layer(
+        findings,
+        fuzz_config,
+        scan_scope="live" if (url or command) else "repository",
+    )
     runtime_event_rows = events_from_fuzz_findings(findings)
     target_label = url or str(scan_target)
     console.print(f"[bold]MCTS fuzz[/bold] — level={result.level.value}, probes={result.probes_run}")
@@ -1436,7 +1679,7 @@ def fuzz(
         console.print("[green]No fuzz findings — server handled probes cleanly.[/green]")
     else:
         for finding in findings:
-            console.print(f"  [{finding.severity.value}] {finding.title}")
+            console.print(f"  [{finding_severity_label(finding, fuzz_config)}] {finding.title}")
 
     payload = {
         "target": target_label,
@@ -1449,8 +1692,12 @@ def fuzz(
     output_path.write_text(json.dumps(payload, indent=2))
     ReportRenderer(resolved_theme, console=console).render_saved_notice(str(output_path))
 
-    if any(f.severity.value in ("critical", "high") for f in findings):
-        raise typer.Exit(code=1)
+    _check_auxiliary_finding_gates(
+        findings,
+        fuzz_config,
+        target=target_label,
+        scan_scope="live" if (url or command) else "repository",
+    )
 
 
 def _parse_headers(header: list[str] | None) -> dict[str, str]:
@@ -1479,17 +1726,37 @@ def readiness(
         bool,
         typer.Option("--llm-judge", help="Enable opt-in LLM readiness review"),
     ] = False,
+    findings_trust_mode: Annotated[
+        str | None,
+        typer.Option(
+            "--findings-trust-mode",
+            help="Apply findings trust validator to readiness notes (off, warn, enforce)",
+            case_sensitive=False,
+        ),
+    ] = None,
+    ignore_policy: Annotated[
+        bool,
+        typer.Option(
+            "--ignore-policy",
+            help="Skip merging .mcts/policy.yaml into readiness checks",
+        ),
+    ] = False,
 ) -> None:
     """Run production readiness checks (separate from security score)."""
     import json
 
     from mcts.readiness.runner import run_readiness
+    from mcts.reporting.trust_apply import finding_severity_label, merge_scan_config_defaults
 
-    config = ScanConfig(
-        target=target,
-        readiness_opa=enable_opa,
-        readiness_llm=enable_llm,
-        no_progress=no_progress,
+    config = merge_scan_config_defaults(
+        ScanConfig(
+            target=target,
+            readiness_opa=enable_opa,
+            readiness_llm=enable_llm,
+            no_progress=no_progress,
+            ignore_policy=ignore_policy,
+        ),
+        findings_trust_mode=findings_trust_mode,
     )
     report = run_readiness(config)
     console.print(
@@ -1497,7 +1764,7 @@ def readiness(
         f"{report.tools_checked} tool(s), {len(report.findings)} note(s)"
     )
     for finding in report.findings[:20]:
-        console.print(f"  [{finding.severity.value}] {finding.title}")
+        console.print(f"  [{finding_severity_label(finding, config)}] {finding.title}")
     output_path = resolve_output_path(output, "readiness-report.json")
     output_path.write_text(
         json.dumps(
@@ -1515,6 +1782,13 @@ def readiness(
 
     if report.tools_checked == 0:
         raise typer.Exit(code=1)
+
+    _check_finding_policy_gates(
+        report.findings,
+        config,
+        target=str(target),
+        scan_scope="readiness",
+    )
 
 
 @app.command(name="serve")
@@ -1918,6 +2192,21 @@ def pentest(
         bool,
         typer.Option("--no-progress", help="Skip progress animation"),
     ] = False,
+    findings_trust_mode: Annotated[
+        str | None,
+        typer.Option(
+            "--findings-trust-mode",
+            help="Apply findings trust validator (off, warn, enforce)",
+            case_sensitive=False,
+        ),
+    ] = None,
+    ignore_policy: Annotated[
+        bool,
+        typer.Option(
+            "--ignore-policy",
+            help="Skip merging .mcts/policy.yaml into pentest scan config",
+        ),
+    ] = False,
 ) -> None:
     """Run structured MCP red-team phases (static recon, attack chains, optional fuzz)."""
     import json
@@ -1926,6 +2215,7 @@ def pentest(
     from mcts.probe.consent import live_consent_granted
     from mcts.probe.session import MCPProbeError
     from mcts.probe.startup_errors import MCPStartupError
+    from mcts.reporting.trust_apply import merge_scan_config_defaults
     from mcts.ui.progress import run_with_progress
 
     if live and not live_consent_granted(flag=understand_live_risk):
@@ -1935,11 +2225,15 @@ def pentest(
         )
         raise typer.Exit(code=2)
 
-    config = ScanConfig(
-        target=target,
-        live=live,
-        live_consent=understand_live_risk,
-        no_progress=no_progress,
+    config = merge_scan_config_defaults(
+        ScanConfig(
+            target=target,
+            live=live,
+            live_consent=understand_live_risk,
+            no_progress=no_progress,
+            ignore_policy=ignore_policy,
+        ),
+        findings_trust_mode=findings_trust_mode,
     )
 
     def _execute() -> object:
@@ -1976,6 +2270,18 @@ def pentest(
             for item in report.recommendations[:5]:
                 console.print(f"  • {item}")
         console.print(f"\n[green]Saved[/green] {output_path}")
+
+    if report.static_report:
+        from mcts.reporting.models import Finding, ScanReport
+
+        static_scan = ScanReport.model_validate(report.static_report)
+        fuzz_rows = [Finding.model_validate(row) for row in report.fuzz_findings]
+        _check_auxiliary_finding_gates(
+            static_scan.findings + fuzz_rows,
+            config,
+            target=str(target),
+            scan_scope=static_scan.scan_scope,
+        )
 
     if report.verdict in {"critical", "high"}:
         raise typer.Exit(code=1)

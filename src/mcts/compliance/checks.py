@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from mcts.reporting.display import effective_severity
 from mcts.reporting.models import Finding, Severity
 
 OWASP_LLM_ANALYZER_MAP: dict[str, str] = {
@@ -63,7 +64,13 @@ OWASP_ANALYZER_MAP = OWASP_LLM_ANALYZER_MAP
 class ComplianceChecker:
     """Maps findings to OWASP LLM + MCP Top 10 coverage gaps (meta-findings only)."""
 
-    def check(self, findings: list[Finding], *, tools_discovered: int = 0) -> list[Finding]:
+    def check(
+        self,
+        findings: list[Finding],
+        *,
+        tools_discovered: int = 0,
+        findings_trust_mode: str = "off",
+    ) -> list[Finding]:
         compliance_findings: list[Finding] = []
         scorable = [f for f in findings if f.analyzer != "compliance"]
 
@@ -85,6 +92,7 @@ class ComplianceChecker:
                     description="Scan completed without security findings — verify discovery scope.",
                     severity=Severity.LOW,
                     recommendation="Confirm the target contains MCP tool definitions.",
+                    finding_kind="coverage",
                 )
             )
 
@@ -100,10 +108,13 @@ class ComplianceChecker:
                         "Expand scan scope or enable additional analyzers for full MCP Top 10 coverage."
                     ),
                     evidence={"missing_mcp_categories": sorted(missing_mcp), "covered": sorted(covered_mcp)},
+                    finding_kind="coverage",
                 )
             )
 
-        critical_count = sum(1 for f in scorable if f.severity == Severity.CRITICAL)
+        critical_count = sum(
+            1 for f in scorable if _compliance_critical_severity(f, findings_trust_mode) == Severity.CRITICAL
+        )
         if critical_count >= 3:
             compliance_findings.append(
                 Finding(
@@ -120,7 +131,15 @@ class ComplianceChecker:
                         "owasp_llm_gaps": sorted(missing_llm),
                         "owasp_mcp_gaps": sorted(missing_mcp),
                     },
+                    finding_kind="coverage",
                 )
             )
 
         return compliance_findings
+
+
+def _compliance_critical_severity(finding: Finding, findings_trust_mode: str) -> Severity:
+    """Align with CI gates: display counts only under enforce; template in warn/off."""
+    if findings_trust_mode == "enforce":
+        return effective_severity(finding)
+    return finding.severity
