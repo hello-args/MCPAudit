@@ -132,6 +132,26 @@ mcts scan ./repo/ \
 
 Category semantics: [Scoring Specification](../reporting/scoring-spec.md). Category gates apply to **legacy** v1 tiles only.
 
+### Gate semantics
+
+MCTS evaluates these CI gates independently. Passing one gate does not imply another gate will pass.
+
+| Gate type | Flag | Fails when | Score type |
+|-----------|------|------------|------------|
+| Critical count | `--fail-on-critical` | Any CRITICAL finding exists | Finding count |
+| Min overall | `--min-score N` / `--ci` | Legacy `score.overall` is below `N` | Exponential 0-100 overall score |
+| Max critical | `--max-critical N` | Critical finding count is greater than `N` | Finding count |
+| Category budget | `--fail-on-category category:N` | Legacy category risk score is greater than or equal to `N` | Category risk points |
+
+Category gates and the overall score use different formulas. For example, an API service can pass
+`--fail-on-category injection:15` because its injection category risk is below 15, then still fail
+`--ci` because the preset also applies `--fail-on-critical` and `--min-score 70` to the overall
+legacy score.
+
+Category limits are inclusive. A zero limit means "fail at zero or above", so `permissions:0` fails
+even when the permissions category score is 0. For D8-style "fail on any permissions risk" policies,
+use `--fail-on-category permissions:1`.
+
 ### Scoring v2 gates
 
 Scans include `score_v2` by default (`scoring: both`). **Gates** on v2 fields are opt-in:

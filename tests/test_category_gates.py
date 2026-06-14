@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
+from typer.testing import CliRunner
+
+from mcts.cli.main import app
 from mcts.report.data import category_gate_failures, parse_category_gates
 from mcts.reporting.models import Finding, Severity
+
+runner = CliRunner()
 
 
 def test_parse_category_gates_accepts_comma_and_repeatable() -> None:
@@ -71,3 +76,14 @@ def test_category_gate_failure_message_never_says_passed_alone() -> None:
     message = failures[0]
     assert "inclusive gate" in message
     assert ">=" in message
+
+
+def test_scan_help_says_ci_category_gates_are_separate() -> None:
+    result = runner.invoke(app, ["scan", "--help"])
+
+    assert result.exit_code == 0, result.stdout
+    help_text = " ".join(result.stdout.split())
+    assert "--ci" in help_text
+    ci_help = help_text.split("--ci", 1)[1].split("--policy", 1)[0]
+    assert "category gates are" in ci_help
+    assert "separate" in ci_help

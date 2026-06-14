@@ -553,7 +553,10 @@ def scan(
         bool,
         typer.Option(
             "--ci",
-            help="Apply CI gate preset (fail-on-critical, min-score 70) and print score breakdown on failure",
+            help=(
+                "Apply CI gate preset (fail-on-critical, min-score 70; "
+                "category gates are separate) and print score breakdown on failure"
+            ),
         ),
     ] = False,
     policy: Annotated[
