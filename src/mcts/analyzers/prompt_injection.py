@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import re
 
 from mcts.analyzers.base import BaseAnalyzer
@@ -12,7 +13,7 @@ from mcts.analyzers.surface_context import (
     surface_text_fields,
     tool_for_surface,
 )
-from mcts.analyzers.surfaces import ScanSurface
+from mcts.analyzers.surfaces import ScanSurface, ScanSurfaceKind
 from mcts.analyzers.tpa_patterns import (
     find_homoglyphs,
     has_ansi_smuggling,
@@ -47,9 +48,12 @@ class PromptInjectionAnalyzer(BaseAnalyzer):
 
         intentional_context = is_intentional_context_surface(surface)
         for field, text in surface_text_fields(surface):
-            findings.extend(self._unicode_findings(surface, text, field, loc, tool_name))
+            field_findings = self._unicode_findings(surface, text, field, loc, tool_name)
             if field == "description" and not intentional_context:
-                findings.extend(self._description_only_findings(surface, text, loc, tool, tool_name))
+                field_findings.extend(self._description_only_findings(surface, text, loc, tool, tool_name))
+            if surface.kind in {ScanSurfaceKind.PROMPT, ScanSurfaceKind.INSTRUCTION}:
+                field_findings = _with_content_hash(field_findings, text)
+            findings.extend(field_findings)
 
         return findings
 
@@ -215,3 +219,19 @@ class PromptInjectionAnalyzer(BaseAnalyzer):
             w in snippet for w in ("subprocess", "os.system", "eval", "delete", "shell=true")
         )
         return claims_safe and handler_dangerous
+
+
+def _with_content_hash(findings: list[Finding], text: str) -> list[Finding]:
+    if not findings:
+        return []
+    content_hash = hashlib.sha256(_normalize_text(text).encode("utf-8")).hexdigest()
+    rows: list[Finding] = []
+    for finding in findings:
+        evidence = dict(finding.evidence)
+        evidence["content_hash"] = content_hash
+        rows.append(finding.model_copy(update={"evidence": evidence}))
+    return rows
+
+
+def _normalize_text(text: str) -> str:
+    return text.replace("\r\n", "\n").replace("\r", "\n").strip()
