@@ -23,6 +23,7 @@ from mcts.analyzers.npm_audit import NpmAuditAnalyzer
 from mcts.analyzers.oauth_config import OAuthConfigAnalyzer
 from mcts.analyzers.path_validation import PathValidationAnalyzer
 from mcts.analyzers.permissions import PermissionAnalyzer
+from mcts.analyzers.prompt_dedupe import dedupe_prompt_findings
 from mcts.analyzers.prompt_defense import PromptDefenseAnalyzer
 from mcts.analyzers.prompt_injection import PromptInjectionAnalyzer
 from mcts.analyzers.runtime_events import RuntimeEventsAnalyzer
@@ -205,6 +206,7 @@ class Scanner:
 
         findings = self._apply_filters(findings)
         findings = dedupe_metadata_findings(findings)
+        findings = dedupe_prompt_findings(findings)
         findings = dedupe_sigma_findings(findings)
         findings = enrich_findings(findings)
         findings.extend(self.compliance.check(findings, tools_discovered=len(server_info.tools)))
