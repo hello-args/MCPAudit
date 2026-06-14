@@ -1535,6 +1535,7 @@ def serve_api(
         import uvicorn
     except ImportError as exc:
         console.print("[red]REST API requires optional api extra: uv sync --extra api[/red]")
+        console.print("[dim]Run `mcts doctor .` to check optional extras before serving.[/dim]")
         raise typer.Exit(code=2) from exc
     from mcts.api.app import app as api_app
     from mcts.api.startup import validate_serve_options

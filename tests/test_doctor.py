@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import builtins
 import json
 from importlib.machinery import ModuleSpec
 from pathlib import Path
@@ -84,7 +85,7 @@ def test_doctor_deep_missing_optional_tools_show_warnings(monkeypatch, tmp_path:
 
     assert result.exit_code == 0
     assert "Extra [mcp]: missing" in result.stdout
-    assert "[api] extra: module 'fastapi' not found" in result.stdout
+    assert "[api] extra: modules 'fastapi', 'uvicorn' not found" in result.stdout
     assert "semgrep CLI: not found on PATH" in result.stdout
     assert "pip-audit CLI: not found on PATH" in result.stdout
     assert "opa CLI: not found on PATH" in result.stdout
@@ -100,7 +101,7 @@ def test_doctor_deep_present_optional_tools_show_pass_lines(monkeypatch, tmp_pat
 
     assert result.exit_code == 0
     assert "Extra [mcp]: installed" in result.stdout
-    assert "[api] extra: module 'fastapi' importable" in result.stdout
+    assert "[api] extra: modules 'fastapi', 'uvicorn' importable" in result.stdout
     assert "semgrep CLI: found at C:\\tools\\semgrep.exe" in result.stdout
     assert "pip-audit CLI: found at C:\\tools\\pip-audit.exe" in result.stdout
     assert "opa CLI: found at C:\\tools\\opa.exe" in result.stdout
@@ -121,6 +122,37 @@ def test_doctor_deep_missing_optional_extras_do_not_fail_core_only_install(
     assert result.exit_code == 0
     assert "Extra [mcp]: missing" in result.stdout
     assert "[api] extra: module 'fastapi' not found" in result.stdout
+
+
+def test_doctor_default_reports_api_extra_status(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(
+        doctor_module.importlib_util,
+        "find_spec",
+        lambda module: None if module in {"fastapi", "uvicorn"} else SimpleNamespace(),
+    )
+
+    result = runner.invoke(app, ["doctor", str(tmp_path)])
+
+    assert result.exit_code == 0
+    assert "[api] extra: modules 'fastapi', 'uvicorn' not found" in result.stdout
+    assert "mcts serve" in result.stdout
+
+
+def test_serve_missing_api_extra_references_doctor(monkeypatch) -> None:
+    real_import = builtins.__import__
+
+    def fail_uvicorn(name, *args, **kwargs):
+        if name == "uvicorn":
+            raise ImportError("blocked for test")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", fail_uvicorn)
+
+    result = runner.invoke(app, ["serve"])
+
+    assert result.exit_code == 2
+    assert "REST API requires optional api extra" in result.stdout
+    assert "mcts doctor ." in result.stdout
 
 
 def test_doctor_deep_exits_zero(tmp_path: Path) -> None:
