@@ -22,7 +22,6 @@ from mcts.discovery.onboarding import find_entrypoint_candidates, find_mcp_confi
 
 console = Console()
 
-_OPTIONAL_EXTRA_CHECKS = (("[api] extra", "fastapi", "mcp-mcts[api]"),)
 _OPTIONAL_CLI_CHECKS = (
     ("semgrep CLI", "semgrep"),
     ("pip-audit CLI", "pip-audit"),
@@ -62,6 +61,8 @@ def run_doctor(
         available_detail="installed — live scan / mcts-mcp available",
         missing_detail='missing — install with `pip install "mcp-mcts[mcp]"` or `uv sync --extra mcp`',
     ):
+        warnings += 1
+    if _append_api_extra_check(checks):
         warnings += 1
 
     if root.is_dir():
@@ -204,13 +205,6 @@ def _deep_import_check(config_path: Path, server_name: str, checks: list[tuple[s
 
 def _check_optional_toolchain(checks: list[tuple[str, str, str]]) -> int:
     warnings = 0
-    for label, module, extra in _OPTIONAL_EXTRA_CHECKS:
-        if importlib_util.find_spec(module):
-            checks.append(("pass", label, f"module {module!r} importable"))
-        else:
-            checks.append(("warn", label, f"module {module!r} not found; install {extra} to enable"))
-            warnings += 1
-
     for label, executable in _OPTIONAL_CLI_CHECKS:
         found = shutil.which(executable)
         if found:
@@ -247,4 +241,30 @@ def _append_optional_extra_check(
         return True
 
     checks.append(("pass", extra_label, available_detail))
+    return False
+
+
+def _append_api_extra_check(checks: list[tuple[str, str, str]]) -> bool:
+    modules = ("fastapi", "uvicorn")
+    missing = [module for module in modules if importlib_util.find_spec(module) is None]
+    if missing:
+        quoted = ", ".join(f"{module!r}" for module in missing)
+        noun = "module" if len(missing) == 1 else "modules"
+        checks.append(
+            (
+                "warn",
+                "[api] extra",
+                f"{noun} {quoted} not found; install `mcp-mcts[api]` "
+                "or run `uv sync --extra api` to enable mcts serve",
+            )
+        )
+        return True
+
+    checks.append(
+        (
+            "pass",
+            "[api] extra",
+            "modules 'fastapi', 'uvicorn' importable — mcts serve available",
+        )
+    )
     return False

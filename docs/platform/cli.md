@@ -27,6 +27,7 @@ Complete reference for every MCTS command and flag. Use this when you need to lo
 ## `mcts doctor`
 
 Read-only preflight checks before your first scan (no live probes).
+Reports optional extras for live MCP features (`[mcp]`) and the REST API (`[api]`).
 
 ```bash
 mcts doctor .
